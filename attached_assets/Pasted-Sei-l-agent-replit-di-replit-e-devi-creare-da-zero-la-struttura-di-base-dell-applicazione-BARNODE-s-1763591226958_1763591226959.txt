@@ -1,0 +1,337 @@
+Sei l’agent replit di replit e devi creare da zero la struttura di base dell’applicazione BARNODE, senza ancora configurare Supabase. Non farmi domande: analizza, progetta e implementa in autonomia, poi alla fine genera solo un report in chat.
+
+🎯 OBIETTIVO GENERALE
+Impostare un progetto completo, pulito e pronto per lo sviluppo UI di Barnode:
+
+Web app mobile-first, uso interno per cocktail bar
+
+Stack: React + TypeScript (via setup standard replit)
+
+Navigazione a 3 sezioni: Home — Database — Ordini
+
+Nessuna integrazione reale con Supabase per ora (solo placeholder minimi)
+
+Governance: ESLint, pre-commit, regole anti-monolite, comando di backup “esegui backup”
+
+1. ANALISI INIZIALE REPO
+
+Analizza lo stato del repository corrente:
+
+Se è vuoto o contiene solo boilerplate, usalo come base per Barnode.
+
+Se esiste già una struttura chiaramente legata a Barnode, riusala ed estendila.
+
+Se trovi codice di altri progetti non correlati, non modificare nulla: limita l’azione a creare una cartella dedicata barnode/ e lavora solo lì.
+
+Nel report finale indica chiaramente:
+
+Contesto iniziale (repo vuoto / boilerplate / progetto misto)
+
+Scelta che hai fatto (root o sottocartella barnode/).
+
+2. SETUP DI PROGETTO (BASE TECNICA)
+
+Imposta un progetto moderno React+TS:
+
+Crea (o adatta) i file principali:
+
+package.json con:
+
+nome: barnode
+
+script standard: dev, build, preview, lint, test (se necessario), typecheck
+
+Config TS (tsconfig.json) con strict mode attivo.
+
+Config di bundler (Vite o equivalente standard replit, se non c’è già).
+
+Configura il punto d’ingresso:
+
+src/main.tsx
+
+src/App.tsx
+
+Installa/usa librerie essenziali:
+
+react, react-dom
+
+routing: react-router-dom
+
+linting: eslint + plugin per React/TS
+
+opzionale: prettier se supportato dal flusso standard.
+
+Non avviare server di sviluppo: ti basta assicurarti che npm run lint e npm run build siano corretti a livello di configurazione.
+
+3. STRUTTURA FEATURE-FIRST
+
+Organizza il codice in struttura feature-first, pensata per mobile-only:
+
+Crea le seguenti cartelle principali:
+
+src/features/home/
+
+src/features/database/
+
+src/features/ordini/
+
+src/shared/components/
+
+src/shared/hooks/
+
+src/shared/layout/
+
+src/shared/styles/
+
+src/shared/utils/
+
+3.1 Router e Layout
+
+Crea un router centralizzato:
+
+File: src/router/AppRouter.tsx
+
+Routes:
+
+/ → Home (Articoli Mancanti)
+
+/database → Database (Articoli / Tipologie / Fornitori)
+
+/ordini → Ordini (Crea / Gestisci)
+
+Crea un layout principale mobile:
+
+File: src/shared/layout/MainLayout.tsx
+
+Logica:
+
+Wrapper responsivo mobile-first (max-width tipo smartphone).
+
+Content area scrollabile.
+
+Navbar inferiore fissa visibile su tutte le pagine.
+
+Navbar inferiore:
+
+File: src/shared/components/BottomNav.tsx
+
+Tre voci:
+
+Home
+
+Database
+
+Ordini
+
+Navigazione via react-router-dom.
+
+Stato attivo evidenziato (per ora stile minimale).
+
+App.tsx deve usare AppRouter e MainLayout in modo chiaro e pulito.
+
+3.2 Schermate principali (placeholder funzionali)
+
+Crea componenti di pagina, con contenuto minimo ma semanticamente corretto:
+
+src/features/home/HomeScreen.tsx
+
+Header con titolo: “Articoli mancanti”
+
+Placeholder per:
+
+Barra di ricerca (input testo)
+
+Lista articoli filtrati
+
+Lista “articoli mancanti” (per ora mockata o vuota)
+
+src/features/database/DatabaseScreen.tsx
+
+Header: “Database”
+
+Layout a tre box (anche solo div placeholder):
+
+Tipologie (aggiungi/modifica/elimina)
+
+Fornitori (aggiungi/modifica/elimina)
+
+Articoli (aggiungi/modifica/elimina)
+
+Lista articoli totale (per ora simulata con mock o testo statico)
+
+src/features/ordini/OrdiniScreen.tsx
+
+Header: “Ordini”
+
+Due pulsanti principali:
+
+“Crea Ordine”
+
+“Gestisci Ordini”
+
+Sottocomponenti placeholder:
+
+CreateOrderPanel (per futuro flusso Crea Ordine)
+
+ManageOrdersPanel (per futura lista ordini attivi/archiviati)
+
+Non implementare ancora logiche reali di business: limita tutto a componenti React con UI neutra, testo esplicativo e TODO chiari.
+
+4. STYLING MOBILE-FIRST E PALETTE
+
+Crea src/shared/styles/global.css (o equivalente) e assicurati che venga importato in main.tsx.
+
+Imposta base mobile-first:
+
+html, body full height, background neutro.
+
+font sans-serif leggibile.
+
+disabilita scroll orizzontale.
+
+container principale centrato e fluido.
+
+Applica palette indicata (anche solo come CSS custom properties, senza esagerare coi dettagli):
+
+bianco crema (background principale)
+
+verde chiaro (accenti, highlight articoli mancanti / azioni positive)
+
+verde scuro (navbar, elementi chiave)
+
+nero per testualità principale
+
+Navbar inferiore e header delle pagine devono rispettare la palette e rendere chiaro visivamente in che sezione ci si trova (anche solo con colore e font-weight).
+
+5. PLACEHOLDER PER DATI (SENZA SUPABASE)
+
+È fondamentale NON configurare Supabase adesso.
+
+Non creare alcun client Supabase reale, né variabili .env con URL o chiavi.
+
+Puoi creare file placeholder per il futuro data layer, ma solo con TODO:
+
+src/shared/services/dataClient.ts o src/shared/services/apiClient.ts
+
+Dentro, inserisci solo:
+
+tipo di interfacce previste (es. Articolo, Fornitore, Tipologia…)
+
+funzioni stub vuote con TODO (es. fetchArticoli, fetchOrdini, ecc.) che per ora lanciano un errore o ritornano Promise.resolve([]).
+
+Nelle pagine usa eventualmente dati mock locali (array hardcodati) per simulare liste, ma separali in file dedicati (es. mockData.ts) in ogni feature.
+
+6. GOVERNANCE E QUALITÀ DEL CODICE
+6.1 ESLint e formattazione
+
+Configura ESLint:
+
+Regole per React + TypeScript.
+
+Regole base di qualità (no unused vars, no console.log in produzione, ecc.).
+
+Se supportato, aggiungi Prettier o equivalente come formattatore, ma mantieni config semplice.
+
+Conferma che:
+
+npm run lint funziona e non fallisce con la struttura minima.
+
+6.2 Regole Anti-Monolite (file-length)
+
+Crea uno script Node interno al progetto (es. scripts/check-file-length.mjs):
+
+Scansiona file .ts e .tsx in src/.
+
+Per ogni file:
+
+Avvisa (log warning) se supera 200 righe.
+
+Fallisce (exit code 1) se supera 300 righe.
+
+Aggiungi script in package.json:
+
+"check:filelength": "node scripts/check-file-length.mjs"
+
+Integra nel pre-commit:
+
+Usa Husky o il meccanismo standard di replit per i pre-commit.
+
+Pipeline minima:
+
+npm run lint
+
+npm run check:filelength
+
+6.3 Struttura chiara documentata
+
+Crea un file README.md minimale che descriva:
+
+Scopo dell’app Barnode (in 3-4 righe)
+
+Struttura cartelle principali
+
+Comandi principali (dev, build, lint)
+
+Nota che Supabase sarà aggiunto in una fase successiva.
+
+7. BACKUP AUTOMATICI — COMANDO “esegui backup”
+
+Prepara il meccanismo tecnico, senza dipendere da Supabase:
+
+Crea una cartella backup/ nella root (può contenere un .gitkeep o essere vuota).
+
+Crea uno script (scegli tu shell o Node, basta che funzioni in ambiente standard replit):
+
+Es.: scripts/backup_barnode.sh oppure scripts/backup_barnode.mjs
+
+Funzionalità:
+
+Crea un archivio compresso nella cartella backup/ con nome tipo:
+
+Backup_19 Nov_22.51.tar.gz (usa timestamp leggibile giorno/mese/ora_minuti, non serve millisecondo)
+
+Esclude:
+
+node_modules
+
+dist o build
+
+eventuali cartelle temporanee (es. tmp, .cache se presenti)
+
+Mantiene solo gli ultimi 3 backup:
+
+se ci sono più di 3 file in backup/, elimina quello più vecchio.
+
+Configura il comando personalizzato replit:
+
+Definisci un comando chiamato esattamente: esegui backup
+
+Questo comando deve eseguire lo script di backup.
+
+Se è richiesto un file di configurazione specifico (es. .replit, replit.config, tasks.json o simili), crealo/aggiorna nel modo più semplice possibile.
+
+Nel report finale elenca:
+
+percorso dello script
+
+formato del nome file
+
+logica di rotazione (come identifichi il più vecchio).
+
+8. VERIFICHE MINIME
+
+Esegui autonomamente le verifiche minime che puoi:
+
+Controllo build:
+
+Assicurati che il progetto sia in stato buildabile (npm run build o equivalente) con la struttura appena creata.
+
+Controllo lint:
+
+Assicurati che npm run lint passi (eventualmente accetta qualche warning non bloccante, ma niente errori).
+
+Dry-run backup:
+
+Esegui il comando esegui backup almeno una volta per verificarne il funzionamento (a livello di script e rotazione file, se possibile).
+
+Se qualcosa non è eseguibile nell’ambiente attuale (es. limitazioni di replit), segnalalo chiaramente nel report invece di forzare.
