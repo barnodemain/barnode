@@ -1,65 +1,76 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { Platform, StyleSheet } from "react-native";
-import HomeStackNavigator from "@/navigation/HomeStackNavigator";
-import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
 import { useTheme } from "@/hooks/useTheme";
+import MissingItemsScreen from "@/screens/MissingItemsScreen";
+import DatabaseScreen from "@/screens/DatabaseScreen";
+import OrdersScreen from "@/screens/OrdersScreen";
+import { getCommonScreenOptions } from "@/navigation/screenOptions";
+import { Spacing } from "@/constants/theme";
+import { HeaderTitle } from "@/components/HeaderTitle";
 
 export type MainTabParamList = {
-  HomeTab: undefined;
-  ProfileTab: undefined;
+  Home: undefined;
+  Database: undefined;
+  Orders: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <Tab.Navigator
-      initialRouteName="HomeTab"
+      initialRouteName="Home"
       screenOptions={{
+        ...getCommonScreenOptions({ theme }),
         tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: Platform.select({
-            ios: "transparent",
-            android: theme.backgroundRoot,
-          }),
+          backgroundColor: theme.tabBar,
           borderTopWidth: 0,
           elevation: 0,
+          height: Spacing.tabBarHeight,
+          paddingBottom: 8,
+          paddingTop: 8,
         },
-        tabBarBackground: () =>
-          Platform.OS === "ios" ? (
-            <BlurView
-              intensity={100}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            />
-          ) : null,
-        headerShown: false,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "400",
+        },
       }}
     >
       <Tab.Screen
-        name="HomeTab"
-        component={HomeStackNavigator}
+        name="Home"
+        component={MissingItemsScreen}
         options={{
           title: "Home",
+          headerTitle: () => <HeaderTitle title="Barnode" />,
           tabBarIcon: ({ color, size }) => (
             <Feather name="home" size={size} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="ProfileTab"
-        component={ProfileStackNavigator}
+        name="Database"
+        component={DatabaseScreen}
         options={{
-          title: "Profile",
+          title: "Database",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={size} color={color} />
+            <Feather name="database" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Orders"
+        component={OrdersScreen}
+        options={{
+          title: "Ordini",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="file-text" size={size} color={color} />
           ),
         }}
       />
