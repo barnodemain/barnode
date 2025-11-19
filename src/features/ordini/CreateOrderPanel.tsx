@@ -32,17 +32,12 @@ export function CreateOrderPanel({ theme, onBack }: CreateOrderPanelProps) {
         <View style={styles.features}>
           <FeatureItem
             icon="check-circle"
-            text="Selezione articoli sotto scorta"
+            text="Selezione articoli"
             theme={theme}
           />
           <FeatureItem
             icon="check-circle"
             text="Raggruppamento per fornitore"
-            theme={theme}
-          />
-          <FeatureItem
-            icon="check-circle"
-            text="Calcolo automatico totale"
             theme={theme}
           />
           <FeatureItem

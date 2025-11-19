@@ -59,13 +59,10 @@ export function ManageOrdersPanel({ theme, onBack }: ManageOrdersPanelProps) {
                   key={idx}
                   style={[styles.articoloText, { color: theme.textSecondary }]}
                 >
-                  • {getArticoloNome(art.articoloId)} x{art.quantita}
+                  • {getArticoloNome(art.articoloId)}
                 </ThemedText>
               ))}
             </View>
-            <ThemedText style={styles.totaleText}>
-              Totale: €{ordine.totale.toFixed(2)}
-            </ThemedText>
             {ordine.note ? (
               <ThemedText
                 style={[styles.noteText, { color: theme.textSecondary }]}
@@ -108,11 +105,6 @@ const styles = StyleSheet.create({
   },
   articoloText: {
     fontSize: 13,
-  },
-  totaleText: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginTop: Spacing.xs,
   },
   noteText: {
     fontSize: 13,

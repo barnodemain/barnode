@@ -3,10 +3,6 @@ export interface Articolo {
   nome: string;
   tipologiaId: string;
   fornitoreId: string;
-  quantita: number;
-  quantitaMinima: number;
-  prezzoUnitario: number;
-  note?: string;
 }
 
 export interface Tipologia {
@@ -31,12 +27,9 @@ export interface Ordine {
   dataConsegna?: string;
   stato: "bozza" | "inviato" | "ricevuto" | "archiviato";
   articoli: OrdineArticolo[];
-  totale: number;
   note?: string;
 }
 
 export interface OrdineArticolo {
   articoloId: string;
-  quantita: number;
-  prezzoUnitario: number;
 }

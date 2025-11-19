@@ -106,18 +106,7 @@ export default function DatabaseScreen() {
                 key={item.id}
                 title={item.nome}
                 subtitle={`${getTipologiaName(item.tipologiaId)} • ${getFornitoreNome(item.fornitoreId)}`}
-                badge={`${item.quantita} pz`}
-                isMissing={item.quantita < item.quantitaMinima}
-              >
-                <View style={styles.details}>
-                  <ThemedText
-                    style={[styles.detailText, { color: theme.textSecondary }]}
-                  >
-                    Prezzo: €{item.prezzoUnitario.toFixed(2)} • Minima:{" "}
-                    {item.quantitaMinima}
-                  </ThemedText>
-                </View>
-              </ItemCard>
+              />
             ))}
           </View>
         </View>
@@ -160,12 +149,6 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: Spacing.sm,
-  },
-  details: {
-    marginTop: Spacing.xs,
-  },
-  detailText: {
-    fontSize: 13,
   },
 });
 

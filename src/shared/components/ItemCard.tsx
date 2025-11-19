@@ -1,6 +1,5 @@
 import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
-import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
@@ -9,7 +8,6 @@ interface ItemCardProps {
   title: string;
   subtitle?: string;
   badge?: string;
-  isMissing?: boolean;
   onPress?: () => void;
   children?: React.ReactNode;
 }
@@ -18,7 +16,6 @@ export function ItemCard({
   title,
   subtitle,
   badge,
-  isMissing = false,
   onPress,
   children,
 }: ItemCardProps) {
@@ -36,23 +33,10 @@ export function ItemCard({
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            {isMissing ? (
-              <Feather
-                name="alert-circle"
-                size={18}
-                color={theme.accent}
-                style={styles.alertIcon}
-              />
-            ) : null}
             <ThemedText style={styles.title}>{title}</ThemedText>
           </View>
           {badge ? (
-            <View
-              style={[
-                styles.badge,
-                { backgroundColor: isMissing ? theme.accent : theme.primary },
-              ]}
-            >
+            <View style={[styles.badge, { backgroundColor: theme.primary }]}>
               <ThemedText style={styles.badgeText}>{badge}</ThemedText>
             </View>
           ) : null}
@@ -91,9 +75,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-  },
-  alertIcon: {
-    marginRight: Spacing.xs,
   },
   title: {
     fontSize: 16,
