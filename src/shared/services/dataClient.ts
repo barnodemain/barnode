@@ -1,81 +1,43 @@
-import { Articolo, Tipologia, Fornitore, Ordine } from "../types";
+import { Articolo, Tipologia, Fornitore, Ordine } from '../types';
+import { mockArticoli, mockTipologie, mockFornitori, mockOrdini } from '../utils/mockData';
 
+/**
+ * dataClient mock di sola lettura.
+ *
+ * In questa fase tutte le funzioni leggono da mockData.ts in memoria.
+ * In uno step successivo, queste implementazioni potranno essere
+ * sostituite con chiamate reali a Supabase mantenendo le stesse firme.
+ */
 export const dataClient = {
   articoli: {
     async getAll(): Promise<Articolo[]> {
-      throw new Error("TODO: Implement Supabase integration");
+      return Promise.resolve(mockArticoli);
     },
     async getById(id: string): Promise<Articolo | null> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async create(articolo: Omit<Articolo, "id">): Promise<Articolo> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async update(
-      id: string,
-      articolo: Partial<Omit<Articolo, "id">>,
-    ): Promise<Articolo> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async delete(id: string): Promise<void> {
-      throw new Error("TODO: Implement Supabase integration");
+      const found = mockArticoli.find((a) => a.id === id) ?? null;
+      return Promise.resolve(found);
     },
   },
 
   tipologie: {
     async getAll(): Promise<Tipologia[]> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async create(tipologia: Omit<Tipologia, "id">): Promise<Tipologia> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async update(
-      id: string,
-      tipologia: Partial<Omit<Tipologia, "id">>,
-    ): Promise<Tipologia> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async delete(id: string): Promise<void> {
-      throw new Error("TODO: Implement Supabase integration");
+      return Promise.resolve(mockTipologie);
     },
   },
 
   fornitori: {
     async getAll(): Promise<Fornitore[]> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async create(fornitore: Omit<Fornitore, "id">): Promise<Fornitore> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async update(
-      id: string,
-      fornitore: Partial<Omit<Fornitore, "id">>,
-    ): Promise<Fornitore> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async delete(id: string): Promise<void> {
-      throw new Error("TODO: Implement Supabase integration");
+      return Promise.resolve(mockFornitori);
     },
   },
 
   ordini: {
     async getAll(): Promise<Ordine[]> {
-      throw new Error("TODO: Implement Supabase integration");
+      return Promise.resolve(mockOrdini);
     },
     async getById(id: string): Promise<Ordine | null> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async create(ordine: Omit<Ordine, "id">): Promise<Ordine> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async update(
-      id: string,
-      ordine: Partial<Omit<Ordine, "id">>,
-    ): Promise<Ordine> {
-      throw new Error("TODO: Implement Supabase integration");
-    },
-    async delete(id: string): Promise<void> {
-      throw new Error("TODO: Implement Supabase integration");
+      const found = mockOrdini.find((o) => o.id === id) ?? null;
+      return Promise.resolve(found);
     },
   },
 };

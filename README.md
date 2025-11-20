@@ -31,8 +31,19 @@ barnode/
 
 ## Comandi Principali
 
-- `npm run dev` - Avvia il server di sviluppo Expo
+L'ambiente di riferimento attuale è **Windsurf + GitHub + Render** (in passato il progetto è stato eseguito su Replit, ora considerato legacy).
+
+Per lavorare in locale:
+
+```bash
+npm install
+npm run dev      # oppure: npm run start
+```
+
+Script di utilità e governance disponibili:
+
 - `npm run lint` - Controlla il codice con ESLint
+- `npm run format` - Format automatico con Prettier
 - `npm run typecheck` - Verifica i tipi TypeScript
 - `npm run check:filelength` - Controlla la lunghezza dei file (warning >200, error >300 righe)
 - `npm run backup` - Crea backup completo del progetto (mantiene ultimi 3)

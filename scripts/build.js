@@ -1,8 +1,12 @@
-const fs = require("fs");
-const path = require("path");
-const { spawn } = require("child_process");
-const { Readable } = require("stream");
-const { pipeline } = require("stream/promises");
+// LEGACY NOTE: questo script di build è stato progettato per il deploy statico su Replit
+// e utilizza variabili d'ambiente REPLIT_*. Nel flusso attuale (Windsurf + GitHub + Render)
+// è considerato materiale legacy e non fa parte del percorso standard di esecuzione.
+
+const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
+const { Readable } = require('stream');
+const { pipeline } = require('stream/promises');
 
 let metroProcess = null;
 
@@ -17,75 +21,70 @@ function exitWithError(message) {
 function setupSignalHandlers() {
   const cleanup = () => {
     if (metroProcess) {
-      console.log("Cleaning up Metro process...");
+      console.log('Cleaning up Metro process...');
       metroProcess.kill();
     }
     process.exit(0);
   };
 
-  process.on("SIGINT", cleanup);
-  process.on("SIGTERM", cleanup);
-  process.on("SIGHUP", cleanup);
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+  process.on('SIGHUP', cleanup);
 }
 
 function getDeploymentUrl() {
   if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
     const url = `https://${process.env.REPLIT_INTERNAL_APP_DOMAIN}`;
-    console.log("Using REPLIT_INTERNAL_APP_DOMAIN:", url);
+    console.log('Using REPLIT_INTERNAL_APP_DOMAIN:', url);
     return url;
   }
 
   if (process.env.REPLIT_DEV_DOMAIN) {
     const url = `https://${process.env.REPLIT_DEV_DOMAIN}`;
-    console.log("Using REPLIT_DEV_DOMAIN:", url);
+    console.log('Using REPLIT_DEV_DOMAIN:', url);
     return url;
   }
 
-  console.error(
-    "ERROR: REPLIT_INTERNAL_APP_DOMAIN and REPLIT_DEV_DOMAIN not set",
-  );
+  console.error('ERROR: REPLIT_INTERNAL_APP_DOMAIN and REPLIT_DEV_DOMAIN not set');
   process.exit(1);
 }
 
 function prepareDirectories(timestamp) {
-  console.log("Preparing build directories...");
+  console.log('Preparing build directories...');
 
-  if (fs.existsSync("static-build")) {
-    fs.rmSync("static-build", { recursive: true });
+  if (fs.existsSync('static-build')) {
+    fs.rmSync('static-build', { recursive: true });
   }
 
   const dirs = [
-    path.join("static-build", timestamp, "_expo", "static", "js", "ios"),
-    path.join("static-build", timestamp, "_expo", "static", "js", "android"),
-    path.join("static-build", "ios"),
-    path.join("static-build", "android"),
+    path.join('static-build', timestamp, '_expo', 'static', 'js', 'ios'),
+    path.join('static-build', timestamp, '_expo', 'static', 'js', 'android'),
+    path.join('static-build', 'ios'),
+    path.join('static-build', 'android'),
   ];
 
   for (const dir of dirs) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  console.log("Build:", timestamp);
+  console.log('Build:', timestamp);
 }
 
 function clearMetroCache() {
-  console.log("Clearing Metro cache...");
+  console.log('Clearing Metro cache...');
 
-  const cacheDirs = [
-    ...fs.globSync(".metro-cache"),
-    ...fs.globSync("node_modules/.cache/metro"),
-  ];
+  const cacheDirs = [...fs.globSync('.metro-cache'), ...fs.globSync('node_modules/.cache/metro')];
 
   for (const dir of cacheDirs) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 
-  console.log("Cache cleared");
+  console.log('Cache cleared');
 }
 
 async function checkMetroHealth() {
   try {
-    const response = await fetch("http://localhost:8081/status");
+    const response = await fetch('http://localhost:8081/status');
     return response.ok;
   } catch {
     return false;
@@ -98,9 +97,9 @@ async function startMetro() {
     return;
   }
 
-  console.log("Starting Metro...");
-  metroProcess = spawn("npm", ["run", "dev"], {
-    stdio: ["ignore", "ignore", "ignore"],
+  console.log('Starting Metro...');
+  metroProcess = spawn('npm', ['run', 'dev'], {
+    stdio: ['ignore', 'ignore', 'ignore'],
     detached: false,
   });
 
@@ -108,12 +107,12 @@ async function startMetro() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const healthy = await checkMetroHealth();
     if (healthy) {
-      console.log("Metro ready");
+      console.log('Metro ready');
       return;
     }
   }
 
-  console.error("Metro timeout");
+  console.error('Metro timeout');
   process.exit(1);
 }
 
@@ -132,7 +131,7 @@ async function downloadFile(url, outputPath) {
 
     if (fileSize === 0) {
       fs.unlinkSync(outputPath);
-      throw new Error("Downloaded file is empty");
+      throw new Error('Downloaded file is empty');
     }
   } catch (error) {
     if (fs.existsSync(outputPath)) {
@@ -143,21 +142,21 @@ async function downloadFile(url, outputPath) {
 }
 
 async function downloadBundle(platform, timestamp) {
-  const url = new URL("http://localhost:8081/index.bundle");
-  url.searchParams.set("platform", platform);
-  url.searchParams.set("dev", "false");
-  url.searchParams.set("hot", "false");
-  url.searchParams.set("lazy", "false");
-  url.searchParams.set("minify", "true");
+  const url = new URL('http://localhost:8081/index.bundle');
+  url.searchParams.set('platform', platform);
+  url.searchParams.set('dev', 'false');
+  url.searchParams.set('hot', 'false');
+  url.searchParams.set('lazy', 'false');
+  url.searchParams.set('minify', 'true');
 
   const output = path.join(
-    "static-build",
+    'static-build',
     timestamp,
-    "_expo",
-    "static",
-    "js",
+    '_expo',
+    'static',
+    'js',
     platform,
-    "bundle.js",
+    'bundle.js'
   );
 
   try {
@@ -168,8 +167,8 @@ async function downloadBundle(platform, timestamp) {
 }
 
 async function downloadManifest(platform) {
-  const response = await fetch("http://localhost:8081/manifest", {
-    headers: { "expo-platform": platform },
+  const response = await fetch('http://localhost:8081/manifest', {
+    headers: { 'expo-platform': platform },
   });
 
   if (!response.ok) {
@@ -180,16 +179,16 @@ async function downloadManifest(platform) {
 }
 
 async function downloadBundlesAndManifests(timestamp) {
-  console.log("Downloading bundles and manifests...");
+  console.log('Downloading bundles and manifests...');
 
   try {
     const [, , iosManifest, androidManifest] = await Promise.all([
-      downloadBundle("ios", timestamp),
-      downloadBundle("android", timestamp),
-      downloadManifest("ios"),
-      downloadManifest("android"),
+      downloadBundle('ios', timestamp),
+      downloadBundle('android', timestamp),
+      downloadManifest('ios'),
+      downloadManifest('android'),
     ]);
-    console.log("Downloaded");
+    console.log('Downloaded');
     return { ios: iosManifest, android: androidManifest };
   } catch (error) {
     exitWithError(`Download failed: ${error.message}`);
@@ -199,28 +198,12 @@ async function downloadBundlesAndManifests(timestamp) {
 function extractAssets(timestamp) {
   const bundles = {
     ios: fs.readFileSync(
-      path.join(
-        "static-build",
-        timestamp,
-        "_expo",
-        "static",
-        "js",
-        "ios",
-        "bundle.js",
-      ),
-      "utf-8",
+      path.join('static-build', timestamp, '_expo', 'static', 'js', 'ios', 'bundle.js'),
+      'utf-8'
     ),
     android: fs.readFileSync(
-      path.join(
-        "static-build",
-        timestamp,
-        "_expo",
-        "static",
-        "js",
-        "android",
-        "bundle.js",
-      ),
-      "utf-8",
+      path.join('static-build', timestamp, '_expo', 'static', 'js', 'android', 'bundle.js'),
+      'utf-8'
     ),
   };
 
@@ -231,21 +214,21 @@ function extractAssets(timestamp) {
   const extractFromBundle = (bundle, platform) => {
     for (const match of bundle.matchAll(assetPattern)) {
       const originalPath = match[1];
-      const filename = match[3] + "." + match[4];
+      const filename = match[3] + '.' + match[4];
 
       const tempUrl = new URL(`http://localhost:8081${originalPath}`);
-      const unstablePath = tempUrl.searchParams.get("unstable_path");
+      const unstablePath = tempUrl.searchParams.get('unstable_path');
 
       if (!unstablePath) {
         throw new Error(`Asset missing unstable_path: ${originalPath}`);
       }
 
-      const decodedPath = decodeURIComponent(unstablePath).replace(/^\.\//, "");
+      const decodedPath = decodeURIComponent(unstablePath).replace(/^\.\//, '');
       const key = path.posix.join(decodedPath, filename);
 
       if (!assetsMap.has(key)) {
         const asset = {
-          url: path.posix.join("/", decodedPath, filename),
+          url: path.posix.join('/', decodedPath, filename),
           originalPath: originalPath,
           filename: filename,
           relativePath: decodedPath,
@@ -259,8 +242,8 @@ function extractAssets(timestamp) {
     }
   };
 
-  extractFromBundle(bundles.ios, "ios");
-  extractFromBundle(bundles.android, "android");
+  extractFromBundle(bundles.ios, 'ios');
+  extractFromBundle(bundles.android, 'android');
 
   return Array.from(assetsMap.values());
 }
@@ -270,7 +253,7 @@ async function downloadAssets(assets, timestamp) {
     return 0;
   }
 
-  console.log("Downloading assets...");
+  console.log('Downloading assets...');
   let successCount = 0;
   const failures = [];
 
@@ -278,26 +261,26 @@ async function downloadAssets(assets, timestamp) {
     const platform = Array.from(asset.platforms)[0];
 
     const tempUrl = new URL(`http://localhost:8081${asset.originalPath}`);
-    const unstablePath = tempUrl.searchParams.get("unstable_path");
+    const unstablePath = tempUrl.searchParams.get('unstable_path');
 
     if (!unstablePath) {
       throw new Error(`Asset missing unstable_path: ${asset.originalPath}`);
     }
 
-    const decodedPath = decodeURIComponent(unstablePath).replace(/^\./, "");
+    const decodedPath = decodeURIComponent(unstablePath).replace(/^\./, '');
     const metroUrl = new URL(
-      `http://localhost:8081${path.posix.join("/assets", decodedPath, asset.filename)}`,
+      `http://localhost:8081${path.posix.join('/assets', decodedPath, asset.filename)}`
     );
-    metroUrl.searchParams.set("platform", platform);
-    metroUrl.searchParams.set("hash", asset.hash);
+    metroUrl.searchParams.set('platform', platform);
+    metroUrl.searchParams.set('hash', asset.hash);
 
     const outputDir = path.join(
-      "static-build",
+      'static-build',
       timestamp,
-      "_expo",
-      "static",
-      "js",
-      asset.relativePath,
+      '_expo',
+      'static',
+      'js',
+      asset.relativePath
     );
     fs.mkdirSync(outputDir, { recursive: true });
     const output = path.join(outputDir, asset.filename);
@@ -319,9 +302,7 @@ async function downloadAssets(assets, timestamp) {
   if (failures.length > 0) {
     const errorMsg =
       `Failed to download ${failures.length} asset(s):\n` +
-      failures
-        .map((f) => `  - ${f.filename}: ${f.error} (${f.url})`)
-        .join("\n");
+      failures.map((f) => `  - ${f.filename}: ${f.error} (${f.url})`).join('\n');
     exitWithError(errorMsg);
   }
 
@@ -332,42 +313,34 @@ async function downloadAssets(assets, timestamp) {
 function updateBundleUrls(timestamp, baseUrl) {
   const updateForPlatform = (platform) => {
     const bundlePath = path.join(
-      "static-build",
+      'static-build',
       timestamp,
-      "_expo",
-      "static",
-      "js",
+      '_expo',
+      'static',
+      'js',
       platform,
-      "bundle.js",
+      'bundle.js'
     );
-    let bundle = fs.readFileSync(bundlePath, "utf-8");
+    let bundle = fs.readFileSync(bundlePath, 'utf-8');
 
-    bundle = bundle.replace(
-      /httpServerLocation:"(\/[^"]+)"/g,
-      (_match, capturedPath) => {
-        const tempUrl = new URL(`http://localhost:8081${capturedPath}`);
-        const unstablePath = tempUrl.searchParams.get("unstable_path");
+    bundle = bundle.replace(/httpServerLocation:"(\/[^"]+)"/g, (_match, capturedPath) => {
+      const tempUrl = new URL(`http://localhost:8081${capturedPath}`);
+      const unstablePath = tempUrl.searchParams.get('unstable_path');
 
-        if (!unstablePath) {
-          throw new Error(
-            `Asset missing unstable_path in bundle: ${capturedPath}`,
-          );
-        }
+      if (!unstablePath) {
+        throw new Error(`Asset missing unstable_path in bundle: ${capturedPath}`);
+      }
 
-        const decodedPath = decodeURIComponent(unstablePath).replace(
-          /^\.\//,
-          "",
-        );
-        return `httpServerLocation:"${baseUrl}/${timestamp}/_expo/static/js/${decodedPath}"`;
-      },
-    );
+      const decodedPath = decodeURIComponent(unstablePath).replace(/^\.\//, '');
+      return `httpServerLocation:"${baseUrl}/${timestamp}/_expo/static/js/${decodedPath}"`;
+    });
 
     fs.writeFileSync(bundlePath, bundle);
   };
 
-  updateForPlatform("ios");
-  updateForPlatform("android");
-  console.log("Updated bundle URLs");
+  updateForPlatform('ios');
+  updateForPlatform('android');
+  console.log('Updated bundle URLs');
 }
 
 function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
@@ -378,13 +351,9 @@ function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
 
     manifest.launchAsset.url = `${baseUrl}/${timestamp}/_expo/static/js/${platform}/bundle.js`;
     manifest.launchAsset.key = `bundle-${timestamp}`;
-    manifest.createdAt = new Date(
-      Number(timestamp.split("-")[0]),
-    ).toISOString();
-    manifest.extra.expoClient.hostUri =
-      baseUrl.replace("https://", "") + "/" + platform;
-    manifest.extra.expoGo.debuggerHost =
-      baseUrl.replace("https://", "") + "/" + platform;
+    manifest.createdAt = new Date(Number(timestamp.split('-')[0])).toISOString();
+    manifest.extra.expoClient.hostUri = baseUrl.replace('https://', '') + '/' + platform;
+    manifest.extra.expoGo.debuggerHost = baseUrl.replace('https://', '') + '/' + platform;
     manifest.extra.expoGo.packagerOpts.dev = false;
 
     if (manifest.assets && manifest.assets.length > 0) {
@@ -402,33 +371,30 @@ function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
     }
 
     fs.writeFileSync(
-      path.join("static-build", platform, "manifest.json"),
-      JSON.stringify(manifest, null, 2),
+      path.join('static-build', platform, 'manifest.json'),
+      JSON.stringify(manifest, null, 2)
     );
   };
 
-  updateForPlatform("ios", manifests.ios);
-  updateForPlatform("android", manifests.android);
-  console.log("Manifests updated");
+  updateForPlatform('ios', manifests.ios);
+  updateForPlatform('android', manifests.android);
+  console.log('Manifests updated');
 }
 
 function createLandingPage(baseUrl) {
-  const expsUrl = baseUrl.replace("https://", "");
-  const template = fs.readFileSync(
-    path.join("scripts", "landing-page-template.html"),
-    "utf-8",
-  );
+  const expsUrl = baseUrl.replace('https://', '');
+  const template = fs.readFileSync(path.join('scripts', 'landing-page-template.html'), 'utf-8');
 
   const html = template
     .replace(/BASE_URL_PLACEHOLDER/g, baseUrl)
     .replace(/EXPS_URL_PLACEHOLDER/g, expsUrl);
 
-  fs.writeFileSync(path.join("static-build", "index.html"), html);
-  console.log("Complete");
+  fs.writeFileSync(path.join('static-build', 'index.html'), html);
+  console.log('Complete');
 }
 
 async function main() {
-  console.log("Building static Expo Go deployment...");
+  console.log('Building static Expo Go deployment...');
 
   setupSignalHandlers();
 
@@ -441,9 +407,9 @@ async function main() {
   await startMetro();
   const manifests = await downloadBundlesAndManifests(timestamp);
 
-  console.log("Processing assets...");
+  console.log('Processing assets...');
   const assets = extractAssets(timestamp);
-  console.log("Found", assets.length, "unique asset(s)");
+  console.log('Found', assets.length, 'unique asset(s)');
 
   const assetsByHash = new Map();
   for (const asset of assets) {
@@ -459,11 +425,11 @@ async function main() {
     updateBundleUrls(timestamp, baseUrl);
   }
 
-  console.log("Updating manifests and creating landing page...");
+  console.log('Updating manifests and creating landing page...');
   updateManifests(manifests, timestamp, baseUrl, assetsByHash);
   createLandingPage(baseUrl);
 
-  console.log("Build complete! Deploy to:", baseUrl);
+  console.log('Build complete! Deploy to:', baseUrl);
 
   if (metroProcess) {
     metroProcess.kill();
@@ -472,7 +438,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Build failed:", error.message);
+  console.error('Build failed:', error.message);
   if (metroProcess) {
     metroProcess.kill();
   }

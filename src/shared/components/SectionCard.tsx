@@ -1,25 +1,19 @@
-import React from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { ThemedText } from "@/components/ThemedText";
-import { useTheme } from "@/hooks/useTheme";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import React from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Tag, Truck } from '@/shared/icons';
+import { ThemedText } from '@/components/ThemedText';
+import { useTheme } from '@/hooks/useTheme';
+import { Spacing, BorderRadius } from '@/constants/theme';
 
 interface SectionCardProps {
   title: string;
   count?: number;
-  icon: keyof typeof Feather.glyphMap;
+  icon: 'tag' | 'truck';
   onPress?: () => void;
   children?: React.ReactNode;
 }
 
-export function SectionCard({
-  title,
-  count,
-  icon,
-  onPress,
-  children,
-}: SectionCardProps) {
+export function SectionCard({ title, count, icon, onPress, children }: SectionCardProps) {
   const { theme } = useTheme();
 
   return (
@@ -29,7 +23,8 @@ export function SectionCard({
         style={({ pressed }) => [styles.header, pressed && { opacity: 0.7 }]}
       >
         <View style={styles.titleRow}>
-          <Feather name={icon} size={20} color={theme.primary} />
+          {icon === 'tag' && <Tag size={22} strokeWidth={2} color={theme.primary} />}
+          {icon === 'truck' && <Truck size={22} strokeWidth={2} color={theme.primary} />}
           <ThemedText style={styles.title}>{title}</ThemedText>
         </View>
         {count !== undefined ? (
@@ -47,26 +42,26 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: BorderRadius.sm,
     marginBottom: Spacing.lg,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: Spacing.md,
   },
   titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   title: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   countBadge: {
     paddingHorizontal: Spacing.sm,
@@ -75,8 +70,8 @@ const styles = StyleSheet.create({
   },
   countText: {
     fontSize: 12,
-    fontWeight: "600",
-    color: "#1A1A1A",
+    fontWeight: '600',
+    color: '#1A1A1A',
   },
   content: {
     paddingHorizontal: Spacing.md,

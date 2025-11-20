@@ -1,8 +1,8 @@
-import React from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { useTheme } from "@/hooks/useTheme";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import React from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { useTheme } from '@/hooks/useTheme';
+import { Spacing, BorderRadius } from '@/constants/theme';
 
 interface ItemCardProps {
   title: string;
@@ -10,6 +10,9 @@ interface ItemCardProps {
   badge?: string;
   onPress?: () => void;
   children?: React.ReactNode;
+  actionLabel?: string;
+  onActionPress?: () => void;
+  disableAction?: boolean;
 }
 
 export function ItemCard({
@@ -17,6 +20,9 @@ export function ItemCard({
   subtitle,
   badge,
   onPress,
+  actionLabel,
+  onActionPress,
+  disableAction,
   children,
 }: ItemCardProps) {
   const { theme } = useTheme();
@@ -47,6 +53,20 @@ export function ItemCard({
           </ThemedText>
         ) : null}
         {children}
+        {actionLabel && onActionPress ? (
+          <Pressable
+            onPress={onActionPress}
+            disabled={disableAction}
+            style={({ pressed }) => [
+              styles.actionContainer,
+              pressed && !disableAction && { opacity: 0.7 },
+            ]}
+          >
+            <ThemedText style={[styles.actionLabel, disableAction && { opacity: 0.6 }]}>
+              {actionLabel}
+            </ThemedText>
+          </Pressable>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -57,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.sm,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -67,18 +87,18 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
   title: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     flex: 1,
   },
   subtitle: {
@@ -91,7 +111,14 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 12,
-    fontWeight: "600",
-    color: "#F8F6F0",
+    fontWeight: '600',
+    color: '#F8F6F0',
+  },
+  actionContainer: {
+    marginTop: Spacing.xs,
+  },
+  actionLabel: {
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

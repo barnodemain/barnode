@@ -1,73 +1,0 @@
-scheda tecnica di riferimento per sviluppare Barnode su Windsurf Cascade. 
-BARNODE — Scheda Tecnica Ufficiale per lo Sviluppo
-1. Descrizione Generale
-Barnode è un’applicazione gestionale mobile-first progettata per l’utilizzo interno di un cocktail bar. L’app sarà utilizzata da più utenti su diversi dispositivi mobile e sarà sviluppata interamente tramite Windsurf Cascade, con backend e database esclusivamente su Supabase.
-L’app NON gestisce giacenze o magazzino completo: si focalizza su due funzioni principali:
-1. Lista articoli mancanti da acquistare
-2. Creazione e gestione ordini da inviare ai fornitori
-Deploy previsto con GitHub (commit/push) + Render per l’hosting.
-
-2. Caratteristiche Principali
-* Mobile-only
-* Database unico Supabase
-* Zero database locali (niente SQLite o storage locale per dati strutturati)
-* Interfaccia minimal, veloce, operativa
-* Navbar fissa in fondo con Home — Database — Ordini
-* Palette colori: bianco crema, verde chiaro, verde scuro, nero per testualità.
-
-3. Struttura dell’Applicazione
-L’app si compone di tre sezioni principali, sempre accessibili tramite navbar inferiore:
-3.1 Home — Articoli Mancanti
-Pagina dedicata alla creazione della lista degli articoli mancanti.
-Funzionalità
-* Campo di ricerca che filtra in tempo reale tutti gli articoli del database.
-* Per ogni articolo è presente un pulsante Aggiungi → Lista mancanti.
-* La Home mostra sempre l’elenco corrente degli articoli mancanti.
-* Nessuna gestione quantità nella Home.
-
-3.2 Database — Articoli & Importazione
-Pagina dedicata alla gestione completa di articoli, tipologie e fornitori.
-Contenuti gestiti:
-* Articoli
-* Tipologie (categorie)
-* Fornitori
-Campi degli articoli:
-* nome
-* tipologia
-* fornitore
-Esempio: Bombay Dry — Gin — Martini & Rossi
-Regole
-* Gli articoli possono essere: ✔️ inseriti manualmente ✔️ importati tramite file CSV
-* Le tabelle tipologie e fornitori sono semplici: solo nome (no email, no telefono, no note).
-UI della pagina Database
-* Barra di ricerca (filtra per nome articolo)
-* Tre box con pulsante per:
-    * aggiungere/modificare/eliminare tipologie
-    * aggiungere/modificare/eliminare fornitori
-    * aggiungere/modificare/eliminare articoli
-* Lista totale articoli SEMPRE visibile, ordinata alfabeticamente a prescindere dai filtri.
-
-3.3 Ordini — Creazione e Gestione
-La sezione più articolata dell’app.
-All’apertura mostra due pulsanti principali:
-1. Crea Ordine
-2. Gestisci Ordini
-
-3.3.1 Creazione Ordine
-Flusso:
-1. L’utente seleziona un fornitore. (Gli ordini sono sempre raggruppati per fornitore.)
-2. Viene mostrata la lista completa dei prodotti associati a quel fornitore.
-3. In testa all’elenco, evidenziati con un colore diverso, compaiono gli articoli “mancanti” presi automaticamente dalla Home.
-4. Per ogni articolo si seleziona la quantità scegliendo:
-    * singolo pezzo
-    * cartone da 6 (opzione esclusiva: una esclude l’altra)
-5. Una volta aggiunti al nuovo ordine, gli articoli mancanti vengono automaticamente rimossi dalla Home.
-Al termine il sistema permette l’invio dell’ordine via WhatsApp tramite messaggio precompilato.
-
-3.3.2 Gestione Ordini
-Mostra la lista di:
-* Ordini creati (attivi)
-* Ordini archiviati
-Logica archivio
-* Quando il fornitore consegna la merce, l’utente apre l’ordine → conferma quantità ricevute → archivia.
-* L’ordine passa in automatico nella sezione archiviati.
