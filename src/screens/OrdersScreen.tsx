@@ -1,19 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { PlusCircle, List } from '@/shared/icons';
 import { ScreenScrollView } from '@/components/ScreenScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/hooks/useTheme';
 import { Spacing, BorderRadius } from '@/constants/theme';
-import { mockOrdini } from '@/shared/utils/mockData';
 import { CreateOrderPanel } from '@/features/ordini/CreateOrderPanel';
 import { ManageOrdersPanel } from '@/features/ordini/ManageOrdersPanel';
+import type { MainTabParamList } from '@/navigation/MainTabNavigator';
 
 type ViewMode = 'main' | 'create' | 'manage';
 
 export default function OrdersScreen() {
   const { theme } = useTheme();
   const [viewMode, setViewMode] = useState<ViewMode>('main');
+  const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList, 'Orders'>>();
+
+  // Ogni volta che la tab Ordini entra in focus riportiamo la schermata
+  // allo stato iniziale con i due pulsanti (viewMode = 'main').
+  useFocusEffect(
+    React.useCallback(() => {
+      setViewMode('main');
+    }, [])
+  );
+
+  // Quando l'utente preme la tab "Ordini" (anche se è già selezionata),
+  // riportiamo comunque la schermata allo stato iniziale.
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabPress', () => {
+      setViewMode('main');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   if (viewMode === 'create') {
     return (
@@ -34,24 +55,6 @@ export default function OrdersScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.container}>
-        <View style={styles.statsCard}>
-          <View style={styles.statItem}>
-            <ThemedText style={styles.statNumber}>{mockOrdini.length}</ThemedText>
-            <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
-              Ordini totali
-            </ThemedText>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <ThemedText style={styles.statNumber}>
-              {mockOrdini.filter((o) => o.stato === 'inviato').length}
-            </ThemedText>
-            <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
-              In attesa
-            </ThemedText>
-          </View>
-        </View>
-
         <View style={styles.actionsContainer}>
           <Pressable
             onPress={() => setViewMode('create')}
@@ -96,33 +99,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: Spacing.lg,
     gap: Spacing.xl,
-  },
-  statsCard: {
-    flexDirection: 'row',
-    padding: Spacing.lg,
-    backgroundColor: '#FFFFFF',
-    borderRadius: BorderRadius.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: 'rgba(45, 90, 61, 0.2)',
-  },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  statLabel: {
-    fontSize: 14,
   },
   actionsContainer: {
     gap: Spacing.lg,

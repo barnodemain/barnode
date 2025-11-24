@@ -1,4 +1,5 @@
 import React from 'react';
+import { Pressable } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@/hooks/useTheme';
 import MissingItemsScreen from '@/screens/MissingItemsScreen';
@@ -7,7 +8,7 @@ import OrdersScreen from '@/screens/OrdersScreen';
 import { getCommonScreenOptions } from '@/navigation/screenOptions';
 import { Spacing } from '@/constants/theme';
 import { HeaderTitle } from '@/components/HeaderTitle';
-import { HomeIcon, DatabaseIcon, OrdersIcon } from '@/shared/icons';
+import { HomeIcon, DatabaseIcon, OrdersIcon, Upload } from '@/shared/icons';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -33,6 +34,7 @@ export default function MainTabNavigator() {
           borderTopWidth: 0,
           elevation: 0,
           height: Spacing.tabBarHeight,
+          marginBottom: Spacing.sm,
           paddingBottom: 8,
           paddingTop: 8,
         },

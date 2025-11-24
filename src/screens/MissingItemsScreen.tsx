@@ -6,32 +6,45 @@ import { SearchBar } from '@/shared/components/SearchBar';
 import { ItemCard } from '@/shared/components/ItemCard';
 import { useTheme } from '@/hooks/useTheme';
 import { Spacing } from '@/constants/theme';
-import { dataClient } from '@/shared/services/dataClient';
+import { supabaseDataClient } from '@/shared/services/supabaseDataClient';
 import { useMissingItems } from '@/features/home/state/missingItemsStore';
 import { MissingItemsList } from '@/features/home/components/MissingItemsList';
 import { Articolo } from '@/shared/types';
+import { PlusCircle } from '@/shared/icons';
 
 export default function MissingItemsScreen() {
   const { theme } = useTheme();
-  const { ids: missingIds, addMissingItem, clearMissingItems } = useMissingItems();
+  const { ids: missingIds, addMissingItem, setMissingItems, clearMissingItems } = useMissingItems();
   const [searchQuery, setSearchQuery] = useState('');
   const [allArticles, setAllArticles] = useState<Articolo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    dataClient.articoli
-      .getAll()
-      .then((items) => {
-        if (isMounted) {
-          setAllArticles(items);
-        }
-      })
-      .finally(() => {
+    async function loadData() {
+      try {
+        const [articles, missingIdsFromDb] = await Promise.all([
+          supabaseDataClient.articoli.getAll(),
+          supabaseDataClient.articoliMancanti.getAllIds(),
+        ]);
+
+        if (!isMounted) return;
+
+        setAllArticles(articles);
+        setMissingItems(missingIdsFromDb);
+      } catch (error) {
+        console.error('[Home] Errore caricamento dati da Supabase', error);
+        if (!isMounted) return;
+        setAllArticles([]);
+        setMissingItems([]);
+      } finally {
         if (isMounted) {
           setLoading(false);
         }
-      });
+      }
+    }
+
+    loadData();
 
     return () => {
       isMounted = false;
@@ -39,65 +52,81 @@ export default function MissingItemsScreen() {
   }, []);
 
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return allArticles;
+    // Se la ricerca è vuota non mostriamo l'intera lista articoli.
+    // La lista completa degli articoli resta visibile solo nella DatabaseScreen;
+    // qui l'utente deve usare il filtro per cercare e aggiungere alla lista mancanti.
+    if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-    return allArticles.filter((item) => item.nome.toLowerCase().includes(query));
+    return allArticles
+      .filter((item) => item.nome.toLowerCase().includes(query))
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'it', { sensitivity: 'base' }));
   }, [allArticles, searchQuery]);
+
+  async function handleAddMissing(itemId: string, isMissing: boolean) {
+    if (isMissing) return;
+
+    const ok = await supabaseDataClient.articoliMancanti.add(itemId);
+    if (ok) {
+      addMissingItem(itemId);
+    }
+  }
 
   return (
     <ScreenScrollView>
       <View style={styles.container}>
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Articoli mancanti</ThemedText>
-          <MissingItemsList allArticles={allArticles} missingIds={missingIds} />
-          {missingIds.length > 0 ? (
-            <Pressable
-              onPress={clearMissingItems}
-              style={[styles.clearButton, { borderColor: theme.border }]}
-            >
-              <ThemedText style={[styles.clearButtonText, { color: theme.textSecondary }]}>
-                Svuota lista mancanti
-              </ThemedText>
-            </Pressable>
-          ) : null}
+        <View style={styles.searchSection}>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Cerca articoli..."
+          />
+
+          {!loading && searchQuery.trim().length > 0 && (
+            <View style={styles.dropdown}>
+              {filteredItems.length === 0 ? (
+                <View style={styles.dropdownEmptyState}>
+                  <ThemedText style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+                    Nessun articolo trovato
+                  </ThemedText>
+                </View>
+              ) : (
+                filteredItems.map((item) => {
+                  const isMissing = missingIds.includes(item.id);
+                  return (
+                    <ItemCard
+                      key={item.id}
+                      title={item.nome}
+                      subtitle={undefined}
+                      rightAccessory={
+                        <Pressable
+                          onPress={() => {
+                            if (!isMissing) {
+                              handleAddMissing(item.id, isMissing);
+                            }
+                          }}
+                          disabled={isMissing}
+                          style={{ paddingLeft: Spacing.sm }}
+                        >
+                          <PlusCircle
+                            size={18}
+                            color={isMissing ? theme.textSecondary : theme.primary}
+                          />
+                        </Pressable>
+                      }
+                    />
+                  );
+                })
+              )}
+            </View>
+          )}
         </View>
 
-        <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Cerca articoli..."
-        />
-
-        <View style={styles.list}>
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Articoli mancanti</ThemedText>
           {loading ? (
             <ThemedText style={{ color: theme.textSecondary }}>Caricamento articoli...</ThemedText>
-          ) : filteredItems.length === 0 ? (
-            <View style={styles.emptyState}>
-              <ThemedText style={[styles.emptyTitle, { color: theme.text }]}>
-                Nessun risultato
-              </ThemedText>
-              <ThemedText style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-                Prova con un altro termine
-              </ThemedText>
-            </View>
           ) : (
-            filteredItems.map((item) => {
-              const isMissing = missingIds.includes(item.id);
-              return (
-                <ItemCard
-                  key={item.id}
-                  title={item.nome}
-                  subtitle={undefined}
-                  actionLabel={isMissing ? 'Già in lista mancanti' : 'Aggiungi → Lista mancanti'}
-                  onActionPress={() => {
-                    if (!isMissing) {
-                      addMissingItem(item.id);
-                    }
-                  }}
-                  disableAction={isMissing}
-                />
-              );
-            })
+            <MissingItemsList allArticles={allArticles} missingIds={missingIds} />
           )}
         </View>
       </View>
@@ -110,37 +139,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     gap: Spacing.lg,
   },
+  searchSection: {
+    marginTop: Spacing.lg,
+    gap: Spacing.xs,
+  },
   section: {
     gap: Spacing.sm,
-    marginTop: Spacing.lg,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
+    textAlign: 'center',
   },
-  clearButton: {
-    marginTop: Spacing.sm,
-    alignSelf: 'flex-start',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: Spacing.xs,
-    borderWidth: 1,
+  dropdown: {
+    marginTop: Spacing.xs,
+    borderRadius: Spacing.sm,
+    overflow: 'hidden',
   },
-  clearButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  list: {
-    gap: Spacing.sm,
-  },
-  emptyState: {
-    paddingVertical: Spacing['5xl'],
+  dropdownEmptyState: {
+    paddingVertical: Spacing.sm,
     alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
   },
   emptySubtitle: {
     fontSize: 14,

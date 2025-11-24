@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Tag, Truck } from '@/shared/icons';
 import { ThemedText } from '@/components/ThemedText';
@@ -11,29 +11,60 @@ interface SectionCardProps {
   icon: 'tag' | 'truck';
   onPress?: () => void;
   children?: React.ReactNode;
+  collapsible?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  highlighted?: boolean;
+  rightAccessory?: React.ReactNode;
 }
 
-export function SectionCard({ title, count, icon, onPress, children }: SectionCardProps) {
+export function SectionCard({ title, count, icon, onPress, children, collapsible, open, onOpenChange, highlighted, rightAccessory }: SectionCardProps) {
   const { theme } = useTheme();
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const isControlled = typeof open === 'boolean';
+  const isOpen = isControlled ? open : internalOpen;
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.backgroundDefault }]}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: theme.backgroundDefault },
+        highlighted && { borderColor: '#F5D027', borderWidth: 1 },
+      ]}
+    >
       <Pressable
-        onPress={onPress}
+        onPress={() => {
+          if (collapsible) {
+            if (isControlled) {
+              onOpenChange?.(!isOpen);
+            } else {
+              setInternalOpen((prev) => !prev);
+            }
+          }
+          onPress?.();
+        }}
         style={({ pressed }) => [styles.header, pressed && { opacity: 0.7 }]}
       >
         <View style={styles.titleRow}>
           {icon === 'tag' && <Tag size={22} strokeWidth={2} color={theme.primary} />}
           {icon === 'truck' && <Truck size={22} strokeWidth={2} color={theme.primary} />}
-          <ThemedText style={styles.title}>{title}</ThemedText>
+          <ThemedText style={[styles.title, highlighted && { color: '#F5D027' }]}>{title}</ThemedText>
         </View>
-        {count !== undefined ? (
-          <View style={[styles.countBadge, { backgroundColor: theme.accent }]}>
-            <ThemedText style={styles.countText}>{count}</ThemedText>
-          </View>
-        ) : null}
+        {rightAccessory
+          ? rightAccessory
+          : count !== undefined && (
+              <View
+                style={[
+                  styles.countBadge,
+                  { backgroundColor: highlighted ? '#F5D027' : theme.accent },
+                ]}
+              >
+                <ThemedText style={styles.countText}>{count}</ThemedText>
+              </View>
+            )}
       </Pressable>
-      {children ? <View style={styles.content}>{children}</View> : null}
+      {children && (!collapsible || isOpen) ? <View style={styles.content}>{children}</View> : null}
     </View>
   );
 }

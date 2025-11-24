@@ -8,6 +8,7 @@ export type MissingItemsActions = {
   addMissingItem: (articleId: string) => void;
   removeMissingItem: (articleId: string) => void;
   clearMissingItems: () => void;
+  setMissingItems: (ids: string[]) => void;
 };
 
 type MissingItemsContextValue = MissingItemState & MissingItemsActions;
@@ -28,6 +29,9 @@ export function MissingItemsProvider({ children }: { children: React.ReactNode }
       },
       clearMissingItems: () => {
         setIds([]);
+      },
+      setMissingItems: (nextIds: string[]) => {
+        setIds(Array.from(new Set(nextIds)));
       },
     }),
     [ids]

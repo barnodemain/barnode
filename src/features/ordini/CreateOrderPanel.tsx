@@ -1,8 +1,10 @@
-import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
-import { ArrowLeft, CheckCircle } from '@/shared/icons';
+import React, { useState } from 'react';
+import { View, Pressable } from 'react-native';
+import { ArrowLeft } from '@/shared/icons';
 import { ThemedText } from '@/components/ThemedText';
-import { Spacing, BorderRadius } from '@/constants/theme';
+import { styles } from './CreateOrderPanel.styles';
+import { OrderArticlesList } from './components/OrderArticlesList';
+import { useCreateOrderData } from './useCreateOrderData';
 
 interface CreateOrderPanelProps {
   theme: any;
@@ -10,76 +12,111 @@ interface CreateOrderPanelProps {
 }
 
 export function CreateOrderPanel({ theme, onBack }: CreateOrderPanelProps) {
+  const {
+    suppliers,
+    loading,
+    error,
+    selectedSupplier,
+    setSelectedSupplier,
+    articles,
+    missingIds,
+    articlesLoading,
+    articlesError,
+  } = useCreateOrderData();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <View style={styles.container}>
       <Pressable onPress={onBack} style={styles.backButton}>
         <ArrowLeft size={22} strokeWidth={2} color={theme.primary} />
         <ThemedText style={[styles.backText, { color: theme.primary }]}>Indietro</ThemedText>
       </Pressable>
-
-      <View style={styles.panel}>
-        <ThemedText style={styles.panelTitle}>Crea Nuovo Ordine</ThemedText>
-        <ThemedText style={[styles.panelDescription, { color: theme.textSecondary }]}>
-          Questa funzionalità sarà disponibile nella prossima versione. Potrai creare ordini
-          selezionando gli articoli mancanti e specificando le quantità.
+      <View style={styles.fieldGroup}>
+        <ThemedText style={[styles.fieldLabel, { color: theme.textSecondary }]}
+        >
+          Fornitore
         </ThemedText>
 
-        <View style={styles.features}>
-          <FeatureItem text="Selezione articoli" theme={theme} />
-          <FeatureItem text="Raggruppamento per fornitore" theme={theme} />
-          <FeatureItem text="Invio email al fornitore" theme={theme} />
-        </View>
+        <Pressable
+          onPress={() => {
+            if (!loading && !error && suppliers.length > 0) {
+              setDropdownOpen((open: boolean) => !open);
+            }
+          }}
+          style={[
+            styles.dropdownTrigger,
+            {
+              borderColor: theme.border ?? 'rgba(255,255,255,0.1)',
+              backgroundColor: theme.backgroundDefault,
+            },
+          ]}
+        >
+          <ThemedText
+            style={[
+              styles.dropdownText,
+              { color: selectedSupplier ? theme.text : theme.textSecondary },
+            ]}
+          >
+            {selectedSupplier ? selectedSupplier.nome : 'Seleziona un fornitore'}
+          </ThemedText>
+        </Pressable>
+
+        {loading && (
+          <ThemedText style={[styles.helperText, { color: theme.textSecondary }]}
+          >
+            Caricamento fornitori...
+          </ThemedText>
+        )}
+
+        {error && !loading && (
+          <ThemedText style={[styles.helperText, { color: theme.textSecondary }]}
+          >
+            {error}
+          </ThemedText>
+        )}
+
+        {!loading && !error && suppliers.length === 0 && (
+          <ThemedText style={[styles.helperText, { color: theme.textSecondary }]}
+          >
+            Nessun fornitore disponibile.
+          </ThemedText>
+        )}
+
+        {dropdownOpen && suppliers.length > 0 && (
+          <View style={[styles.dropdownList, { backgroundColor: theme.backgroundDefault }]}
+          >
+            {suppliers.map((supplier) => (
+              <Pressable
+                key={supplier.id}
+                onPress={() => {
+                  setSelectedSupplier(supplier);
+                  setDropdownOpen(false);
+                }}
+                style={({ pressed }) => [
+                  styles.dropdownItem,
+                  pressed && { backgroundColor: 'rgba(255,255,255,0.04)' },
+                ]}
+              >
+                <ThemedText style={[styles.dropdownItemText, { color: theme.text }]}
+                >
+                  {supplier.nome}
+                </ThemedText>
+              </Pressable>
+            ))}
+          </View>
+        )}
       </View>
+
+      {selectedSupplier && (
+        <OrderArticlesList
+          supplierName={selectedSupplier.nome}
+          articles={articles}
+          missingIds={missingIds}
+          loading={articlesLoading}
+          error={articlesError}
+        />
+      )}
     </View>
   );
 }
-
-function FeatureItem({ text, theme }: { text: string; theme: any }) {
-  return (
-    <View style={styles.featureItem}>
-      <CheckCircle size={22} strokeWidth={2} color={theme.accent} />
-      <ThemedText style={[styles.featureText, { color: theme.textSecondary }]}>{text}</ThemedText>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: Spacing.lg,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  backText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  panel: {
-    padding: Spacing.lg,
-    backgroundColor: '#FFFFFF',
-    borderRadius: BorderRadius.sm,
-    gap: Spacing.lg,
-  },
-  panelTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  panelDescription: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  features: {
-    gap: Spacing.md,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  featureText: {
-    fontSize: 14,
-  },
-});

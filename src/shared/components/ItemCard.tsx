@@ -13,6 +13,8 @@ interface ItemCardProps {
   actionLabel?: string;
   onActionPress?: () => void;
   disableAction?: boolean;
+  rightAccessory?: React.ReactNode;
+  titleColor?: string;
 }
 
 export function ItemCard({
@@ -23,29 +25,38 @@ export function ItemCard({
   actionLabel,
   onActionPress,
   disableAction,
+  rightAccessory,
   children,
+  titleColor,
 }: ItemCardProps) {
   const { theme } = useTheme();
 
+  const Container: React.ComponentType<any> = onPress ? Pressable : View;
+
   return (
-    <Pressable
+    <Container
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: theme.backgroundDefault },
-        pressed && { opacity: 0.7 },
-      ]}
+      style={onPress
+        ? ({ pressed }: { pressed: boolean }) => [
+            styles.card,
+            { backgroundColor: theme.backgroundDefault },
+            pressed && { opacity: 0.7 },
+          ]
+        : [styles.card, { backgroundColor: theme.backgroundDefault }]}
     >
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            <ThemedText style={styles.title}>{title}</ThemedText>
+            <ThemedText style={[styles.title, titleColor && { color: titleColor }]}>
+              {title}
+            </ThemedText>
           </View>
           {badge ? (
             <View style={[styles.badge, { backgroundColor: theme.primary }]}>
               <ThemedText style={styles.badgeText}>{badge}</ThemedText>
             </View>
           ) : null}
+          {rightAccessory}
         </View>
         {subtitle ? (
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -68,12 +79,13 @@ export function ItemCard({
           </Pressable>
         ) : null}
       </View>
-    </Pressable>
+    </Container>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    position: 'relative',
     borderRadius: BorderRadius.sm,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
