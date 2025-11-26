@@ -40,8 +40,7 @@ function OrderConfirmModal({
                     <div className="orders-confirm-item-name">{article.nome}</div>
                     <div className="orders-confirm-item-meta">
                       <span>
-                        {line.quantity}{' '}
-                        {line.unit === 'scatola' ? 'cartoni' : 'pezzi'}
+                        {line.quantity} {line.unit === 'scatola' ? 'cartoni' : 'pezzi'}
                       </span>
                       {fromMissing && <span className="orders-confirm-badge">da mancanti</span>}
                     </div>

@@ -1,23 +1,27 @@
+import { Suspense, lazy } from 'react';
 import { NavLink, Route, Routes } from 'react-router-dom';
-import MissingItemsPage from './pages/MissingItemsPage';
-import DatabasePage from './pages/DatabasePage';
-import OrdersPage from './pages/orders/OrdersPage';
-import ManageOrdersPage from './pages/orders/ManageOrdersPage';
-import CreateOrderPage from './pages/orders/CreateOrderPage';
-import OrderCreatedPage from './pages/orders/OrderCreatedPage';
+
+const MissingItemsPage = lazy(() => import('./pages/MissingItemsPage'));
+const DatabasePage = lazy(() => import('./pages/DatabasePage'));
+const OrdersPage = lazy(() => import('./pages/orders/OrdersPage'));
+const ManageOrdersPage = lazy(() => import('./pages/orders/ManageOrdersPage'));
+const CreateOrderPage = lazy(() => import('./pages/orders/CreateOrderPage'));
+const OrderCreatedPage = lazy(() => import('./pages/orders/OrderCreatedPage'));
 
 function App() {
   return (
     <div className="app-root">
       <div className="page-content">
-        <Routes>
-          <Route path="/" element={<MissingItemsPage />} />
-          <Route path="/database" element={<DatabasePage />} />
-          <Route path="/orders" element={<OrdersPage />} />
-          <Route path="/orders/create" element={<CreateOrderPage />} />
-          <Route path="/orders/manage" element={<ManageOrdersPage />} />
-          <Route path="/orders/created/:id" element={<OrderCreatedPage />} />
-        </Routes>
+        <Suspense fallback={<div className="page-loading">Caricamento...</div>}>
+          <Routes>
+            <Route path="/" element={<MissingItemsPage />} />
+            <Route path="/database" element={<DatabasePage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/orders/create" element={<CreateOrderPage />} />
+            <Route path="/orders/manage" element={<ManageOrdersPage />} />
+            <Route path="/orders/created/:id" element={<OrderCreatedPage />} />
+          </Routes>
+        </Suspense>
       </div>
       <nav className="bottom-nav">
         <NavLink

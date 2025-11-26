@@ -10,11 +10,7 @@ function EditOrderPage() {
     <main className="page">
       <div className="orders-page">
         <header className="page-header orders-header">
-          <button
-            type="button"
-            className="orders-back-button"
-            onClick={() => navigate(-1)}
-          >
+          <button type="button" className="orders-back-button" onClick={() => navigate(-1)}>
             ← Indietro
           </button>
           <h1 className="page-title">Modifica ordine non disponibile</h1>
@@ -22,8 +18,8 @@ function EditOrderPage() {
 
         <section className="orders-section">
           <p className="empty-state">
-            La funzione di modifica ordine non è disponibile in questa versione. Puoi creare
-            nuovi ordini o gestire quelli esistenti dalla schermata "Ordini".
+            La funzione di modifica ordine non è disponibile in questa versione. Puoi creare nuovi
+            ordini o gestire quelli esistenti dalla schermata &quot;Ordini&quot;.
           </p>
         </section>
       </div>

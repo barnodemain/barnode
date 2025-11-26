@@ -6,7 +6,11 @@ interface OrderSupplierSelectProps {
   onChange: (supplierId: string | null) => void;
 }
 
-function OrderSupplierSelect({ suppliers, selectedSupplierId, onChange }: OrderSupplierSelectProps) {
+function OrderSupplierSelect({
+  suppliers,
+  selectedSupplierId,
+  onChange,
+}: OrderSupplierSelectProps) {
   return (
     <section className="orders-section">
       <h2 className="section-title">1. Seleziona il fornitore</h2>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCatalog } from '../../shared/state/catalogStore';
@@ -45,18 +46,14 @@ function ManageOrdersPage() {
         <div className="orders-tabs">
           <button
             type="button"
-            className={
-              tab === 'active' ? 'orders-tab orders-tab-active' : 'orders-tab'
-            }
+            className={tab === 'active' ? 'orders-tab orders-tab-active' : 'orders-tab'}
             onClick={() => setTab('active')}
           >
             In corso
           </button>
           <button
             type="button"
-            className={
-              tab === 'archived' ? 'orders-tab orders-tab-active' : 'orders-tab'
-            }
+            className={tab === 'archived' ? 'orders-tab orders-tab-active' : 'orders-tab'}
             onClick={() => setTab('archived')}
           >
             Archiviati

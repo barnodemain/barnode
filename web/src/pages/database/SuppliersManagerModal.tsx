@@ -100,11 +100,7 @@ function SuppliersManagerModal({
         </div>
       </div>
       <div className="modal-actions modal-actions-center">
-        <button
-          type="button"
-          className="btn-secondary btn-secondary-soft-danger"
-          onClick={onClose}
-        >
+        <button type="button" className="btn-secondary btn-secondary-soft-danger" onClick={onClose}>
           Chiudi
         </button>
       </div>

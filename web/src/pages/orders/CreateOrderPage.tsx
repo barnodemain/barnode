@@ -5,14 +5,13 @@ import { useMissingItems } from '../../shared/state/missingItemsStore';
 import { useOrders } from '../../state/ordersStore';
 import { createOrderWithLines } from '../../repositories/ordersRepository';
 import type { ArticoloWithRelations } from '../../shared/types/items';
-import type { CreateOrderLineInput, OrderUnit, OrderWithLines } from '../../types';
+import type { CreateOrderLineInput, CreateOrderWithLinesInput, OrderUnit } from '../../types';
 import OrderSupplierSelect from '../../components/orders/OrderSupplierSelect';
 import OrderArticleBox from '../../components/orders/OrderArticleBox';
 import OrderConfirmModal from '../../components/orders/OrderConfirmModal';
 
 interface OrderEditorPageBaseProps {
   mode: 'create' | 'edit';
-  existingOrder?: OrderWithLines | null;
   supplierLocked: boolean;
   submitLabel: string;
   onSubmit: (
@@ -27,7 +26,6 @@ interface OrderEditorPageBaseProps {
 
 function OrderEditorPageBase({
   mode,
-  existingOrder,
   supplierLocked,
   submitLabel,
   onSubmit,
@@ -35,13 +33,8 @@ function OrderEditorPageBase({
   const navigate = useNavigate();
   const { fornitori, articoli } = useCatalog();
   const { missingIds } = useMissingItems();
-  const {
-    draftSupplierId,
-    setDraftSupplierId,
-    draftLinesByArticleId,
-    setDraftLine,
-    canSendOrder,
-  } = useOrders();
+  const { draftSupplierId, setDraftSupplierId, draftLinesByArticleId, setDraftLine, canSendOrder } =
+    useOrders();
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +69,9 @@ function OrderEditorPageBase({
     return entries
       .filter((entry) => entry.quantity > 0)
       .map((entry) => {
-        const article = articoli.find((a) => a.id === entry.articleId) as ArticoloWithRelations | undefined;
+        const article = articoli.find((a) => a.id === entry.articleId) as
+          | ArticoloWithRelations
+          | undefined;
         if (!article) {
           return null;
         }
@@ -89,7 +84,15 @@ function OrderEditorPageBase({
         };
         return { article, line, fromMissing };
       })
-      .filter((item): item is { article: ArticoloWithRelations; line: CreateOrderLineInput; fromMissing: boolean } => item != null);
+      .filter(
+        (
+          item
+        ): item is {
+          article: ArticoloWithRelations;
+          line: CreateOrderLineInput;
+          fromMissing: boolean;
+        } => item != null
+      );
   }, [articoli, draftLinesByArticleId, missingIds]);
 
   const handleConfirm = async () => {
@@ -102,7 +105,7 @@ function OrderEditorPageBase({
       setIsConfirmOpen(false);
     } catch (error) {
       console.error('[OrderEditorPageBase] Errore durante submit ordine', error);
-      alert('Errore durante il salvataggio dell\'ordine. Riprova.');
+      alert("Errore durante il salvataggio dell'ordine. Riprova.");
       setIsSubmitting(false);
     }
   };
@@ -125,7 +128,7 @@ function OrderEditorPageBase({
             {supplierName ? (
               <p className="orders-supplier-readonly">{supplierName}</p>
             ) : (
-              <p className="empty-state">Impossibile determinare il fornitore dell'ordine.</p>
+              <p className="empty-state">Impossibile determinare il fornitore dell&apos;ordine.</p>
             )}
           </section>
         ) : (
@@ -220,22 +223,20 @@ function CreateOrderPage() {
       return;
     }
 
-    const payload = {
+    const payload: CreateOrderWithLinesInput = {
       supplierId,
       lines,
     };
 
     console.log('[CreateOrderPage] createOrderWithLines payload', payload);
 
-    const result = await createOrderWithLines(payload as any);
+    const result = await createOrderWithLines(payload as CreateOrderWithLinesInput);
 
     console.log('[CreateOrderPage] createOrderWithLines result', result);
 
     // Supporta sia { data, error } sia ritorno diretto
-    const data =
-      result && 'data' in result ? result.data : result;
-    const error =
-      result && 'error' in result ? result.error : null;
+    const data = result && 'data' in result ? result.data : result;
+    const error = result && 'error' in result ? result.error : null;
 
     if (!data || error) {
       console.error('[CreateOrderPage] Errore creazione ordine', { error, data });
@@ -261,7 +262,6 @@ function CreateOrderPage() {
   return (
     <OrderEditorPageBase
       mode="create"
-      existingOrder={undefined}
       supplierLocked={false}
       submitLabel="Invia ordine"
       onSubmit={handleSubmit}

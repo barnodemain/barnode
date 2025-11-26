@@ -7,7 +7,7 @@ export interface RepositoryResult<T> {
 }
 
 async function wrapQuery<T>(
-  fn: () => Promise<{ data: T | null; error: any }>
+  fn: () => Promise<{ data: T | null; error: unknown }>
 ): Promise<RepositoryResult<T>> {
   if (!isSupabaseConfigured) {
     return { data: null, error: new Error('Supabase non configurato (env mancanti).') };
@@ -16,7 +16,11 @@ async function wrapQuery<T>(
   const { data, error } = await fn();
   if (error) {
     console.error('[catalogRepository] Errore Supabase', error);
-    return { data: null, error: new Error(String(error.message ?? error)) };
+    const message =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? String((error as { message?: unknown }).message ?? error)
+        : String(error);
+    return { data: null, error: new Error(message) };
   }
 
   return { data: data ?? null, error: null };
@@ -61,7 +65,7 @@ export async function getArticoliWithRelations(): Promise<
       return { data: null, error };
     }
 
-    const mapped: ArticoloWithRelations[] = (data ?? []).map((row: any) => ({
+    const mapped: ArticoloWithRelations[] = (data ?? []).map((row) => ({
       id: row.id,
       nome: row.nome,
       tipologiaId: row.tipologia_id ?? '',
@@ -173,16 +177,16 @@ export async function createArticolo(
       return { data: null, error };
     }
 
-    const row = data as any;
-
-    const articolo: ArticoloWithRelations = {
-      id: row.id,
-      nome: row.nome,
-      tipologiaId: row.tipologia_id ?? '',
-      fornitoreId: row.fornitore_id ?? '',
-      tipologiaNome: row.tipologie?.nome ?? 'N/A',
-      fornitoreNome: row.fornitori?.nome ?? 'N/A',
-    };
+    const articolo: ArticoloWithRelations | null = data
+      ? {
+          id: data.id,
+          nome: data.nome,
+          tipologiaId: data.tipologia_id ?? '',
+          fornitoreId: data.fornitore_id ?? '',
+          tipologiaNome: data.tipologie?.nome ?? 'N/A',
+          fornitoreNome: data.fornitori?.nome ?? 'N/A',
+        }
+      : null;
 
     return { data: articolo, error: null };
   });

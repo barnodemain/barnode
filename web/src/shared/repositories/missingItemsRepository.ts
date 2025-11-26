@@ -6,7 +6,7 @@ export interface RepositoryResult<T> {
 }
 
 async function wrapQuery<T>(
-  fn: () => Promise<{ data: T | null; error: any }>
+  fn: () => Promise<{ data: T | null; error: unknown }>
 ): Promise<RepositoryResult<T>> {
   if (!isSupabaseConfigured) {
     return { data: null, error: new Error('Supabase non configurato (env mancanti).') };
@@ -15,7 +15,11 @@ async function wrapQuery<T>(
   const { data, error } = await fn();
   if (error) {
     console.error('[missingItemsRepository] Errore Supabase', error);
-    return { data: null, error: new Error(String(error.message ?? error)) };
+    const message =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? String((error as { message?: unknown }).message ?? error)
+        : String(error);
+    return { data: null, error: new Error(message) };
   }
 
   return { data: data ?? null, error: null };
@@ -28,7 +32,7 @@ export async function getMissingIds(): Promise<RepositoryResult<string[]>> {
       .select('articolo_id')
       .order('created_at', { ascending: true });
 
-    const ids = (data ?? []).map((row: any) => row.articolo_id as string);
+    const ids = (data ?? []).map((row) => row.articolo_id as string);
     return { data: ids, error };
   });
 }

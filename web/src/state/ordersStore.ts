@@ -10,7 +10,7 @@ import {
 } from '../repositories/ordersRepository';
 import type { CreateOrderLineInput, Order, OrderUnit, OrderWithLines } from '../types';
 
-interface DraftOrderLine extends CreateOrderLineInput {}
+type DraftOrderLine = CreateOrderLineInput;
 
 export function useOrders() {
   const [activeOrders, setActiveOrders] = useState<Order[]>([]);
@@ -18,7 +18,9 @@ export function useOrders() {
   const [loadedFromSupabase, setLoadedFromSupabase] = useState(false);
 
   const [draftSupplierId, setDraftSupplierId] = useState<string | null>(null);
-  const [draftLinesByArticleId, setDraftLinesByArticleId] = useState<Record<string, DraftOrderLine>>({});
+  const [draftLinesByArticleId, setDraftLinesByArticleId] = useState<
+    Record<string, DraftOrderLine>
+  >({});
 
   useEffect(() => {
     let active = true;
@@ -31,10 +33,7 @@ export function useOrders() {
         return;
       }
 
-      const [activeRes, archivedRes] = await Promise.all([
-        getActiveOrders(),
-        getArchivedOrders(),
-      ]);
+      const [activeRes, archivedRes] = await Promise.all([getActiveOrders(), getArchivedOrders()]);
 
       if (!active) return;
 
@@ -120,7 +119,8 @@ export function useOrders() {
   const setDraftLine = (articleId: string, quantity: number, unit: OrderUnit, note?: string) => {
     setDraftLinesByArticleId((current) => {
       if (quantity <= 0) {
-        const { [articleId]: _removed, ...rest } = current;
+        const rest: Record<string, DraftOrderLine> = { ...current };
+        delete rest[articleId];
         return rest;
       }
 
@@ -138,8 +138,9 @@ export function useOrders() {
 
   const removeDraftLine = (articleId: string) => {
     setDraftLinesByArticleId((current) => {
-      const { [articleId]: _removed, ...rest } = current;
-      return rest;
+      const next: Record<string, DraftOrderLine> = { ...current };
+      delete next[articleId];
+      return next;
     });
   };
 
@@ -164,10 +165,7 @@ export function useOrders() {
     setDraftLinesByArticleId(nextLines);
   };
 
-  const finalizeEditOrder = async (
-    id: string,
-    lines: CreateOrderLineInput[]
-  ): Promise<boolean> => {
+  const finalizeEditOrder = async (id: string, lines: CreateOrderLineInput[]): Promise<boolean> => {
     if (!isSupabaseConfigured) return false;
 
     const { data, error } = await repoUpdateOrder(id, { lines });

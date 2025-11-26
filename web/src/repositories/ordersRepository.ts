@@ -14,7 +14,7 @@ export interface RepositoryResult<T> {
 }
 
 async function wrapQuery<T>(
-  fn: () => Promise<{ data: T | null; error: any }>
+  fn: () => Promise<{ data: T | null; error: unknown }>
 ): Promise<RepositoryResult<T>> {
   if (!isSupabaseConfigured) {
     return { data: null, error: new Error('Supabase non configurato (env mancanti).') };
@@ -23,13 +23,28 @@ async function wrapQuery<T>(
   const { data, error } = await fn();
   if (error) {
     console.error('[ordersRepository] Errore Supabase', error);
-    return { data: null, error: new Error(String(error.message ?? error)) };
+    const message =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? String((error as { message?: unknown }).message ?? error)
+        : String(error);
+    return { data: null, error: new Error(message) };
   }
 
   return { data: data ?? null, error: null };
 }
 
-function mapOrderRow(row: any): Order {
+interface OrderRow {
+  id: string;
+  fornitore_id: string;
+  data_creazione: string;
+  data_consegna?: string | null;
+  status: string;
+  totale_righe?: number | null;
+  note?: string | null;
+  whatsapp_text?: string | null;
+}
+
+function mapOrderRow(row: OrderRow): Order {
   return {
     id: row.id,
     supplierId: row.fornitore_id,
@@ -42,13 +57,22 @@ function mapOrderRow(row: any): Order {
   };
 }
 
-function mapOrderLineRow(row: any): OrderLine {
+interface OrderLineRow {
+  id: string;
+  ordine_id: string;
+  articolo_id: string;
+  quantita: number;
+  unita: string;
+  note?: string | null;
+}
+
+function mapOrderLineRow(row: OrderLineRow): OrderLine {
   return {
     id: row.id,
     orderId: row.ordine_id,
     articleId: row.articolo_id,
     quantity: row.quantita,
-    unit: row.unita,
+    unit: row.unita as OrderUnit,
     note: row.note ?? undefined,
   };
 }
@@ -130,22 +154,20 @@ export async function getOrderById(id: string): Promise<RepositoryResult<OrderWi
       articleNameById.set(row.id as string, row.nome as string);
     }
 
-    const linesForText = lines.map((line) => ({
-      ...line,
+    const linesForText: WhatsappLine[] = lines.map((line) => ({
+      quantity: line.quantity,
+      unit: line.unit,
       articleName: articleNameById.get(line.articleId) ?? line.articleId,
       fromMissing: false,
     }));
 
     const whatsappText = buildWhatsappText({
-      ...order,
-      lines: linesForText as any,
+      createdAt: order.createdAt,
+      lines: linesForText,
       supplierName,
-    } as any);
+    });
 
-    await supabase
-      .from('ordini')
-      .update({ whatsapp_text: whatsappText })
-      .eq('id', id);
+    await supabase.from('ordini').update({ whatsapp_text: whatsappText }).eq('id', id);
 
     const orderWithLines: OrderWithLines = {
       ...order,
@@ -341,9 +363,7 @@ export async function updateOrder(
           note: line.note ?? null,
         }));
 
-        const { error: insertError } = await supabase
-          .from('ordini_articoli')
-          .insert(lineInserts);
+        const { error: insertError } = await supabase.from('ordini_articoli').insert(lineInserts);
 
         if (insertError) {
           return { data: null, error: insertError };

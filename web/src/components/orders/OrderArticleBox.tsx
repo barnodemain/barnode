@@ -34,7 +34,11 @@ function OrderArticleBox({ article, isMissing, quantity, unit, onChange }: Order
   const displayUnitLabel = unit === OrderUnit.Box ? 'cart.' : unit === OrderUnit.Piece ? 'pz' : '';
 
   return (
-    <li className={isMissing ? 'orders-article-card orders-article-card-missing' : 'orders-article-card'}>
+    <li
+      className={
+        isMissing ? 'orders-article-card orders-article-card-missing' : 'orders-article-card'
+      }
+    >
       <button
         type="button"
         className="orders-article-header"
@@ -58,9 +62,7 @@ function OrderArticleBox({ article, isMissing, quantity, unit, onChange }: Order
             <button
               type="button"
               className={
-                unit === OrderUnit.Piece
-                  ? 'orders-toggle orders-toggle-active'
-                  : 'orders-toggle'
+                unit === OrderUnit.Piece ? 'orders-toggle orders-toggle-active' : 'orders-toggle'
               }
               onClick={() => handleUnitChange(OrderUnit.Piece)}
             >

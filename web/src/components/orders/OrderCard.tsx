@@ -28,7 +28,13 @@ function OrderCard({ order, supplier, onArchive, onDelete }: OrderCardProps) {
             <div className="orders-card-supplier">{supplier?.nome ?? 'Fornitore sconosciuto'}</div>
             <div className="orders-card-meta">
               {createdLabel && <span>{createdLabel}</span>}
-              <span className={isArchived ? 'orders-status-badge orders-status-badge-archived' : 'orders-status-badge orders-status-badge-active'}>
+              <span
+                className={
+                  isArchived
+                    ? 'orders-status-badge orders-status-badge-archived'
+                    : 'orders-status-badge orders-status-badge-active'
+                }
+              >
                 {isArchived ? 'Archiviato' : 'In corso'}
               </span>
             </div>
