@@ -108,3 +108,14 @@ Il sistema di backup:
 3. Flusso completo creazione ordini con invio email
 4. Sistema di notifiche per articoli sotto scorta
 5. Export PDF ordini
+
+## Barnode Web (nuova app)
+
+Per avviare la nuova web app (React + Vite + TypeScript):
+
+```bash
+cd web
+npm install
+npm run dev
+```
+

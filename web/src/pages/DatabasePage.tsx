@@ -1,0 +1,152 @@
+import { useMemo, useState } from 'react';
+import { useCatalog } from '../shared/state/catalogStore';
+import EditArticleModal from './database/EditArticleModal';
+import NewArticleModal from './database/NewArticleModal';
+import TypesManagerModal from './database/TypesManagerModal';
+import SuppliersManagerModal from './database/SuppliersManagerModal';
+
+function DatabasePage() {
+  const {
+    articoli,
+    tipologie,
+    fornitori,
+    addArticolo,
+    updateArticoloNome,
+    deleteArticolo,
+    addTipologia,
+    updateTipologia,
+    deleteTipologia,
+    addFornitore,
+    updateFornitore,
+    deleteFornitore,
+  } = useCatalog();
+
+  const [query, setQuery] = useState('');
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const [isEditArticleOpen, setIsEditArticleOpen] = useState(false);
+  const [isNewArticleOpen, setIsNewArticleOpen] = useState(false);
+  const [isTypesOpen, setIsTypesOpen] = useState(false);
+  const [isSuppliersOpen, setIsSuppliersOpen] = useState(false);
+
+  const filteredArticoli = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return articoli;
+    return articoli.filter((item) => item.nome.toLowerCase().includes(normalized));
+  }, [articoli, query]);
+
+  const selectedArticle =
+    selectedArticleId != null
+      ? (articoli.find((item) => item.id === selectedArticleId) ?? null)
+      : null;
+
+  return (
+    <main className="page">
+      <div className="db-page">
+        <header className="page-header">
+          <h1 className="page-title">Database articoli</h1>
+          <div className="search-row">
+            <span className="search-icon" aria-hidden="true">
+              🔍
+            </span>
+            <input
+              type="search"
+              placeholder="Cerca per nome articolo…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="search-input"
+            />
+          </div>
+        </header>
+        <section className="db-box-grid">
+          <button type="button" className="db-box" onClick={() => setIsTypesOpen(true)}>
+            Gestisci tipologie
+          </button>
+          <button type="button" className="db-box" onClick={() => setIsSuppliersOpen(true)}>
+            Gestisci fornitori
+          </button>
+          <button type="button" className="db-box" onClick={() => setIsNewArticleOpen(true)}>
+            Aggiungi articoli
+          </button>
+        </section>
+        <section className="list">
+          <div className="db-list-scroll">
+            <ul className="item-list">
+              {filteredArticoli.map((item) => (
+                <li key={item.id} className="item-card">
+                  <button
+                    type="button"
+                    className="db-item-button"
+                    onClick={() => {
+                      setSelectedArticleId(item.id);
+                      setIsEditArticleOpen(true);
+                    }}
+                  >
+                    <div className="db-item-main">
+                      <div className="db-item-name">{item.nome}</div>
+                      <div className="db-item-meta">
+                        <span>{item.tipologiaNome}</span>
+                        <span>{item.fornitoreNome}</span>
+                      </div>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <EditArticleModal
+        isOpen={isEditArticleOpen && selectedArticle != null}
+        article={selectedArticle}
+        onSave={(id, nuovoNome) => {
+          updateArticoloNome(id, nuovoNome);
+          setIsEditArticleOpen(false);
+          setSelectedArticleId(null);
+        }}
+        onDelete={(id) => {
+          if (window.confirm('Sei sicuro di voler eliminare questo articolo?')) {
+            deleteArticolo(id);
+            setIsEditArticleOpen(false);
+            setSelectedArticleId(null);
+          }
+        }}
+        onClose={() => {
+          setIsEditArticleOpen(false);
+          setSelectedArticleId(null);
+        }}
+      />
+
+      <NewArticleModal
+        isOpen={isNewArticleOpen}
+        tipologie={tipologie}
+        fornitori={fornitori}
+        onSave={(payload) => {
+          addArticolo(payload);
+          setIsNewArticleOpen(false);
+        }}
+        onClose={() => setIsNewArticleOpen(false)}
+      />
+
+      <TypesManagerModal
+        isOpen={isTypesOpen}
+        tipologie={tipologie}
+        addTipologia={addTipologia}
+        updateTipologia={updateTipologia}
+        deleteTipologia={deleteTipologia}
+        onClose={() => setIsTypesOpen(false)}
+      />
+
+      <SuppliersManagerModal
+        isOpen={isSuppliersOpen}
+        fornitori={fornitori}
+        addFornitore={addFornitore}
+        updateFornitore={updateFornitore}
+        deleteFornitore={deleteFornitore}
+        onClose={() => setIsSuppliersOpen(false)}
+      />
+    </main>
+  );
+}
+
+export default DatabasePage;

@@ -1,0 +1,26 @@
+{
+  "name": "barnode-web",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx --config ../eslint.config.js",
+    "lint:fix": "eslint src --ext .ts,.tsx --config ../eslint.config.js --fix"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.84.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "typescript": "^5.4.0",
+    "vite": "^5.0.0"
+  }
+}

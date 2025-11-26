@@ -736,6 +736,149 @@ begin
   end if;
 
 end$$;
-```
+
+## 10. UI Ordini — flusso di creazione (Web)
+
+La nuova UI web per la creazione degli ordini (cartella `web/`) utilizza **solo** il client Supabase lato browser (`web/src/shared/services/supabaseClient.ts`) e i repository/store React dedicati.
+
+Flusso riassunto:
+
+- Hook principali:
+  - `useCatalog()` (`web/src/shared/state/catalogStore.ts`) → espone `fornitori` e `articoli` reali.
+  - `useMissingItems()` (`web/src/shared/state/missingItemsStore.ts`) → espone `missingIds` per evidenziare gli articoli provenienti da `articoli_mancanti`.
+  - `useOrders()` (`web/src/state/ordersStore.ts`) → gestisce stato globale ordini (`activeOrders`, `archivedOrders`) e bozza ordine (`draftSupplierId`, `draftLinesByArticleId`, `canSendOrder`).
+
+- Repository ordini:
+  - `ordersRepository` (`web/src/repositories/ordersRepository.ts`) incapsula tutte le chiamate Supabase per:
+    - leggere ordini attivi/archiviati;
+    - leggere un ordine con righe;
+    - creare un nuovo ordine con righe (`createOrderWithLines`);
+    - aggiornare/archiviare/eliminare un ordine.
+  - Nota: la colonna corretta per lo stato degli ordini in Supabase è `status` (non `stato`).
+  - Nota: la tabella di dettaglio delle righe ordine è sempre `ordini_articoli` (non esiste nessuna tabella `ordini_righe`).
+
+- Pagina di creazione ordine:
+  - `CreateOrderPage` (`web/src/pages/orders/CreateOrderPage.tsx`):
+    - Step 1: selezione fornitore (obbligatoria) usando `draftSupplierId` da `useOrders()`.
+    - Step 2: lista articoli del fornitore, con priorità visiva per quelli in `articoli_mancanti` (lettura da `useMissingItems()`).
+    - Per ogni articolo gestisce una riga di bozza (`draftLinesByArticleId`) con quantità e unità (`order_unit`).
+    - Il pulsante "Invia ordine" diventa attivo solo quando `canSendOrder` è `true` (supplier selezionato + almeno una quantità > 0).
+    - Alla conferma crea l'ordine chiamando `createOrderWithLines` (Supabase) e aggiorna lo stato globale degli ordini tramite `useOrders()`.
+    - Gli articoli provenienti da `articoli_mancanti` vengono depennati dopo la creazione dell'ordine usando il relativo repository.
+
+    Nota: al momento della conferma il componente editor (`OrderEditorPageBase`) passa esplicitamente a `CreateOrderPage` l'id del fornitore selezionato, invece di farlo rileggere dallo store, per evitare desincronizzazioni tra stato UI e stato globale.
+
+La UI non usa mai direttamente le chiavi Supabase: legge sempre dal client inizializzato in `web/src/shared/services/supabaseClient.ts`, che a sua volta utilizza `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` definite in `.env.local`.
+
+## 11. UI Ordini — Gestione Ordini (Lista, Tab, Azioni)
+
+La sezione "Ordini" della web app espone due schermate principali per la gestione degli ordini:
+
+- `OrdersPage` (`web/src/pages/orders/OrdersPage.tsx`)
+- `ManageOrdersPage` (`web/src/pages/orders/ManageOrdersPage.tsx`)
+
+### 11.1 OrdersPage (entry point)
+
+- Percorso router: `/orders`.
+- Mostra due card principali in stile BARnode:
+  - **Crea ordine** → `navigate('/orders/create')`.
+  - **Gestisci ordini** → `navigate('/orders/manage')`.
+- Layout mobile-first, card ampie e facilmente cliccabili, su sfondo crema.
+
+### 11.2 ManageOrdersPage (lista + tab)
+
+- Percorso router: `/orders/manage`.
+- Header fisso con pulsante "← Indietro" che usa `navigate(-1)`.
+- Due tab touch-friendly:
+  - "In corso" (ordini attivi).
+  - "Archiviati" (ordini già chiusi/archiviati).
+- Il contenuto centrale è una lista scrollabile di card ordine (`OrderCard`).
+
+Hook usati:
+
+- `useOrders()` (`web/src/state/ordersStore.ts`):
+  - `activeOrders`, `archivedOrders`.
+  - `loadActiveOrders()`, `loadArchivedOrders()`.
+  - `archiveOrder(id)`, `deleteOrder(id)`.
+- `useCatalog()` (`web/src/shared/state/catalogStore.ts`):
+  - espone `fornitori`, usati per risolvere `supplierId` → nome fornitore.
+
+Comportamento tab:
+
+- All'ingresso della pagina viene chiamato `loadActiveOrders()` per popolare la tab "In corso".
+- Al primo passaggio alla tab "Archiviati" viene chiamato `loadArchivedOrders()` (lazy load).
+
+### 11.3 OrderCard (UI per singolo ordine)
+
+- Componente: `OrderCard` (`web/src/components/orders/OrderCard.tsx`).
+- Props principali:
+  - `order` (tipo `Order` dal layer web degli ordini).
+  - `supplier` (oggetto `Fornitore` risolto da `useCatalog()`).
+  - callback `onArchive(id)`, `onDelete(id)`, `onEdit(id)`, `onWhatsapp(id)`.
+- UI:
+  - Card bianca arrotondata con:
+    - titolo = nome del fornitore,
+    - data creazione formattata,
+    - badge stato ("In corso" / "Archiviato"),
+    - riepilogo righe (es. `totalLines`).
+  - Barra di azioni in fondo alla card con pulsanti pill:
+    - **Modifica** (solo per ordini attivi) → apre route `/orders/edit/{id}` (la logica di edit/WhatsApp verrà completata in step successivi).
+    - **Archivia** (solo per ordini attivi) → chiama `onArchive(id)`.
+    - **WhatsApp** (solo per ordini attivi) → chiama `onWhatsapp(id)` (solo click handler, nessun testo messaggio in questo step).
+    - **Elimina** (sempre visibile) → chiama `onDelete(id)`.
+
+In `ManageOrdersPage`, le callback sono collegate allo store `useOrders()`:
+
+- `onArchive(id)` → `archiveOrder(id)` e ricarico liste con `loadActiveOrders()` + `loadArchivedOrders()`.
+- `onDelete(id)` → conferma via `window.confirm(...)`, poi `deleteOrder(id)` + ricarica liste.
+
+Anche in questa sezione la UI non usa direttamente Supabase: tutte le operazioni passano attraverso `useOrders()` e `ordersRepository`, che a loro volta usano il client Supabase tipizzato.
+
+## 12. UI Ordini — Schermata Finale e WhatsApp
+
+Al termine della creazione di un ordine, la web app mostra una schermata di conferma con pulsante per aprire WhatsApp usando un testo precompilato salvato in Supabase.
+
+### 12.1 Generazione del testo WhatsApp
+
+- Nel repository ordini (`web/src/repositories/ordersRepository.ts`) è stata aggiunta una funzione helper `buildWhatsappText(...)` che genera il testo da inviare via WhatsApp a partire da:
+  - data di creazione dell'ordine;
+  - eventuale nome fornitore;
+  - elenco delle righe ordine (quantità, unità, nome articolo, flag "mancante").
+- Il testo ha la forma:
+  - intestazione tipo `Ordine BARnode — {nome fornitore}`;
+  - riga con la data dell'ordine;
+  - sezione "Articoli:" con una riga per ciascuna riga ordine:
+    - `• {quantità} {unità} — {nome articolo}`
+    - se la riga proviene dagli articoli mancanti viene aggiunto il suffisso `(mancante)`.
+Al momento della creazione ordine (`createOrderWithLines`):
+
+- viene inserita la testata in `ordini` e le righe in `ordini_articoli`;
+- il repository recupera il nome del fornitore (`fornitori`) e i nomi degli articoli (`articoli`);
+- costruisce un array di righe adatto a `buildWhatsappText` e genera la stringa finale;
+- aggiorna il campo `whatsapp_text` della tabella `ordini` con il testo generato.
+
+### 12.2 Uso di whatsapp_text nel client web
+
+- Il tipo `Order` usato lato web include ora un campo opzionale `whatsappText` che mappa il valore del campo `whatsapp_text` di Supabase.
+- Le funzioni di lettura del repository (`getActiveOrders`, `getArchivedOrders`, `getOrderById`, `archiveOrder`, `updateOrder`) selezionano anche `whatsapp_text` e lo mappano sul campo `whatsappText` lato client.
+- Lo store `useOrders()` espone metodi di sola lettura per recuperare un ordine completo con le sue righe:
+  - `getOrderById(id)` → legge l'ordine con righe da Supabase;
+  - `finalizeCreatedOrder(id)` → wrapper che richiama `getOrderById` senza modificare lo stato globale.
+
+### 12.3 OrderCreatedPage e apertura WhatsApp
+
+- Pagina: `OrderCreatedPage` (`web/src/pages/orders/OrderCreatedPage.tsx`).
+- Route: `/orders/created/:id`.
+- Flusso:
+  - al termine di `createOrderWithLines`, la UI di creazione (`CreateOrderPage`) esegue `navigate('/orders/created/{id}')` usando l'id dell'ordine appena creato;
+  - `OrderCreatedPage` legge l'id da `useParams`, usa `finalizeCreatedOrder(id)` per ottenere `OrderWithLines` (incluso `whatsappText`), e mostra una schermata di conferma;
+  - un pulsante principale "Apri WhatsApp" richiama una funzione `openWhatsApp(text)` che:
+    - esegue `encodeURIComponent(text)`;
+    - reindirizza il browser verso `https://wa.me/?text={encoded}`;
+  - un secondo pulsante "Torna agli ordini" riporta l'utente alla lista ordini (`/orders`).
+
+- In assenza di `whatsappText` il client non interrompe il flusso, ma evita di aprire WhatsApp e registra un warning in console.
+
+Questa integrazione non modifica in alcun modo lo schema del database né le policy RLS: usa esclusivamente il campo `whatsapp_text` già previsto nella tabella `ordini` e le normali operazioni di update tramite Supabase JS.
 
 _Fine file_
