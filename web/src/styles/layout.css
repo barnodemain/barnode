@@ -91,10 +91,12 @@
   color: inherit;
   font-size: 0.9rem;
   padding: 2px 0;
+  transition: color 0.2s ease-in-out;
 }
 
 .nav-item-active {
   font-weight: 600;
+  color: #f6c453;
 }
 
 .floating-add-button {
