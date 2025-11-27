@@ -69,6 +69,16 @@ function MissingItemsPage() {
           )}
         </section>
       </div>
+
+      <button
+        type="button"
+        className="floating-add-button"
+        onClick={() => {
+          // TODO: aggiunta rapida articolo mancante
+        }}
+      >
+        <AppIcon name="plus" size={22} />
+      </button>
     </main>
   );
 }

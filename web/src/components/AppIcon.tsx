@@ -6,9 +6,10 @@ import {
   Settings as SettingsIcon,
   Search as SearchIcon,
   Trash2 as TrashIcon,
+  Plus as PlusIcon,
 } from 'lucide-react';
 
-export type AppIconName = 'home' | 'archive' | 'settings' | 'search' | 'trash';
+export type AppIconName = 'home' | 'archive' | 'settings' | 'search' | 'trash' | 'plus';
 
 const ICON_MAP: Record<AppIconName, LucideIcon> = {
   home: HomeIcon,
@@ -16,6 +17,7 @@ const ICON_MAP: Record<AppIconName, LucideIcon> = {
   settings: SettingsIcon,
   search: SearchIcon,
   trash: TrashIcon,
+  plus: PlusIcon,
 };
 
 export interface AppIconProps extends ComponentProps<LucideIcon> {

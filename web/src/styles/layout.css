@@ -96,3 +96,30 @@
 .nav-item-active {
   font-weight: 600;
 }
+
+.floating-add-button {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.5rem; /* appena sopra la NavBar */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #215936;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
+
+.floating-add-button:active {
+  transform: scale(0.95);
+}
+
+.floating-add-button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}

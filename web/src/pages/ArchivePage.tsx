@@ -87,6 +87,16 @@ function ArchivePage() {
           setSelectedArticleId(null);
         }}
       />
+
+      <button
+        type="button"
+        className="floating-add-button"
+        onClick={() => {
+          // TODO: aggiunta rapida articolo archivio
+        }}
+      >
+        <AppIcon name="plus" size={22} />
+      </button>
     </main>
   );
 }
