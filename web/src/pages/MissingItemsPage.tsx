@@ -12,7 +12,7 @@ function MissingItemsPage() {
         <div className="page-logo-wrapper">
           <img src={logo} alt="Barnode" className="page-logo" />
         </div>
-        <h1 className="page-title">Articoli mancanti</h1>
+        <h1 className="page-title">Lista articoli mancanti</h1>
         <div className="search-row">
           <span className="search-icon" aria-hidden="true">
             <AppIcon name="search" size={16} />

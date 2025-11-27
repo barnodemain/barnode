@@ -1,5 +1,6 @@
 import React from 'react';
 import logo from '../assets/logo.png';
+import { AppIcon } from '../components/AppIcon';
 
 function SettingsPage() {
   return (
@@ -13,13 +14,22 @@ function SettingsPage() {
       <section className="list">
         <div className="settings-grid">
           <button type="button" className="db-box settings-button">
-            IMPORTA
+            <span className="settings-button-icon">
+              <AppIcon name="upload" size={18} />
+            </span>
+            <span className="settings-button-label">IMPORTA</span>
           </button>
           <button type="button" className="db-box settings-button">
-            ARTICOLI
+            <span className="settings-button-icon">
+              <AppIcon name="file-text" size={18} />
+            </span>
+            <span className="settings-button-label">ARTICOLI</span>
           </button>
           <button type="button" className="db-box settings-button">
-            TIPOLOGIE
+            <span className="settings-button-icon">
+              <AppIcon name="tag" size={18} />
+            </span>
+            <span className="settings-button-label">TIPOLOGIE</span>
           </button>
           <button
             type="button"
@@ -28,7 +38,10 @@ function SettingsPage() {
               // TODO: collegare azione BACKUP quando disponibile
             }}
           >
-            BACKUP
+            <span className="settings-button-icon">
+              <AppIcon name="cloud" size={18} />
+            </span>
+            <span className="settings-button-label">BACKUP</span>
           </button>
         </div>
       </section>
