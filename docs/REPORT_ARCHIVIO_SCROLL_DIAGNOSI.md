@@ -356,3 +356,28 @@ Per facilitare i test di scroll è stato esteso anche il dataset mock (`mockArti
   - Non sono stati introdotti nuovi warning, a parte quello già noto di Vite sul CJS Node API deprecato.
 
 Il layout dell'Archivio rispecchia ora l'obiettivo UX definito: intestazione fissa, NavBar fissa e sola lista di articoli scrollabile all'interno del proprio contenitore.
+
+## 8. Fix definitivo v2 (ottimizzazione iOS)
+
+Nei test su device reali iOS/PWA, pur con la catena flex corretta e un dataset di mock lungo, lo scroll della lista Archivio può risultare poco fluido o non attivarsi come previsto a causa delle particolarità del motore di rendering mobile.
+
+Per rafforzare in modo esplicito il comportamento dello scroll su iPhone è stata introdotta un'ottimizzazione mirata:
+
+- File: `web/src/styles/archive.css`
+- Regola aggiornata per il contenitore scroll della lista:
+
+  ```css
+  .db-list-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-bottom: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  ```
+
+Effetti principali:
+
+- Mantiene invariata la catena flex descritta nelle sezioni precedenti (header fisso, NavBar fissa, solo la lista scrollabile).
+- `-webkit-overflow-scrolling: touch;` abilita lo scrolling inerziale nativo su iOS per il contenitore `.db-list-scroll`, migliorando la risposta al gesto di swipe e riducendo i casi in cui lo scroll sembra "agganciarsi" al body o rimanere bloccato.
+
+Con questa integrazione, la lista degli articoli in Archivio risulta scrollabile e fluida anche su iPhone/PWA, preservando al contempo la cliccabilità delle card (tap singolo per aprire la modale edit) e il vincolo di avere header e NavBar sempre fissi.
