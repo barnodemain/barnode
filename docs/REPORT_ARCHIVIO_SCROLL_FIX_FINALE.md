@@ -246,3 +246,136 @@ In questo assetto:
 - non esistono più container con `overflow-y: auto` dedicati alla lista: l'overflow è gestito dal browser sul documento.
 
 Questo riduce al minimo i rischi di comportamenti differenti tra desktop, Safari mobile e PWA, concentrando lo scroll su un singolo livello (il body) e lasciando la NavBar come overlay sempre visibile.
+
+## 8. Layout a 3 fasce per /archivio
+
+Per ottenere un comportamento ancora più controllato su `/archivio`, è stato introdotto un layout a 3 fasce locale alla pagina Archivio, basato su `position: fixed`:
+
+- Struttura JSX finale di `ArchivePage`:
+
+  ```tsx
+  <main className="page archive-page">
+    <header className="archive-header"> ... logo + titolo + search ... </header>
+    <div className="archive-scroll">
+      <ul className="archive-item-list"> ... card articoli ... </ul>
+    </div>
+    <EditArticleModal ... />
+  </main>
+  ```
+
+- CSS chiave in `archive.css`:
+
+  ```css
+  .archive-page {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .archive-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: #f7f3e8;
+    z-index: 10;
+  }
+
+  .archive-scroll {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 160px;   /* altezza stimata header */
+    bottom: 80px; /* altezza stimata NavBar */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem 1.5rem;
+  }
+
+  .archive-item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  ```
+
+In questo schema:
+
+- l'**header Archivio** (logo + titolo + search) rimane sempre visibile in alto;
+- la **NavBar** continua a essere fissa in basso (`position: fixed` in `layout.css`);
+- la lista articoli scorre solo dentro `archive-scroll`, l'area centrale compresa tra `top: 160px` e `bottom: 80px`;
+- il body resta scrollabile in generale, ma per la pagina Archivio la porzione visivamente scrollabile è `archive-scroll`, con supporto allo scroll inerziale su iOS grazie a `-webkit-overflow-scrolling: touch`.
+
+## 9. Layout 3 fasce Home
+
+La pagina Home (`MissingItemsPage`, route `/`) è stata allineata allo stesso schema a 3 fasce usato per `/archivio`:
+
+- Struttura JSX finale della Home:
+
+  ```tsx
+  <main className="page home-page">
+    <header className="home-header"> ... logo + titolo + search ... </header>
+    <div className="home-scroll">
+      {/* suggerimenti + lista mancanze */}
+      <section className="list">
+        <ul className="home-item-list"> ... card mancanze ... </ul>
+      </section>
+    </div>
+  </main>
+  ```
+
+- CSS chiave in `archive.css`:
+
+  ```css
+  .home-page {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .home-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: #f7f3e8;
+    z-index: 10;
+  }
+
+  .home-scroll {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 160px;   /* altezza stimata header Home */
+    bottom: 80px; /* altezza stimata NavBar */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem 1.5rem;
+  }
+
+  .home-item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  ```
+
+In questo modo, anche la Home espone un layout a 3 fasce:
+
+- header sempre visibile in alto;
+- NavBar fissa in basso;
+- solo la lista delle mancanze scorre dentro `home-scroll`, con comportamento coerente tra desktop e iPhone/PWA.

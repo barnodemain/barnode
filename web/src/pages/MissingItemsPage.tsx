@@ -7,8 +7,8 @@ function MissingItemsPage() {
     useMissingItems();
 
   return (
-    <main className="page">
-      <header className="page-header">
+    <main className="page home-page">
+      <header className="home-header">
         <div className="page-logo-wrapper">
           <img src={logo} alt="Barnode" className="page-logo" />
         </div>
@@ -26,47 +26,49 @@ function MissingItemsPage() {
           />
         </div>
       </header>
-      {query.trim().length > 0 && suggestedItems.length > 0 && (
-        <section className="suggestions-panel">
-          <ul className="suggestions-list">
-            {suggestedItems.map((item) => (
-              <li
-                key={item.id}
-                className="suggestions-item"
-                onClick={() => {
-                  addMissing(item.id);
-                  setQuery('');
-                }}
-              >
-                <span className="item-name">{item.nome}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-      <section className="list">
-        {missingItems.length === 0 ? (
-          <p className="empty-state">Nessun articolo in lista da acquistare.</p>
-        ) : (
-          <ul className="item-list">
-            {missingItems.map((item) => (
-              <li key={item.id} className="item-card">
-                <div className="item-row">
+      <div className="home-scroll">
+        {query.trim().length > 0 && suggestedItems.length > 0 && (
+          <section className="suggestions-panel">
+            <ul className="suggestions-list">
+              {suggestedItems.map((item) => (
+                <li
+                  key={item.id}
+                  className="suggestions-item"
+                  onClick={() => {
+                    addMissing(item.id);
+                    setQuery('');
+                  }}
+                >
                   <span className="item-name">{item.nome}</span>
-                  <button
-                    type="button"
-                    className="item-delete-button"
-                    onClick={() => removeMissing(item.id)}
-                    aria-label={`Rimuovi ${item.nome} dalla lista`}
-                  >
-                    <AppIcon name="trash" size={18} />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
-      </section>
+        <section className="list">
+          {missingItems.length === 0 ? (
+            <p className="empty-state">Nessun articolo in lista da acquistare.</p>
+          ) : (
+            <ul className="home-item-list">
+              {missingItems.map((item) => (
+                <li key={item.id} className="item-card">
+                  <div className="item-row">
+                    <span className="item-name">{item.nome}</span>
+                    <button
+                      type="button"
+                      className="item-delete-button"
+                      onClick={() => removeMissing(item.id)}
+                      aria-label={`Rimuovi ${item.nome} dalla lista`}
+                    >
+                      <AppIcon name="trash" size={18} />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

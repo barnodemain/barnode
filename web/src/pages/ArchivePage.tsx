@@ -24,7 +24,7 @@ function ArchivePage() {
 
   return (
     <main className="page archive-page">
-      <header className="page-header">
+      <header className="archive-header">
         <div className="page-logo-wrapper">
           <img src={logo} alt="Barnode" className="page-logo" />
         </div>
@@ -43,27 +43,29 @@ function ArchivePage() {
         </div>
       </header>
 
-      <ul className="archive-item-list">
-        {filteredArticoli.map((item) => (
-          <li key={item.id} className="item-card">
-            <button
-              type="button"
-              className="db-item-button"
-              onClick={() => {
-                setSelectedArticleId(item.id);
-                setIsEditArticleOpen(true);
-              }}
-            >
-              <div className="db-item-main">
-                <div className="db-item-name">{item.nome}</div>
-                <div className="db-item-meta">
-                  <span>{item.tipologiaNome}</span>
+      <div className="archive-scroll">
+        <ul className="archive-item-list">
+          {filteredArticoli.map((item) => (
+            <li key={item.id} className="item-card">
+              <button
+                type="button"
+                className="db-item-button"
+                onClick={() => {
+                  setSelectedArticleId(item.id);
+                  setIsEditArticleOpen(true);
+                }}
+              >
+                <div className="db-item-main">
+                  <div className="db-item-name">{item.nome}</div>
+                  <div className="db-item-meta">
+                    <span>{item.tipologiaNome}</span>
+                  </div>
                 </div>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <EditArticleModal
         isOpen={isEditArticleOpen && selectedArticle != null}

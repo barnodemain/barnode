@@ -1,11 +1,75 @@
 .archive-page {
-  max-width: 800px;
-  margin: 0 auto;
+  position: relative;
+  min-height: 100vh;
+}
+
+.archive-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #f7f3e8;
+  z-index: 10;
+}
+
+.archive-scroll {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 160px; /* altezza stimata header (logo + titolo + search) */
+  bottom: 80px; /* altezza stimata NavBar inclusi padding/safe-area */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1rem 1.5rem;
 }
 
 .archive-item-list {
   list-style: none;
-  margin: 1rem 0 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-page {
+  position: relative;
+  min-height: 100vh;
+}
+
+.home-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #f7f3e8;
+  z-index: 10;
+}
+
+.home-scroll {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 160px; /* altezza stimata header Home (logo + titolo + search) */
+  bottom: 80px; /* altezza stimata NavBar */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1rem 1.5rem;
+}
+
+.home-item-list {
+  list-style: none;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
