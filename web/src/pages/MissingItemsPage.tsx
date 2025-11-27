@@ -1,5 +1,6 @@
 import { useMissingItems } from '../shared/state/missingItemsStore';
 import logo from '../assets/logo.png';
+import { AppIcon } from '../components/AppIcon';
 
 function MissingItemsPage() {
   const { missingItems, suggestedItems, query, setQuery, addMissing, removeMissing } =
@@ -14,7 +15,7 @@ function MissingItemsPage() {
         <h1 className="page-title">Articoli mancanti</h1>
         <div className="search-row">
           <span className="search-icon" aria-hidden="true">
-            🔍
+            <AppIcon name="search" size={16} />
           </span>
           <input
             type="search"
@@ -58,7 +59,7 @@ function MissingItemsPage() {
                     onClick={() => removeMissing(item.id)}
                     aria-label={`Rimuovi ${item.nome} dalla lista`}
                   >
-                    🗑️
+                    <AppIcon name="trash" size={18} />
                   </button>
                 </div>
               </li>

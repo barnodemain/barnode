@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { AppIcon } from './components/AppIcon';
 
 const MissingItemsPage = lazy(() => import('./pages/MissingItemsPage'));
 const ArchivePage = lazy(() => import('./pages/ArchivePage'));
@@ -25,19 +26,22 @@ function App() {
           end
           className={({ isActive }) => (isActive ? 'nav-item nav-item-active' : 'nav-item')}
         >
-          Home
+          <AppIcon name="home" size={18} />
+          <span>Home</span>
         </NavLink>
         <NavLink
           to="/archivio"
           className={({ isActive }) => (isActive ? 'nav-item nav-item-active' : 'nav-item')}
         >
-          Archivio
+          <AppIcon name="archive" size={18} />
+          <span>Archivio</span>
         </NavLink>
         <NavLink
           to="/settings"
           className={({ isActive }) => (isActive ? 'nav-item nav-item-active' : 'nav-item')}
         >
-          Impostazioni
+          <AppIcon name="settings" size={18} />
+          <span>Impostazioni</span>
         </NavLink>
       </nav>
     </div>

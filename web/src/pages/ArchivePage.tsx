@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useCatalog } from '../shared/state/catalogStore';
+import { AppIcon } from '../components/AppIcon';
 import EditArticleModal from './archive/EditArticleModal';
 
 function ArchivePage() {
@@ -27,7 +28,7 @@ function ArchivePage() {
           <h1 className="page-title">Archivio articoli</h1>
           <div className="search-row">
             <span className="search-icon" aria-hidden="true">
-              🔍
+              <AppIcon name="search" size={16} />
             </span>
             <input
               type="search"
