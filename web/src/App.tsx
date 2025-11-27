@@ -20,6 +20,7 @@ function App() {
             <Route path="/orders/create" element={<CreateOrderPage />} />
             <Route path="/orders/manage" element={<ManageOrdersPage />} />
             <Route path="/orders/created/:id" element={<OrderCreatedPage />} />
+            <Route path="*" element={<MissingItemsPage />} />
           </Routes>
         </Suspense>
       </div>
