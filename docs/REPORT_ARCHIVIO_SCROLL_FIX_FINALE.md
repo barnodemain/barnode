@@ -178,3 +178,71 @@ Warning residui:
 - warning degli strumenti browser su `-webkit-overflow-scrolling` non supportato in alcuni ambienti (irrilevante: la regola viene semplicemente ignorata fuori da iOS).
 
 Nel complesso, la pagina Archivio soddisfa ora il requisito UX non negoziabile: header e NavBar fissi, lista articoli scrollabile in modo fluido (anche su iPhone/PWA) e articoli pienamente cliccabili per l'apertura della modale di modifica.
+
+## 7. Cambio di strategia: scroll di pagina semplice
+
+In una fase successiva è stata abbandonata la strategia "app shell" con `html/body/#root` bloccati e scroll interno annidato, in favore di un approccio più semplice e robusto:
+
+- `html` e `body` non hanno più `overflow: hidden`; usano invece:
+
+  ```css
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+
+  #root {
+    min-height: 100%;
+  }
+  ```
+
+- `.page-content` non è più un contenitore di scroll interno:
+
+  ```css
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    padding-bottom: 5.8rem; /* spazio visivo sopra la NavBar fissa */
+  }
+  ```
+
+- La pagina Archivio espone una struttura lineare:
+
+  ```tsx
+  <main className="page archive-page">
+    <header className="page-header"> ... </header>
+    <ul className="archive-item-list"> ... </ul>
+    <EditArticleModal ... />
+  </main>
+  ```
+
+  con CSS corrispondente:
+
+  ```css
+  .archive-page {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .archive-item-list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  ```
+
+In questo assetto:
+
+- è la **pagina intera** (body) a scrollare in modo naturale, come in un sito web classico;
+- la NavBar verde resta `position: fixed` in fondo allo schermo;
+- l'header Archivio può scorrere con la pagina (sticky non è più un requisito forte);
+- non esistono più container con `overflow-y: auto` dedicati alla lista: l'overflow è gestito dal browser sul documento.
+
+Questo riduce al minimo i rischi di comportamenti differenti tra desktop, Safari mobile e PWA, concentrando lo scroll su un singolo livello (il body) e lasciando la NavBar come overlay sempre visibile.

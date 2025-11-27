@@ -1,20 +1,11 @@
 .archive-page {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.archive-scroll {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding-bottom: 1.5rem;
-  -webkit-overflow-scrolling: touch;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .archive-item-list {
   list-style: none;
-  margin: 0;
+  margin: 1rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;

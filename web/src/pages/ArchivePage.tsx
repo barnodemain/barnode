@@ -43,29 +43,27 @@ function ArchivePage() {
         </div>
       </header>
 
-      <div className="archive-scroll">
-        <ul className="archive-item-list">
-          {filteredArticoli.map((item) => (
-            <li key={item.id} className="item-card">
-              <button
-                type="button"
-                className="db-item-button"
-                onClick={() => {
-                  setSelectedArticleId(item.id);
-                  setIsEditArticleOpen(true);
-                }}
-              >
-                <div className="db-item-main">
-                  <div className="db-item-name">{item.nome}</div>
-                  <div className="db-item-meta">
-                    <span>{item.tipologiaNome}</span>
-                  </div>
+      <ul className="archive-item-list">
+        {filteredArticoli.map((item) => (
+          <li key={item.id} className="item-card">
+            <button
+              type="button"
+              className="db-item-button"
+              onClick={() => {
+                setSelectedArticleId(item.id);
+                setIsEditArticleOpen(true);
+              }}
+            >
+              <div className="db-item-main">
+                <div className="db-item-name">{item.nome}</div>
+                <div className="db-item-meta">
+                  <span>{item.tipologiaNome}</span>
                 </div>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
 
       <EditArticleModal
         isOpen={isEditArticleOpen && selectedArticle != null}
