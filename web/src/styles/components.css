@@ -20,6 +20,13 @@
   border: none;
   font-size: 0.95rem;
   outline: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+}
+
+.search-input::-webkit-search-decoration,
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
 }
 
 .suggestions-panel {
