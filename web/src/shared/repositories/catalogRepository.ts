@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
-import type { Articolo, ArticoloWithRelations, Tipologia } from '../types';
+import type { Articolo, ArticoloWithRelations, Tipologia } from '../types/items';
 
 export interface RepositoryResult<T> {
   data: T | null;
