@@ -37,7 +37,7 @@ function DatabasePage() {
     <main className="page">
       <div className="db-page">
         <header className="page-header">
-          <h1 className="page-title">Database articoli</h1>
+          <h1 className="page-title">Archivio articoli</h1>
           <div className="search-row">
             <span className="search-icon" aria-hidden="true">
               🔍

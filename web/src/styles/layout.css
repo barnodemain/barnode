@@ -11,7 +11,7 @@
   flex-direction: column;
   overflow: hidden;
   padding: 1rem;
-  padding-bottom: 4rem;
+  padding-bottom: 5.8rem;
   min-height: 0;
 }
 
@@ -60,10 +60,13 @@
   bottom: 0;
   display: flex;
   justify-content: space-around;
+  align-items: center;
   border-top: 1px solid #e0dfd8;
   background-color: #215936;
   color: #ffffff;
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  min-height: 64px;
+  z-index: 999;
 }
 
 .nav-item {
@@ -71,8 +74,8 @@
   text-align: center;
   text-decoration: none;
   color: inherit;
-  font-size: 0.9rem;
-  padding: 4px 0;
+  font-size: 1rem;
+  padding: 12px 0;
 }
 
 .nav-item-active {

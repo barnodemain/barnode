@@ -3,6 +3,7 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 
 const MissingItemsPage = lazy(() => import('./pages/MissingItemsPage'));
 const DatabasePage = lazy(() => import('./pages/DatabasePage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Routes>
             <Route path="/" element={<MissingItemsPage />} />
             <Route path="/database" element={<DatabasePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<MissingItemsPage />} />
           </Routes>
         </Suspense>
@@ -28,7 +30,13 @@ function App() {
           to="/database"
           className={({ isActive }) => (isActive ? 'nav-item nav-item-active' : 'nav-item')}
         >
-          Database
+          Archivio
+        </NavLink>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) => (isActive ? 'nav-item nav-item-active' : 'nav-item')}
+        >
+          Impostazioni
         </NavLink>
       </nav>
     </div>
