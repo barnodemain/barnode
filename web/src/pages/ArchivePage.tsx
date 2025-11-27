@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useCatalog } from '../shared/state/catalogStore';
+import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
 import EditArticleModal from './archive/EditArticleModal';
 
@@ -25,6 +26,9 @@ function ArchivePage() {
     <main className="page">
       <div className="db-page">
         <header className="page-header">
+          <div className="page-logo-wrapper">
+            <img src={logo} alt="Barnode" className="page-logo" />
+          </div>
           <h1 className="page-title">Archivio articoli</h1>
           <div className="search-row">
             <span className="search-icon" aria-hidden="true">

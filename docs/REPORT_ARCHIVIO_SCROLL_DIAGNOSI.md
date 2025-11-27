@@ -346,6 +346,8 @@ In questo assetto:
     - NavBar fissa in basso con gestione della safe-area.
     - Lista articoli scrollabile in modo indipendente e fluido al tocco.
 
+Per facilitare i test di scroll è stato esteso anche il dataset mock (`mockArticoli` in `web/src/shared/data/mockCatalog.ts`) a circa 40 elementi, in modo da avere liste sufficientemente lunghe sia in Home che in Archivio.
+
 ### 7.4 Stato tecnico
 
 - Dopo il fix è stato verificato che:
