@@ -64,7 +64,7 @@
   border-top: 1px solid #e0dfd8;
   background-color: #215936;
   color: #ffffff;
-  padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  padding: 16px 16px calc(6px + env(safe-area-inset-bottom, 0px));
   min-height: 64px;
   z-index: 999;
 }

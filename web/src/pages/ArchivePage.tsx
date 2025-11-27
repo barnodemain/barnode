@@ -1,26 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useCatalog } from '../shared/state/catalogStore';
-import EditArticleModal from './database/EditArticleModal';
-import NewArticleModal from './database/NewArticleModal';
-import TypesManagerModal from './database/TypesManagerModal';
+import EditArticleModal from './archive/EditArticleModal';
 
-function DatabasePage() {
-  const {
-    articoli,
-    tipologie,
-    addArticolo,
-    updateArticoloNome,
-    deleteArticolo,
-    addTipologia,
-    updateTipologia,
-    deleteTipologia,
-  } = useCatalog();
+function ArchivePage() {
+  const { articoli, updateArticoloNome, deleteArticolo } = useCatalog();
 
   const [query, setQuery] = useState('');
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [isEditArticleOpen, setIsEditArticleOpen] = useState(false);
-  const [isNewArticleOpen, setIsNewArticleOpen] = useState(false);
-  const [isTypesOpen, setIsTypesOpen] = useState(false);
 
   const filteredArticoli = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -51,14 +38,6 @@ function DatabasePage() {
             />
           </div>
         </header>
-        <section className="db-box-grid">
-          <button type="button" className="db-box" onClick={() => setIsTypesOpen(true)}>
-            Gestisci tipologie
-          </button>
-          <button type="button" className="db-box" onClick={() => setIsNewArticleOpen(true)}>
-            Aggiungi articoli
-          </button>
-        </section>
         <section className="list">
           <div className="db-list-scroll">
             <ul className="item-list">
@@ -106,27 +85,8 @@ function DatabasePage() {
           setSelectedArticleId(null);
         }}
       />
-
-      <NewArticleModal
-        isOpen={isNewArticleOpen}
-        tipologie={tipologie}
-        onSave={(payload) => {
-          addArticolo(payload);
-          setIsNewArticleOpen(false);
-        }}
-        onClose={() => setIsNewArticleOpen(false)}
-      />
-
-      <TypesManagerModal
-        isOpen={isTypesOpen}
-        tipologie={tipologie}
-        addTipologia={addTipologia}
-        updateTipologia={updateTipologia}
-        deleteTipologia={deleteTipologia}
-        onClose={() => setIsTypesOpen(false)}
-      />
     </main>
   );
 }
 
-export default DatabasePage;
+export default ArchivePage;

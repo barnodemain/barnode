@@ -9,14 +9,6 @@
   flex: 1 1 auto;
   overflow-y: auto;
   padding-bottom: 1.5rem;
-  -webkit-overflow-scrolling: touch;
-}
-
-.db-box-grid {
-  margin-top: 1.25rem;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
 }
 
 .db-box {
@@ -43,14 +35,22 @@
 .db-item-name {
   font-size: 1rem;
   font-weight: 500;
+  color: #000000;
 }
 
 .db-item-meta {
   font-size: 0.8rem;
-  color: #555;
+  color: #555555;
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
+}
+
+.db-box,
+.db-box a,
+.db-item-main a {
+  color: #000000;
+  text-decoration: none;
 }
 
 .db-item-button {

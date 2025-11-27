@@ -1,8 +1,8 @@
 import { Suspense, lazy } from 'react';
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 
 const MissingItemsPage = lazy(() => import('./pages/MissingItemsPage'));
-const DatabasePage = lazy(() => import('./pages/DatabasePage'));
+const ArchivePage = lazy(() => import('./pages/ArchivePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function App() {
@@ -12,7 +12,8 @@ function App() {
         <Suspense fallback={<div className="page-loading">Caricamento...</div>}>
           <Routes>
             <Route path="/" element={<MissingItemsPage />} />
-            <Route path="/database" element={<DatabasePage />} />
+            <Route path="/archivio" element={<ArchivePage />} />
+            <Route path="/database" element={<Navigate to="/archivio" replace />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<MissingItemsPage />} />
           </Routes>
@@ -27,7 +28,7 @@ function App() {
           Home
         </NavLink>
         <NavLink
-          to="/database"
+          to="/archivio"
           className={({ isActive }) => (isActive ? 'nav-item nav-item-active' : 'nav-item')}
         >
           Archivio
