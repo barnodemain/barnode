@@ -30,11 +30,17 @@ export async function getTipologie(): Promise<RepositoryResult<Tipologia[]>> {
   return wrapQuery(async () => {
     return supabase
       .from('tipologie')
-      .select('id, nome, descrizione')
-      .eq('is_attiva', true)
+      .select('id, nome, created_at')
       .order('nome', { ascending: true });
   });
 }
+
+type ArticoloWithRelationsRow = {
+  id: string;
+  nome: string;
+  tipologia_id: string | null;
+  tipologie?: { id: string; nome: string } | { id: string; nome: string }[];
+};
 
 export interface CreateArticoloInput {
   nome: string;
@@ -79,19 +85,22 @@ export async function getArticoliWithRelations(): Promise<
         tipologie ( id, nome )
       `
       )
-      .eq('is_attivo', true)
       .order('nome', { ascending: true });
 
     if (error) {
       return { data: null, error };
     }
 
-    const mapped: ArticoloWithRelations[] = (data ?? []).map((row) => ({
-      id: row.id,
-      nome: row.nome,
-      tipologiaId: row.tipologia_id ?? '',
-      tipologiaNome: row.tipologie?.nome ?? 'N/A',
-    }));
+    const mapped: ArticoloWithRelations[] = (data ?? []).map((row: ArticoloWithRelationsRow) => {
+      const firstTipologia = Array.isArray(row.tipologie) ? row.tipologie[0] : row.tipologie;
+
+      return {
+        id: row.id,
+        nome: row.nome,
+        tipologiaId: row.tipologia_id ?? '',
+        tipologiaNome: firstTipologia?.nome ?? 'N/A',
+      };
+    });
 
     return { data: mapped, error: null };
   });

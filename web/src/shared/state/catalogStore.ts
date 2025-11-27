@@ -31,9 +31,9 @@ export function useCatalog() {
       if (!active) return;
 
       if (tipRes.error || artRes.error) {
-        console.error('[useCatalog] Errore caricamento iniziale, fallback ai mock');
-        setTipologie([...mockTipologie]);
-        setArticoli([...mockArticoli]);
+        console.error('[useCatalog] Errore caricamento da Supabase', tipRes.error || artRes.error);
+        setTipologie([]);
+        setArticoli([]);
         setLoadedFromSupabase(false);
         return;
       }
