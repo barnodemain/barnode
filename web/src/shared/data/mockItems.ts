@@ -6,8 +6,6 @@ export const mockMissingItems: ArticoloWithRelations[] = [
     nome: 'Bombay Dry',
     tipologiaId: 'tip-gin',
     tipologiaNome: 'Gin',
-    fornitoreId: 'for-1',
-    fornitoreNome: 'Fornitore Principale',
     descrizione: 'Gin secco per cocktail classici.',
   },
   {
@@ -15,8 +13,6 @@ export const mockMissingItems: ArticoloWithRelations[] = [
     nome: 'Lime fresco',
     tipologiaId: 'tip-frutta',
     tipologiaNome: 'Frutta fresca',
-    fornitoreId: 'for-2',
-    fornitoreNome: 'Orto & Co.',
     descrizione: 'Lime per drink sour e garnish.',
   },
 ];

@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
-import type { Articolo, ArticoloWithRelations, Fornitore, Tipologia } from '../types';
+import type { Articolo, ArticoloWithRelations, Tipologia } from '../types';
 
 export interface RepositoryResult<T> {
   data: T | null;
@@ -36,12 +36,6 @@ export async function getTipologie(): Promise<RepositoryResult<Tipologia[]>> {
   });
 }
 
-export async function getFornitori(): Promise<RepositoryResult<Fornitore[]>> {
-  return wrapQuery(async () => {
-    return supabase.from('fornitori').select('id, nome').order('nome', { ascending: true });
-  });
-}
-
 export async function getArticoliWithRelations(): Promise<
   RepositoryResult<ArticoloWithRelations[]>
 > {
@@ -53,9 +47,7 @@ export async function getArticoliWithRelations(): Promise<
         id,
         nome,
         tipologia_id,
-        fornitore_id,
-        tipologie ( id, nome ),
-        fornitori ( id, nome )
+        tipologie ( id, nome )
       `
       )
       .eq('is_attivo', true)
@@ -69,9 +61,7 @@ export async function getArticoliWithRelations(): Promise<
       id: row.id,
       nome: row.nome,
       tipologiaId: row.tipologia_id ?? '',
-      fornitoreId: row.fornitore_id ?? '',
       tipologiaNome: row.tipologie?.nome ?? 'N/A',
-      fornitoreNome: row.fornitori?.nome ?? 'N/A',
     }));
 
     return { data: mapped, error: null };
@@ -111,43 +101,9 @@ export async function deleteTipologia(id: string): Promise<RepositoryResult<null
   });
 }
 
-export async function createFornitore(nome: string): Promise<RepositoryResult<Fornitore>> {
-  return wrapQuery(async () => {
-    const { data, error } = await supabase
-      .from('fornitori')
-      .insert({ nome })
-      .select('id, nome')
-      .single();
-    return { data, error };
-  });
-}
-
-export async function updateFornitore(
-  id: string,
-  nome: string
-): Promise<RepositoryResult<Fornitore>> {
-  return wrapQuery(async () => {
-    const { data, error } = await supabase
-      .from('fornitori')
-      .update({ nome })
-      .eq('id', id)
-      .select('id, nome')
-      .single();
-    return { data, error };
-  });
-}
-
-export async function deleteFornitore(id: string): Promise<RepositoryResult<null>> {
-  return wrapQuery(async () => {
-    const { error } = await supabase.from('fornitori').delete().eq('id', id);
-    return { data: null, error };
-  });
-}
-
 interface CreateArticoloInput {
   nome: string;
   tipologiaId: string;
-  fornitoreId: string;
 }
 
 export async function createArticolo(
@@ -159,16 +115,13 @@ export async function createArticolo(
       .insert({
         nome: input.nome,
         tipologia_id: input.tipologiaId || null,
-        fornitore_id: input.fornitoreId || null,
       })
       .select(
         `
         id,
         nome,
         tipologia_id,
-        fornitore_id,
-        tipologie ( id, nome ),
-        fornitori ( id, nome )
+        tipologie ( id, nome )
       `
       )
       .single();
@@ -182,9 +135,7 @@ export async function createArticolo(
           id: data.id,
           nome: data.nome,
           tipologiaId: data.tipologia_id ?? '',
-          fornitoreId: data.fornitore_id ?? '',
           tipologiaNome: data.tipologie?.nome ?? 'N/A',
-          fornitoreNome: data.fornitori?.nome ?? 'N/A',
         }
       : null;
 
@@ -201,7 +152,7 @@ export async function updateArticoloNome(
       .from('articoli')
       .update({ nome: nuovoNome })
       .eq('id', id)
-      .select('id, nome, tipologia_id, fornitore_id')
+      .select('id, nome, tipologia_id')
       .single();
 
     const mapped: Articolo | null = data
@@ -209,7 +160,6 @@ export async function updateArticoloNome(
           id: data.id,
           nome: data.nome,
           tipologiaId: data.tipologia_id ?? '',
-          fornitoreId: data.fornitore_id ?? '',
         }
       : null;
 

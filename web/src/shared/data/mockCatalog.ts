@@ -1,4 +1,4 @@
-import { ArticoloWithRelations, Fornitore, Tipologia } from '../types/items';
+import { ArticoloWithRelations, Tipologia } from '../types/items';
 
 export const mockTipologie: Tipologia[] = [
   { id: 'tip-gin', nome: 'Gin' },
@@ -8,21 +8,12 @@ export const mockTipologie: Tipologia[] = [
   { id: 'tip-garnish', nome: 'Garnish' },
 ];
 
-export const mockFornitori: Fornitore[] = [
-  { id: 'for-1', nome: 'Distribuzione Centrale' },
-  { id: 'for-2', nome: 'Enoteca Milano' },
-  { id: 'for-3', nome: 'Soft & Co.' },
-  { id: 'for-4', nome: 'Orto Fresco' },
-];
-
 export const mockArticoli: ArticoloWithRelations[] = [
   {
     id: 'art-1',
     nome: 'Bombay Dry',
     tipologiaId: 'tip-gin',
     tipologiaNome: 'Gin',
-    fornitoreId: 'for-1',
-    fornitoreNome: 'Distribuzione Centrale',
     descrizione: 'Gin secco per cocktail classici.',
   },
   {
@@ -30,8 +21,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Tanqueray London Dry',
     tipologiaId: 'tip-gin',
     tipologiaNome: 'Gin',
-    fornitoreId: 'for-1',
-    fornitoreNome: 'Distribuzione Centrale',
     descrizione: 'Gin iconico, versatile per miscelazione.',
   },
   {
@@ -39,8 +28,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Campari Bitter',
     tipologiaId: 'tip-amaro',
     tipologiaNome: 'Amaro',
-    fornitoreId: 'for-1',
-    fornitoreNome: 'Distribuzione Centrale',
     descrizione: 'Bitter per Negroni e aperitivi classici.',
   },
   {
@@ -48,8 +35,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Aperol',
     tipologiaId: 'tip-amaro',
     tipologiaNome: 'Amaro',
-    fornitoreId: 'for-1',
-    fornitoreNome: 'Distribuzione Centrale',
     descrizione: 'Aperitivo aranciato per spritz leggeri.',
   },
   {
@@ -57,8 +42,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Prosecco DOC',
     tipologiaId: 'tip-vino',
     tipologiaNome: 'Vino',
-    fornitoreId: 'for-2',
-    fornitoreNome: 'Enoteca Milano',
     descrizione: 'Bollicine per spritz e brindisi veloci.',
   },
   {
@@ -66,8 +49,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Chianti Classico',
     tipologiaId: 'tip-vino',
     tipologiaNome: 'Vino',
-    fornitoreId: 'for-2',
-    fornitoreNome: 'Enoteca Milano',
     descrizione: 'Vino rosso fermo da mescita.',
   },
   {
@@ -75,8 +56,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Coca-Cola 33cl',
     tipologiaId: 'tip-soft',
     tipologiaNome: 'Soft drink',
-    fornitoreId: 'for-3',
-    fornitoreNome: 'Soft & Co.',
     descrizione: 'Soft drink per long drink e analcolici.',
   },
   {
@@ -84,8 +63,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Acqua tonica premium',
     tipologiaId: 'tip-soft',
     tipologiaNome: 'Soft drink',
-    fornitoreId: 'for-3',
-    fornitoreNome: 'Soft & Co.',
     descrizione: 'Tonica per Gin Tonic e highball.',
   },
   {
@@ -93,8 +70,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Lime fresco',
     tipologiaId: 'tip-garnish',
     tipologiaNome: 'Garnish',
-    fornitoreId: 'for-4',
-    fornitoreNome: 'Orto Fresco',
     descrizione: 'Garnish e ingrediente per sour.',
   },
   {
@@ -102,8 +77,6 @@ export const mockArticoli: ArticoloWithRelations[] = [
     nome: 'Foglie di menta',
     tipologiaId: 'tip-garnish',
     tipologiaNome: 'Garnish',
-    fornitoreId: 'for-4',
-    fornitoreNome: 'Orto Fresco',
     descrizione: 'Garnish per Mojito e drink freschi.',
   },
 ];

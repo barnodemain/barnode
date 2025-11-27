@@ -3,22 +3,17 @@ import { useCatalog } from '../shared/state/catalogStore';
 import EditArticleModal from './database/EditArticleModal';
 import NewArticleModal from './database/NewArticleModal';
 import TypesManagerModal from './database/TypesManagerModal';
-import SuppliersManagerModal from './database/SuppliersManagerModal';
 
 function DatabasePage() {
   const {
     articoli,
     tipologie,
-    fornitori,
     addArticolo,
     updateArticoloNome,
     deleteArticolo,
     addTipologia,
     updateTipologia,
     deleteTipologia,
-    addFornitore,
-    updateFornitore,
-    deleteFornitore,
   } = useCatalog();
 
   const [query, setQuery] = useState('');
@@ -26,7 +21,6 @@ function DatabasePage() {
   const [isEditArticleOpen, setIsEditArticleOpen] = useState(false);
   const [isNewArticleOpen, setIsNewArticleOpen] = useState(false);
   const [isTypesOpen, setIsTypesOpen] = useState(false);
-  const [isSuppliersOpen, setIsSuppliersOpen] = useState(false);
 
   const filteredArticoli = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -61,9 +55,6 @@ function DatabasePage() {
           <button type="button" className="db-box" onClick={() => setIsTypesOpen(true)}>
             Gestisci tipologie
           </button>
-          <button type="button" className="db-box" onClick={() => setIsSuppliersOpen(true)}>
-            Gestisci fornitori
-          </button>
           <button type="button" className="db-box" onClick={() => setIsNewArticleOpen(true)}>
             Aggiungi articoli
           </button>
@@ -85,7 +76,6 @@ function DatabasePage() {
                       <div className="db-item-name">{item.nome}</div>
                       <div className="db-item-meta">
                         <span>{item.tipologiaNome}</span>
-                        <span>{item.fornitoreNome}</span>
                       </div>
                     </div>
                   </button>
@@ -120,7 +110,6 @@ function DatabasePage() {
       <NewArticleModal
         isOpen={isNewArticleOpen}
         tipologie={tipologie}
-        fornitori={fornitori}
         onSave={(payload) => {
           addArticolo(payload);
           setIsNewArticleOpen(false);
@@ -135,15 +124,6 @@ function DatabasePage() {
         updateTipologia={updateTipologia}
         deleteTipologia={deleteTipologia}
         onClose={() => setIsTypesOpen(false)}
-      />
-
-      <SuppliersManagerModal
-        isOpen={isSuppliersOpen}
-        fornitori={fornitori}
-        addFornitore={addFornitore}
-        updateFornitore={updateFornitore}
-        deleteFornitore={deleteFornitore}
-        onClose={() => setIsSuppliersOpen(false)}
       />
     </main>
   );

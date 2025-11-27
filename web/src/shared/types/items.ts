@@ -2,18 +2,12 @@ export interface Articolo {
   id: string;
   nome: string;
   tipologiaId: string;
-  fornitoreId: string;
 }
 
 export interface Tipologia {
   id: string;
   nome: string;
   descrizione?: string;
-}
-
-export interface Fornitore {
-  id: string;
-  nome: string;
 }
 
 export interface OrdineArticolo {
@@ -32,6 +26,5 @@ export interface Ordine {
 
 export interface ArticoloWithRelations extends Articolo {
   tipologiaNome: string;
-  fornitoreNome: string;
   descrizione?: string;
 }

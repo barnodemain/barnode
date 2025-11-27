@@ -4,15 +4,13 @@ import AppModal from '../../shared/components/AppModal';
 interface NewArticleModalProps {
   isOpen: boolean;
   tipologie: { id: string; nome: string }[];
-  fornitori: { id: string; nome: string }[];
-  onSave: (payload: { nome: string; tipologiaId: string; fornitoreId: string }) => void;
+  onSave: (payload: { nome: string; tipologiaId: string }) => void;
   onClose: () => void;
 }
 
-function NewArticleModal({ isOpen, tipologie, fornitori, onSave, onClose }: NewArticleModalProps) {
+function NewArticleModal({ isOpen, tipologie, onSave, onClose }: NewArticleModalProps) {
   const [nome, setNome] = useState('');
   const [tipologiaId, setTipologiaId] = useState('');
-  const [fornitoreId, setFornitoreId] = useState('');
 
   if (!isOpen) return null;
 
@@ -42,21 +40,6 @@ function NewArticleModal({ isOpen, tipologie, fornitori, onSave, onClose }: NewA
             ))}
           </select>
         </label>
-        <label className="modal-field">
-          <span>Fornitore</span>
-          <select
-            value={fornitoreId}
-            onChange={(event) => setFornitoreId(event.target.value)}
-            className="modal-select"
-          >
-            <option value="">Seleziona fornitore</option>
-            {fornitori.map((fornitore) => (
-              <option key={fornitore.id} value={fornitore.id}>
-                {fornitore.nome}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
       <div className="modal-actions">
         <button
@@ -64,11 +47,10 @@ function NewArticleModal({ isOpen, tipologie, fornitori, onSave, onClose }: NewA
           className="btn-primary"
           onClick={() => {
             const trimmed = nome.trim();
-            if (!trimmed || !tipologiaId || !fornitoreId) return;
-            onSave({ nome: trimmed, tipologiaId, fornitoreId });
+            if (!trimmed || !tipologiaId) return;
+            onSave({ nome: trimmed, tipologiaId });
             setNome('');
             setTipologiaId('');
-            setFornitoreId('');
           }}
         >
           Salva
