@@ -5,6 +5,20 @@
   background-color: #f7f3e8;
 }
 
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .page-content {
   flex: 1 1 auto;
   display: flex;
