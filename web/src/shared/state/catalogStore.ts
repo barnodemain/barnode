@@ -6,6 +6,7 @@ import {
   getArticoliWithRelations,
   getTipologie,
   updateArticoloNome as repoUpdateArticoloNome,
+  createArticolo as repoCreateArticolo,
 } from '../repositories/catalogRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 
@@ -86,10 +87,62 @@ export function useCatalog() {
     setArticoli((current) => current.filter((art) => art.id !== id));
   };
 
+  type AddArticoloInput = {
+    nome: string;
+    tipologiaId: string;
+  };
+
+  const addArticolo = async ({ nome, tipologiaId }: AddArticoloInput) => {
+    const trimmed = nome.trim();
+    if (!trimmed) return;
+
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
+      setArticoli((current) => {
+        const fallbackTipologia =
+          tipologie.find((t) => t.id === tipologiaId) ?? tipologie[0] ?? null;
+
+        if (!fallbackTipologia) {
+          return current;
+        }
+
+        const newId = `mock-${Date.now()}`;
+
+        const nuovo: ArticoloWithRelations = {
+          id: newId,
+          nome: trimmed,
+          tipologiaId: fallbackTipologia.id,
+          tipologiaNome: fallbackTipologia.nome,
+        };
+
+        return [...current, nuovo];
+      });
+
+      return;
+    }
+
+    const { data, error } = await repoCreateArticolo({ nome: trimmed, tipologiaId });
+    if (error || !data) return;
+
+    setArticoli((current) => {
+      const fallbackTipologia =
+        tipologie.find((t) => t.id === data.tipologiaId) ?? tipologie[0] ?? null;
+
+      const nuovo: ArticoloWithRelations = {
+        id: data.id,
+        nome: data.nome,
+        tipologiaId: data.tipologiaId,
+        tipologiaNome: fallbackTipologia?.nome ?? 'N/A',
+      };
+
+      return [...current, nuovo];
+    });
+  };
+
   return {
     tipologie: sortedTipologie,
     articoli: sortedArticoli,
     updateArticoloNome,
     deleteArticolo,
+    addArticolo,
   };
 }

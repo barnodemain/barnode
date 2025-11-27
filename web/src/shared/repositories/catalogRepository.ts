@@ -36,6 +36,35 @@ export async function getTipologie(): Promise<RepositoryResult<Tipologia[]>> {
   });
 }
 
+export interface CreateArticoloInput {
+  nome: string;
+  tipologiaId: string;
+}
+
+export async function createArticolo(
+  input: CreateArticoloInput
+): Promise<RepositoryResult<Articolo>> {
+  const { nome, tipologiaId } = input;
+
+  return wrapQuery(async () => {
+    const { data, error } = await supabase
+      .from('articoli')
+      .insert({ nome, tipologia_id: tipologiaId })
+      .select('id, nome, tipologia_id')
+      .single();
+
+    const mapped: Articolo | null = data
+      ? {
+          id: data.id,
+          nome: data.nome,
+          tipologiaId: data.tipologia_id ?? '',
+        }
+      : null;
+
+    return { data: mapped, error };
+  });
+}
+
 export async function getArticoliWithRelations(): Promise<
   RepositoryResult<ArticoloWithRelations[]>
 > {

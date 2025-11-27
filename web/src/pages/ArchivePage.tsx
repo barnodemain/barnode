@@ -3,13 +3,15 @@ import { useCatalog } from '../shared/state/catalogStore';
 import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
 import EditArticleModal from './archive/EditArticleModal';
+import NewArticleModal from './archive/NewArticleModal';
 
 function ArchivePage() {
-  const { articoli, updateArticoloNome, deleteArticolo } = useCatalog();
+  const { articoli, tipologie, updateArticoloNome, deleteArticolo, addArticolo } = useCatalog();
 
   const [query, setQuery] = useState('');
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [isEditArticleOpen, setIsEditArticleOpen] = useState(false);
+  const [isNewArticleOpen, setIsNewArticleOpen] = useState(false);
 
   const filteredArticoli = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -92,11 +94,22 @@ function ArchivePage() {
         type="button"
         className="floating-add-button"
         onClick={() => {
-          // TODO: aggiunta rapida articolo archivio
+          setIsNewArticleOpen(true);
         }}
+        aria-label="Aggiungi articolo"
       >
         <AppIcon name="plus" size={22} />
       </button>
+
+      <NewArticleModal
+        isOpen={isNewArticleOpen}
+        onClose={() => setIsNewArticleOpen(false)}
+        tipologie={tipologie}
+        onSave={({ nome, tipologiaId }) => {
+          addArticolo({ nome, tipologiaId });
+          setIsNewArticleOpen(false);
+        }}
+      />
     </main>
   );
 }
