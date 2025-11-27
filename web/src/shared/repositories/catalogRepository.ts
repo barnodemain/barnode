@@ -30,9 +30,19 @@ export async function getTipologie(): Promise<RepositoryResult<Tipologia[]>> {
   return wrapQuery(async () => {
     return supabase
       .from('tipologie')
-      .select('id, nome, created_at')
+      .select('id, nome, colore, created_at')
       .order('nome', { ascending: true });
   });
+}
+
+export interface CreateTipologiaInput {
+  nome: string;
+  colore: string;
+}
+
+export interface UpdateTipologiaInput {
+  nome: string;
+  colore: string;
 }
 
 type ArticoloWithRelationsRow = {
@@ -133,6 +143,63 @@ export async function updateArticoloNome(
 export async function deleteArticolo(id: string): Promise<RepositoryResult<null>> {
   return wrapQuery(async () => {
     const { error } = await supabase.from('articoli').delete().eq('id', id);
+    return { data: null, error };
+  });
+}
+
+export async function createTipologia(
+  input: CreateTipologiaInput
+): Promise<RepositoryResult<Tipologia>> {
+  const { nome, colore } = input;
+
+  return wrapQuery(async () => {
+    const { data, error } = await supabase
+      .from('tipologie')
+      .insert({ nome, colore })
+      .select('id, nome, colore')
+      .single();
+
+    const mapped: Tipologia | null = data
+      ? {
+          id: data.id,
+          nome: data.nome,
+          colore: data.colore,
+        }
+      : null;
+
+    return { data: mapped, error };
+  });
+}
+
+export async function updateTipologia(
+  id: string,
+  input: UpdateTipologiaInput
+): Promise<RepositoryResult<Tipologia>> {
+  const { nome, colore } = input;
+
+  return wrapQuery(async () => {
+    const { data, error } = await supabase
+      .from('tipologie')
+      .update({ nome, colore })
+      .eq('id', id)
+      .select('id, nome, colore')
+      .single();
+
+    const mapped: Tipologia | null = data
+      ? {
+          id: data.id,
+          nome: data.nome,
+          colore: data.colore,
+        }
+      : null;
+
+    return { data: mapped, error };
+  });
+}
+
+export async function deleteTipologia(id: string): Promise<RepositoryResult<null>> {
+  return wrapQuery(async () => {
+    const { error } = await supabase.from('tipologie').delete().eq('id', id);
     return { data: null, error };
   });
 }

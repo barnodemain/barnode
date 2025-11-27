@@ -7,6 +7,9 @@ import {
   getTipologie,
   updateArticoloNome as repoUpdateArticoloNome,
   createArticolo as repoCreateArticolo,
+  createTipologia as repoCreateTipologia,
+  updateTipologia as repoUpdateTipologia,
+  deleteTipologia as repoDeleteTipologia,
 } from '../repositories/catalogRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 
@@ -138,11 +141,84 @@ export function useCatalog() {
     });
   };
 
+  type AddTipologiaInput = {
+    nome: string;
+    colore: string;
+  };
+
+  const addTipologia = async ({ nome, colore }: AddTipologiaInput) => {
+    const trimmed = nome.trim();
+    if (!trimmed) return;
+
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
+      setTipologie((current) => {
+        const newId = `mock-tipologia-${Date.now()}`;
+        const nuova: Tipologia = {
+          id: newId,
+          nome: trimmed,
+          colore,
+        };
+
+        return [...current, nuova];
+      });
+
+      return;
+    }
+
+    const { data, error } = await repoCreateTipologia({ nome: trimmed, colore });
+    if (error || !data) return;
+
+    setTipologie((current) => [...current, data]);
+  };
+
+  const updateTipologia = async (id: string, payload: { nome: string; colore: string }) => {
+    const trimmed = payload.nome.trim();
+    if (!trimmed) return;
+
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
+      setTipologie((current) =>
+        current.map((t) =>
+          t.id === id
+            ? {
+                ...t,
+                nome: trimmed,
+                colore: payload.colore,
+              }
+            : t
+        )
+      );
+      return;
+    }
+
+    const { data, error } = await repoUpdateTipologia(id, {
+      nome: trimmed,
+      colore: payload.colore,
+    });
+    if (error || !data) return;
+
+    setTipologie((current) => current.map((t) => (t.id === id ? data : t)));
+  };
+
+  const deleteTipologia = async (id: string) => {
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
+      setTipologie((current) => current.filter((t) => t.id !== id));
+      return;
+    }
+
+    const { error } = await repoDeleteTipologia(id);
+    if (error) return;
+
+    setTipologie((current) => current.filter((t) => t.id !== id));
+  };
+
   return {
     tipologie: sortedTipologie,
     articoli: sortedArticoli,
     updateArticoloNome,
     deleteArticolo,
     addArticolo,
+    addTipologia,
+    updateTipologia,
+    deleteTipologia,
   };
 }

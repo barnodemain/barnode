@@ -5,6 +5,7 @@ import { AppIcon } from './components/AppIcon';
 const MissingItemsPage = lazy(() => import('./pages/MissingItemsPage'));
 const ArchivePage = lazy(() => import('./pages/ArchivePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const TipologiePage = lazy(() => import('./pages/TipologiePage'));
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/archivio" element={<ArchivePage />} />
             <Route path="/database" element={<Navigate to="/archivio" replace />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/tipologie" element={<TipologiePage />} />
             <Route path="*" element={<MissingItemsPage />} />
           </Routes>
         </Suspense>

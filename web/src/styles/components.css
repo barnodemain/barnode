@@ -149,6 +149,7 @@
   background: #faf6ed;
   padding: 2rem 2rem 1.75rem;
   max-height: 90vh;
+  min-height: 30vh;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -163,6 +164,8 @@
 
 .modal-body {
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-body-fields {
@@ -193,6 +196,28 @@
 
 .modal-input:focus {
   outline: none;
+  border-color: #215936;
+  box-shadow: 0 0 0 2px rgba(33, 89, 54, 0.18);
+}
+
+.bn-color-picker-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bn-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.bn-color-swatch--selected {
   border-color: #215936;
   box-shadow: 0 0 0 2px rgba(33, 89, 54, 0.18);
 }
@@ -232,6 +257,7 @@
 .modal-actions-edit {
   align-items: center;
   justify-content: space-between;
+  margin-top: auto;
 }
 
 .modal-actions-edit-right {

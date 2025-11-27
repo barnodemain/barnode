@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
 
 function SettingsPage() {
+  const navigate = useNavigate();
   return (
     <main className="page settings-page">
       <header className="page-header">
@@ -25,7 +27,11 @@ function SettingsPage() {
             </span>
             <span className="settings-button-label">ARTICOLI</span>
           </button>
-          <button type="button" className="db-box settings-button">
+          <button
+            type="button"
+            className="db-box settings-button"
+            onClick={() => navigate('/settings/tipologie')}
+          >
             <span className="settings-button-icon">
               <AppIcon name="tag" size={18} />
             </span>
