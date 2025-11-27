@@ -53,12 +53,14 @@ function MissingItemsPage() {
               {missingItems.map((item) => (
                 <li key={item.id} className="item-card">
                   <div className="item-row">
-                    <span className="item-name">{item.nome}</span>
+                    <span className="item-name">
+                      {'articoloNome' in item ? item.articoloNome : item.nome}
+                    </span>
                     <button
                       type="button"
                       className="item-delete-button"
                       onClick={() => removeMissing(item.id)}
-                      aria-label={`Rimuovi ${item.nome} dalla lista`}
+                      aria-label={`Rimuovi ${'articoloNome' in item ? item.articoloNome : item.nome} dalla lista`}
                     >
                       <AppIcon name="trash" size={18} />
                     </button>

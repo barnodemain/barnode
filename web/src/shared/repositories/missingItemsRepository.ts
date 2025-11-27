@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
+import type { MissingItemWithRelations } from '../types/items';
 
 export interface RepositoryResult<T> {
   data: T | null;
@@ -25,37 +26,99 @@ async function wrapQuery<T>(
   return { data: data ?? null, error: null };
 }
 
-export async function getMissingIds(): Promise<RepositoryResult<string[]>> {
+type MissingItemRow = {
+  id: string;
+  articolo_id: string | null;
+  articoli?: {
+    id: string;
+    nome: string;
+    tipologia_id: string | null;
+    tipologie?: { id: string; nome: string } | { id: string; nome: string }[];
+  } | null;
+};
+
+export async function getMissingItems(): Promise<RepositoryResult<MissingItemWithRelations[]>> {
   return wrapQuery(async () => {
     const { data, error } = await supabase
-      .from('articoli_mancanti')
-      .select('articolo_id')
+      .from('missing_items')
+      .select(
+        `
+        id,
+        articolo_id,
+        articoli (
+          id,
+          nome,
+          tipologia_id,
+          tipologie ( id, nome )
+        )
+      `
+      )
       .order('created_at', { ascending: true });
 
-    const ids = (data ?? []).map((row) => row.articolo_id as string);
-    return { data: ids, error };
+    const rows: MissingItemRow[] = (data ?? []) as unknown as MissingItemRow[];
+
+    const mapped: MissingItemWithRelations[] = rows.map((row) => {
+      const articolo = row.articoli;
+      const firstTipologia = Array.isArray(articolo?.tipologie)
+        ? articolo?.tipologie[0]
+        : articolo?.tipologie;
+
+      return {
+        id: row.id,
+        articoloId: row.articolo_id ?? '',
+        articoloNome: articolo?.nome ?? 'N/A',
+        tipologiaNome: firstTipologia?.nome ?? 'N/A',
+      };
+    });
+
+    return { data: mapped, error };
   });
 }
 
-export async function addMissing(articoloId: string): Promise<RepositoryResult<null>> {
+export async function addMissingItem(
+  articoloId: string
+): Promise<RepositoryResult<MissingItemWithRelations>> {
   return wrapQuery(async () => {
-    const { error } = await supabase.from('articoli_mancanti').insert({ articolo_id: articoloId });
+    const { data, error } = await supabase
+      .from('missing_items')
+      .insert({ articolo_id: articoloId })
+      .select(
+        `
+        id,
+        articolo_id,
+        articoli (
+          id,
+          nome,
+          tipologia_id,
+          tipologie ( id, nome )
+        )
+      `
+      )
+      .single();
 
-    // Violazione unique (già presente) → la trattiamo come non-bloccante.
-    if (error && String(error.code) !== '23505') {
-      return { data: null, error };
-    }
+    const row = data as MissingItemRow | null;
 
-    return { data: null, error: null };
+    const articolo = row?.articoli ?? null;
+    const firstTipologia = Array.isArray(articolo?.tipologie)
+      ? articolo?.tipologie[0]
+      : articolo?.tipologie;
+
+    const mapped: MissingItemWithRelations | null = row
+      ? {
+          id: row.id,
+          articoloId: row.articolo_id ?? '',
+          articoloNome: articolo?.nome ?? 'N/A',
+          tipologiaNome: firstTipologia?.nome ?? 'N/A',
+        }
+      : null;
+
+    return { data: mapped, error };
   });
 }
 
-export async function removeMissing(articoloId: string): Promise<RepositoryResult<null>> {
+export async function removeMissingItem(id: string): Promise<RepositoryResult<null>> {
   return wrapQuery(async () => {
-    const { error } = await supabase
-      .from('articoli_mancanti')
-      .delete()
-      .eq('articolo_id', articoloId);
+    const { error } = await supabase.from('missing_items').delete().eq('id', id);
 
     return { data: null, error };
   });

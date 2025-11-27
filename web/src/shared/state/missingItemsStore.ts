@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArticoloWithRelations } from '../types/items';
-import { mockArticoli } from '../data';
+import { ArticoloWithRelations, MissingItemWithRelations } from '../types/items';
+import { mockArticoli, mockMissingItems } from '../data';
 import { getArticoliWithRelations } from '../repositories/catalogRepository';
 import {
-  addMissing as repoAddMissing,
-  getMissingIds as repoGetMissingIds,
-  removeMissing as repoRemoveMissing,
+  addMissingItem as repoAddMissingItem,
+  getMissingItems as repoGetMissingItems,
+  removeMissingItem as repoRemoveMissingItem,
 } from '../repositories/missingItemsRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 
 export function useMissingItems() {
   const [allItems, setAllItems] = useState<ArticoloWithRelations[]>(mockArticoli);
+  const [missingItems, setMissingItems] = useState<MissingItemWithRelations[]>([]);
   const [missingIds, setMissingIds] = useState<string[]>([]);
   const [query, setQuery] = useState('');
   const [loadedFromSupabase, setLoadedFromSupabase] = useState(false);
@@ -21,28 +22,35 @@ export function useMissingItems() {
     async function loadInitial() {
       if (!isSupabaseConfigured) {
         setAllItems(mockArticoli);
-        setMissingIds([]);
+        setMissingItems([]);
+        setMissingIds(mockMissingItems.map((item: ArticoloWithRelations) => item.id));
         setLoadedFromSupabase(false);
         return;
       }
 
       const [artRes, missRes] = await Promise.all([
         getArticoliWithRelations(),
-        repoGetMissingIds(),
+        repoGetMissingItems(),
       ]);
 
       if (!active) return;
 
       if (artRes.error || missRes.error) {
-        console.error('[useMissingItems] Errore caricamento iniziale, fallback ai mock');
-        setAllItems(mockArticoli);
+        console.error(
+          '[useMissingItems] Errore caricamento da Supabase',
+          artRes.error || missRes.error
+        );
+        setAllItems([]);
+        setMissingItems([]);
         setMissingIds([]);
         setLoadedFromSupabase(false);
         return;
       }
 
       setAllItems(artRes.data ?? []);
-      setMissingIds(missRes.data ?? []);
+      const loadedMissing = missRes.data ?? [];
+      setMissingItems(loadedMissing);
+      setMissingIds(loadedMissing.map((item) => item.articoloId));
       setLoadedFromSupabase(true);
     }
 
@@ -53,11 +61,15 @@ export function useMissingItems() {
     };
   }, []);
 
-  const missingItems = useMemo(() => {
-    return allItems
-      .filter((item) => missingIds.includes(item.id))
-      .sort((a, b) => a.nome.localeCompare(b.nome));
-  }, [allItems, missingIds]);
+  const missingItemsForView = useMemo(() => {
+    if (!loadedFromSupabase) {
+      return allItems
+        .filter((item) => missingIds.includes(item.id))
+        .sort((a, b) => a.nome.localeCompare(b.nome));
+    }
+
+    return [...missingItems].sort((a, b) => a.articoloNome.localeCompare(b.articoloNome));
+  }, [allItems, loadedFromSupabase, missingIds, missingItems]);
 
   const suggestedItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -72,7 +84,7 @@ export function useMissingItems() {
   }, [allItems, missingIds, query]);
 
   const addMissing = async (id: string) => {
-    if (!loadedFromSupabase) {
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
       setMissingIds((previous) => {
         if (previous.includes(id)) return previous;
         return [...previous, id];
@@ -80,29 +92,40 @@ export function useMissingItems() {
       return;
     }
 
-    const { error } = await repoAddMissing(id);
-    if (error) return;
+    const { data, error } = await repoAddMissingItem(id);
+    if (error || !data) return;
+
+    setMissingItems((previous) => {
+      if (previous.some((item) => item.articoloId === data.articoloId)) return previous;
+      return [...previous, data];
+    });
 
     setMissingIds((previous) => {
-      if (previous.includes(id)) return previous;
-      return [...previous, id];
+      if (previous.includes(data.articoloId)) return previous;
+      return [...previous, data.articoloId];
     });
   };
 
   const removeMissing = async (id: string) => {
-    if (!loadedFromSupabase) {
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
       setMissingIds((previous) => previous.filter((itemId) => itemId !== id));
       return;
     }
 
-    const { error } = await repoRemoveMissing(id);
+    const { error } = await repoRemoveMissingItem(id);
     if (error) return;
 
-    setMissingIds((previous) => previous.filter((itemId) => itemId !== id));
+    setMissingItems((previous) => previous.filter((item) => item.id !== id));
+
+    setMissingIds((previous) => {
+      const toRemove = missingItems.find((item) => item.id === id);
+      if (!toRemove) return previous;
+      return previous.filter((itemId) => itemId !== toRemove.articoloId);
+    });
   };
 
   return {
-    missingItems,
+    missingItems: missingItemsForView,
     suggestedItems,
     missingIds,
     query,

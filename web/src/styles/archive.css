@@ -148,14 +148,14 @@
   width: 100%;
   border: none;
   border-radius: 22px;
-  padding: 1.45rem 1.8rem;
+  padding: 1.9rem 2.35rem;
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: center;
-  background: #ffffff;
-  color: #215936;
+  background: #215936;
+  color: #ffffff;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
@@ -168,7 +168,7 @@
 }
 
 .settings-button:hover {
-  background-color: #eef5f0;
+  background-color: #1a472c;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
@@ -182,20 +182,50 @@
   outline-offset: 2px;
 }
 
-.settings-grid .settings-button:first-child {
-  background: #215936;
-  color: #ffffff;
+/* Colori specifici per i 4 pulsanti Impostazioni, dall'alto verso il basso */
+.settings-grid .settings-button:nth-child(1) {
+  background-color: #16472a; /* IMPORTA - verde scuro più marcato */
 }
 
-.settings-grid .settings-button:first-child:hover {
-  background: #1a472c;
+.settings-grid .settings-button:nth-child(1):hover {
+  background-color: #113821;
+}
+
+.settings-grid .settings-button:nth-child(2) {
+  background-color: #1e5b38; /* ARTICOLI - verde medio scuro */
+}
+
+.settings-grid .settings-button:nth-child(2):hover {
+  background-color: #18452a;
+}
+
+.settings-grid .settings-button:nth-child(3) {
+  background-color: #4f9870; /* TIPOLOGIE - verde medio chiaro, tra ARTICOLI e BACKUP */
+}
+
+.settings-grid .settings-button:nth-child(3):hover {
+  background-color: #3e7e5c;
+}
+
+.settings-grid .settings-button:nth-child(4) {
+  background-color: #9ec7ac; /* BACKUP leggermente più scuro */
+  color: #16472a;
+}
+
+.settings-grid .settings-button:nth-child(4):hover {
+  background-color: #86b399;
 }
 
 .settings-button-icon {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  width: 1.2rem;
   color: inherit;
+}
+
+.settings-grid .settings-button:nth-child(4) .settings-button-icon {
+  margin-right: 0.4rem; /* circa due "spazi" visivi fra icona e testo */
 }
 
 .settings-button-label {

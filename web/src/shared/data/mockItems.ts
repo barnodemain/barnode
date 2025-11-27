@@ -1,5 +1,6 @@
 import { ArticoloWithRelations } from '../types/items';
 
+// Dati mock per la Home (lista articoli mancanti), usati solo quando Supabase non è configurato.
 export const mockMissingItems: ArticoloWithRelations[] = [
   {
     id: 'art-1',

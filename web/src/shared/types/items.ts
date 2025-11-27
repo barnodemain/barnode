@@ -14,3 +14,10 @@ export interface ArticoloWithRelations extends Articolo {
   tipologiaNome: string;
   descrizione?: string;
 }
+
+export interface MissingItemWithRelations {
+  id: string;
+  articoloId: string;
+  articoloNome: string;
+  tipologiaNome: string;
+}

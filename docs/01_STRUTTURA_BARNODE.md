@@ -277,7 +277,61 @@ Gestisce tipologie + articoli per l’Archivio.
 
 ---
 
-## 7. Data layer (repository e mock)
+## 7. Missing Items — Supabase Mode
+
+La Home (Lista articoli mancanti) utilizza ora Supabase come fonte dati principale quando le env sono
+configurate.
+
+- Tabella reale utilizzata: `missing_items` (schema `public`).
+- Relazioni:
+  - `missing_items.articolo_id` → `articoli.id`
+  - `articoli.tipologia_id` → `tipologie.id`
+
+Flusso dati:
+
+- Il repository `missingItemsRepository.ts` legge da `missing_items` con join su `articoli` e
+  `tipologie`, mappando ogni riga in un `MissingItemWithRelations` con:
+  - `id` (id della riga in `missing_items`),
+  - `articoloId` (FK verso `articoli`),
+  - `articoloNome`,
+  - `tipologiaNome`.
+- Lo store `useMissingItems` combina questi dati con il catalogo articoli per calcolare:
+  - `missingItems` (lista degli articoli effettivamente mancanti),
+  - `suggestedItems` (articoli suggeriti da aggiungere in base alla ricerca).
+
+Comportamento per Supabase configurato (`isSupabaseConfigured === true`):
+
+- All’avvio:
+  - carica gli articoli da `catalogRepository` (tabella `articoli` + `tipologie`),
+  - carica i missing items da `missingItemsRepository` (tabella `missing_items`).
+- Se entrambe le query hanno successo:
+  - popola lo stato con i dati reali del DB;
+  - `loadedFromSupabase = true`.
+- Se una delle query fallisce:
+  - logga un errore (`[useMissingItems] Errore caricamento da Supabase ...`),
+  - imposta liste vuote per articoli e missing items,
+  - **non** torna ai mock.
+
+CRUD in modalità Supabase:
+
+- `addMissing(articoloId)`:
+  - chiama `addMissingItem` sul repository (insert in `missing_items`),
+  - aggiorna lo stato locale con il nuovo record.
+- `removeMissing(id)`:
+  - chiama `removeMissingItem` (delete su `missing_items` per `id`),
+  - rimuove l’elemento corrispondente dallo stato locale.
+
+Mock e modalità offline:
+
+- Quando `isSupabaseConfigured === false`, lo store usa solo dati mock:
+  - articoli da `mockCatalog.ts`,
+  - missing items iniziali da `mockItems.ts`.
+- In questa modalità tutte le operazioni avvengono in memoria.
+- I mock **non** vengono più usati quando Supabase è configurato, neanche in caso di errore Supabase.
+
+---
+
+## 8. Data layer (repository e mock)
 
 ### 7.1 catalogRepository (`shared/repositories/catalogRepository.ts`)
 
@@ -324,7 +378,7 @@ Uso attuale:
 
 ---
 
-## 8. Logiche di funzionamento riassuntive
+## 9. Logiche di funzionamento riassuntive
 
 ### 8.1 Home
 
@@ -368,7 +422,7 @@ Uso attuale:
 
 ---
 
-## 9. Estensioni future previste / TODO strutturali
+## 10. Estensioni future previste / TODO strutturali
 
 Questi elementi sono già presenti nella UI o nel codice, ma non ancora completati a livello di business logic:
 
@@ -393,7 +447,7 @@ Questi elementi sono già presenti nella UI o nel codice, ma non ancora completa
 
 ---
 
-## 10. Manutenzione di questo documento
+## 11. Manutenzione di questo documento
 
 Ogni volta che si introduce una modifica strutturale in BARnode Web, questo file deve essere aggiornato nella **stessa modifica/PR**, in particolare quando:
 
