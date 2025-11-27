@@ -23,51 +23,48 @@ function ArchivePage() {
       : null;
 
   return (
-    <main className="page">
-      <div className="db-page">
-        <header className="page-header">
-          <div className="page-logo-wrapper">
-            <img src={logo} alt="Barnode" className="page-logo" />
-          </div>
-          <h1 className="page-title">Archivio articoli</h1>
-          <div className="search-row">
-            <span className="search-icon" aria-hidden="true">
-              <AppIcon name="search" size={16} />
-            </span>
-            <input
-              type="search"
-              placeholder="Cerca per nome articolo…"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              className="search-input"
-            />
-          </div>
-        </header>
-        <section className="list">
-          <div className="db-list-scroll">
-            <ul className="item-list">
-              {filteredArticoli.map((item) => (
-                <li key={item.id} className="item-card">
-                  <button
-                    type="button"
-                    className="db-item-button"
-                    onClick={() => {
-                      setSelectedArticleId(item.id);
-                      setIsEditArticleOpen(true);
-                    }}
-                  >
-                    <div className="db-item-main">
-                      <div className="db-item-name">{item.nome}</div>
-                      <div className="db-item-meta">
-                        <span>{item.tipologiaNome}</span>
-                      </div>
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+    <main className="page archive-page">
+      <header className="page-header">
+        <div className="page-logo-wrapper">
+          <img src={logo} alt="Barnode" className="page-logo" />
+        </div>
+        <h1 className="page-title">Archivio articoli</h1>
+        <div className="search-row">
+          <span className="search-icon" aria-hidden="true">
+            <AppIcon name="search" size={16} />
+          </span>
+          <input
+            type="search"
+            placeholder="Cerca per nome articolo…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            className="search-input"
+          />
+        </div>
+      </header>
+
+      <div className="archive-scroll">
+        <ul className="archive-item-list">
+          {filteredArticoli.map((item) => (
+            <li key={item.id} className="item-card">
+              <button
+                type="button"
+                className="db-item-button"
+                onClick={() => {
+                  setSelectedArticleId(item.id);
+                  setIsEditArticleOpen(true);
+                }}
+              >
+                <div className="db-item-main">
+                  <div className="db-item-name">{item.nome}</div>
+                  <div className="db-item-meta">
+                    <span>{item.tipologiaNome}</span>
+                  </div>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <EditArticleModal
