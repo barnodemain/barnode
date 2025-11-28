@@ -122,10 +122,21 @@ export function useCatalog() {
     if (!trimmed) return;
     const normalized = toTitleCaseWords(trimmed);
 
+    let effectiveTipologiaId = tipologiaId;
+
+    if (!effectiveTipologiaId) {
+      const varie = tipologie.find((t) => t.nome.trim().toLowerCase() === 'varie');
+      const defaultTipologia = varie ?? tipologie[0] ?? null;
+
+      if (!defaultTipologia) return;
+
+      effectiveTipologiaId = defaultTipologia.id;
+    }
+
     if (!loadedFromSupabase || !isSupabaseConfigured) {
       setArticoli((current) => {
         const fallbackTipologia =
-          tipologie.find((t) => t.id === tipologiaId) ?? tipologie[0] ?? null;
+          tipologie.find((t) => t.id === effectiveTipologiaId) ?? tipologie[0] ?? null;
 
         if (!fallbackTipologia) {
           return current;
@@ -146,7 +157,7 @@ export function useCatalog() {
       return;
     }
 
-    const { data, error } = await repoCreateArticolo({ nome: normalized, tipologiaId });
+    const { data, error } = await repoCreateArticolo({ nome: normalized, tipologiaId: effectiveTipologiaId });
     if (error || !data) return;
 
     setArticoli((current) => {

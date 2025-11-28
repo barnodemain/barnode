@@ -5,7 +5,6 @@ import { useCatalog } from '../shared/state/catalogStore';
 import type { Tipologia } from '../shared/types/items';
 import TipologiaModalAdd from '../components/tipologie/TipologiaModalAdd';
 import TipologiaModalEdit from '../components/tipologie/TipologiaModalEdit';
-import { COLORE_VARIE } from '../shared/constants/tipologie';
 
 function TipologiePage() {
   const { tipologie, addTipologia, updateTipologia, deleteTipologia } = useCatalog();
@@ -43,8 +42,7 @@ function TipologiePage() {
       <div className="archive-scroll">
         <ul className="archive-item-list tipologie-item-list">
           {filteredTipologie.map((tipologia) => {
-            const isVarie = tipologia.nome.trim().toLowerCase() === 'varie';
-            const colore = isVarie ? COLORE_VARIE : (tipologia.colore ?? COLORE_VARIE);
+            const colore = tipologia.colore ?? '#2D9CDB';
 
             return (
               <li key={tipologia.id} className="item-card tipologie-item-card">
