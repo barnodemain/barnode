@@ -20,7 +20,7 @@ function BackupPage() {
     }
 
     window.alert("Backup ripristinato con successo. L'app verrà ricaricata.");
-    window.location.reload();
+    window.location.href = '/';
   };
 
   return (
