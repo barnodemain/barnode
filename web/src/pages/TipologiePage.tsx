@@ -5,6 +5,7 @@ import { useCatalog } from '../shared/state/catalogStore';
 import type { Tipologia } from '../shared/types/items';
 import TipologiaModalAdd from '../components/tipologie/TipologiaModalAdd';
 import TipologiaModalEdit from '../components/tipologie/TipologiaModalEdit';
+import { COLORE_VARIE } from '../shared/constants/tipologie';
 
 function TipologiePage() {
   const { tipologie, addTipologia, updateTipologia, deleteTipologia } = useCatalog();
@@ -42,30 +43,25 @@ function TipologiePage() {
       <div className="archive-scroll">
         <ul className="archive-item-list">
           {filteredTipologie.map((tipologia) => {
-            const colore = tipologia.colore ?? '#374151';
+            const isVarie = tipologia.nome.trim().toLowerCase() === 'varie';
+            const colore = isVarie ? COLORE_VARIE : (tipologia.colore ?? COLORE_VARIE);
+
             return (
               <li key={tipologia.id} className="item-card">
-                <button
-                  type="button"
-                  className="db-item-button"
-                  onClick={() => setEditing(tipologia)}
-                >
-                  <div className="db-item-main">
-                    <div className="db-item-name">{tipologia.nome}</div>
-                    <div className="db-item-meta">
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          width: 16,
-                          height: 16,
-                          borderRadius: 4,
-                          backgroundColor: colore,
-                          border: '1px solid rgba(0,0,0,0.1)',
-                        }}
-                      />
-                    </div>
+                <div className="bn-card">
+                  <div className="bn-card-color" style={{ backgroundColor: colore }} />
+                  <div className="bn-card-content">
+                    <button
+                      type="button"
+                      className="db-item-button"
+                      onClick={() => setEditing(tipologia)}
+                    >
+                      <div className="db-item-main">
+                        <div className="db-item-name">{tipologia.nome}</div>
+                      </div>
+                    </button>
                   </div>
-                </button>
+                </div>
               </li>
             );
           })}

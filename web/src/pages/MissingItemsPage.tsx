@@ -1,10 +1,13 @@
 import { useMissingItems } from '../shared/state/missingItemsStore';
 import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
+import { useCatalog } from '../shared/state/catalogStore';
+import { COLORE_VARIE } from '../shared/constants/tipologie';
 
 function MissingItemsPage() {
   const { missingItems, suggestedItems, query, setQuery, addMissing, removeMissing } =
     useMissingItems();
+  const { tipologie } = useCatalog();
 
   return (
     <main className="page home-page">
@@ -50,23 +53,35 @@ function MissingItemsPage() {
             <p className="empty-state">Nessun articolo in lista da acquistare.</p>
           ) : (
             <ul className="home-item-list">
-              {missingItems.map((item) => (
-                <li key={item.id} className="item-card">
-                  <div className="item-row">
-                    <span className="item-name">
-                      {'articoloNome' in item ? item.articoloNome : item.nome}
-                    </span>
-                    <button
-                      type="button"
-                      className="item-delete-button"
-                      onClick={() => removeMissing(item.id)}
-                      aria-label={`Rimuovi ${'articoloNome' in item ? item.articoloNome : item.nome} dalla lista`}
-                    >
-                      <AppIcon name="trash" size={18} />
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {missingItems.map((item) => {
+                const nomeArticolo = 'articoloNome' in item ? item.articoloNome : item.nome;
+                const tipo = tipologie.find(
+                  (t) => t.nome.trim().toLowerCase() === item.tipologiaNome?.trim().toLowerCase()
+                );
+                const isVarie = tipo && tipo.nome.trim().toLowerCase() === 'varie';
+                const colore = isVarie ? COLORE_VARIE : (tipo?.colore ?? COLORE_VARIE);
+
+                return (
+                  <li key={item.id} className="item-card">
+                    <div className="bn-card">
+                      <div className="bn-card-color" style={{ backgroundColor: colore }} />
+                      <div className="bn-card-content">
+                        <div className="item-row">
+                          <span className="item-name">{nomeArticolo}</span>
+                          <button
+                            type="button"
+                            className="item-delete-button"
+                            onClick={() => removeMissing(item.id)}
+                            aria-label={`Rimuovi ${nomeArticolo} dalla lista`}
+                          >
+                            <AppIcon name="trash" size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

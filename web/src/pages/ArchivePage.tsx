@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useCatalog } from '../shared/state/catalogStore';
 import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
+import { COLORE_VARIE } from '../shared/constants/tipologie';
 import EditArticleModal from './archive/EditArticleModal';
 import NewArticleModal from './archive/NewArticleModal';
 
@@ -47,25 +48,36 @@ function ArchivePage() {
 
       <div className="archive-scroll">
         <ul className="archive-item-list">
-          {filteredArticoli.map((item) => (
-            <li key={item.id} className="item-card">
-              <button
-                type="button"
-                className="db-item-button"
-                onClick={() => {
-                  setSelectedArticleId(item.id);
-                  setIsEditArticleOpen(true);
-                }}
-              >
-                <div className="db-item-main">
-                  <div className="db-item-name">{item.nome}</div>
-                  <div className="db-item-meta">
-                    <span>{item.tipologiaNome}</span>
+          {filteredArticoli.map((item) => {
+            const tipo = tipologie.find((t) => t.id === item.tipologiaId);
+            const isVarie = tipo && tipo.nome.trim().toLowerCase() === 'varie';
+            const colore = isVarie ? COLORE_VARIE : (tipo?.colore ?? COLORE_VARIE);
+
+            return (
+              <li key={item.id} className="item-card">
+                <div className="bn-card">
+                  <div className="bn-card-color" style={{ backgroundColor: colore }} />
+                  <div className="bn-card-content">
+                    <button
+                      type="button"
+                      className="db-item-button"
+                      onClick={() => {
+                        setSelectedArticleId(item.id);
+                        setIsEditArticleOpen(true);
+                      }}
+                    >
+                      <div className="db-item-main">
+                        <div className="db-item-name">{item.nome}</div>
+                        <div className="db-item-meta">
+                          <span>{item.tipologiaNome}</span>
+                        </div>
+                      </div>
+                    </button>
                   </div>
                 </div>
-              </button>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
 

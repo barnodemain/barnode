@@ -8,6 +8,7 @@ export interface Tipologia {
   id: string;
   nome: string;
   descrizione?: string;
+  colore: string;
 }
 
 export interface ArticoloWithRelations extends Articolo {

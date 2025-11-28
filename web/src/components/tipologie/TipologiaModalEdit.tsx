@@ -46,7 +46,7 @@ function TipologiaModalEdit({
       const initialColor = tipologia.colore ?? availableColors[0] ?? '#374151';
       setColore(initialColor);
     }
-  }, [isOpen, tipologia]);
+  }, [isOpen, tipologia, availableColors]);
 
   if (!isOpen || !tipologia) return null;
 
@@ -91,10 +91,7 @@ function TipologiaModalEdit({
         </button>
         <div className="modal-actions-edit-right">
           <button type="button" className="btn-primary" onClick={handleSave}>
-            Salva
-          </button>
-          <button type="button" className="btn-secondary btn-outline-danger" onClick={onClose}>
-            Annulla
+            Aggiorna
           </button>
         </div>
       </div>

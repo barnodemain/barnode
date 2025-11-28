@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AppModal from '../../shared/components/AppModal';
 
 interface NewArticleModalProps {
@@ -13,20 +13,30 @@ function NewArticleModal({ isOpen, onClose, onSave, tipologie }: NewArticleModal
   const [nome, setNome] = useState('');
   const [tipologiaId, setTipologiaId] = useState('');
 
+  const defaultVarie = useMemo(
+    () => tipologie.find((t) => t.nome.trim().toLowerCase() === 'varie') ?? tipologie[0] ?? null,
+    [tipologie]
+  );
+
   useEffect(() => {
     if (isOpen) {
       setNome('');
-      const first = tipologie[0];
-      setTipologiaId(first ? first.id : '');
+      setTipologiaId(defaultVarie ? defaultVarie.id : '');
     }
-  }, [isOpen, tipologie]);
+  }, [isOpen, defaultVarie]);
 
   if (!isOpen) return null;
 
   const handleSave = () => {
     const trimmed = nome.trim();
-    if (!trimmed || !tipologiaId) return;
-    onSave({ nome: trimmed, tipologiaId });
+    let finalTipologiaId = tipologiaId;
+
+    if (!finalTipologiaId && defaultVarie) {
+      finalTipologiaId = defaultVarie.id;
+    }
+
+    if (!trimmed || !finalTipologiaId) return;
+    onSave({ nome: trimmed, tipologiaId: finalTipologiaId });
   };
 
   return (

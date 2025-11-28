@@ -68,10 +68,32 @@
 }
 
 .item-card {
-  padding: 0.85rem 0.95rem;
   border-radius: 0.9rem;
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.bn-card {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.bn-card-color {
+  display: block;
+  width: 8px;
+  min-width: 8px;
+  max-width: 8px;
+  border-radius: 10px 0 0 10px;
+}
+
+.bn-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.85rem 0.95rem;
 }
 
 .item-row {
