@@ -41,13 +41,13 @@ function TipologiePage() {
       </header>
 
       <div className="archive-scroll">
-        <ul className="archive-item-list">
+        <ul className="archive-item-list tipologie-item-list">
           {filteredTipologie.map((tipologia) => {
             const isVarie = tipologia.nome.trim().toLowerCase() === 'varie';
             const colore = isVarie ? COLORE_VARIE : (tipologia.colore ?? COLORE_VARIE);
 
             return (
-              <li key={tipologia.id} className="item-card">
+              <li key={tipologia.id} className="item-card tipologie-item-card">
                 <div className="bn-card">
                   <div className="bn-card-color" style={{ backgroundColor: colore }} />
                   <div className="bn-card-content">

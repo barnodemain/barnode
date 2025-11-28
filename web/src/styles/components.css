@@ -96,6 +96,15 @@
   padding: 0.85rem 0.95rem;
 }
 
+.tipologie-item-list {
+  gap: 0.6rem;
+}
+
+.tipologie-item-list .tipologie-item-card .bn-card-content {
+  padding-top: 1.05rem;
+  padding-bottom: 1.05rem;
+}
+
 .item-row {
   display: flex;
   align-items: center;

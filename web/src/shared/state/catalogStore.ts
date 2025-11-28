@@ -7,6 +7,7 @@ import {
   getTipologie,
   updateArticoloNome as repoUpdateArticoloNome,
   createArticolo as repoCreateArticolo,
+  updateArticolo as repoUpdateArticolo,
   createTipologia as repoCreateTipologia,
   updateTipologia as repoUpdateTipologia,
   deleteTipologia as repoDeleteTipologia,
@@ -141,6 +142,58 @@ export function useCatalog() {
     });
   };
 
+  type UpdateArticoloInput = {
+    id: string;
+    nome: string;
+    tipologiaId: string;
+  };
+
+  const updateArticolo = async ({ id, nome, tipologiaId }: UpdateArticoloInput) => {
+    const trimmed = nome.trim();
+    if (!trimmed) return;
+
+    if (!loadedFromSupabase || !isSupabaseConfigured) {
+      setArticoli((current) => {
+        const fallbackTipologia =
+          tipologie.find((t) => t.id === tipologiaId) ?? tipologie[0] ?? null;
+
+        if (!fallbackTipologia) return current;
+
+        return current.map((art) =>
+          art.id === id
+            ? {
+                ...art,
+                nome: trimmed,
+                tipologiaId: fallbackTipologia.id,
+                tipologiaNome: fallbackTipologia.nome,
+              }
+            : art
+        );
+      });
+
+      return;
+    }
+
+    const { data, error } = await repoUpdateArticolo(id, { nome: trimmed, tipologiaId });
+    if (error || !data) return;
+
+    setArticoli((current) => {
+      const fallbackTipologia =
+        tipologie.find((t) => t.id === data.tipologiaId) ?? tipologie[0] ?? null;
+
+      return current.map((art) =>
+        art.id === id
+          ? {
+              ...art,
+              nome: data.nome,
+              tipologiaId: data.tipologiaId,
+              tipologiaNome: fallbackTipologia?.nome ?? art.tipologiaNome,
+            }
+          : art
+      );
+    });
+  };
+
   type AddTipologiaInput = {
     nome: string;
     colore: string;
@@ -217,6 +270,7 @@ export function useCatalog() {
     updateArticoloNome,
     deleteArticolo,
     addArticolo,
+    updateArticolo,
     addTipologia,
     updateTipologia,
     deleteTipologia,

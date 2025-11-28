@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { useMissingItems } from '../shared/state/missingItemsStore';
 import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
 import { useCatalog } from '../shared/state/catalogStore';
 import { COLORE_VARIE } from '../shared/constants/tipologie';
+import NewArticleModal from './archive/NewArticleModal';
 
 function MissingItemsPage() {
   const { missingItems, suggestedItems, query, setQuery, addMissing, removeMissing } =
     useMissingItems();
   const { tipologie } = useCatalog();
+  const { addArticolo } = useCatalog();
+  const [isNewArticleOpen, setIsNewArticleOpen] = useState(false);
 
   return (
     <main className="page home-page">
@@ -91,11 +95,20 @@ function MissingItemsPage() {
         type="button"
         className="floating-add-button"
         onClick={() => {
-          // TODO: aggiunta rapida articolo mancante
+          setIsNewArticleOpen(true);
         }}
       >
         <AppIcon name="plus" size={22} />
       </button>
+      <NewArticleModal
+        isOpen={isNewArticleOpen}
+        onClose={() => setIsNewArticleOpen(false)}
+        tipologie={tipologie}
+        onSave={({ nome, tipologiaId }) => {
+          addArticolo({ nome, tipologiaId });
+          setIsNewArticleOpen(false);
+        }}
+      />
     </main>
   );
 }

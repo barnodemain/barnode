@@ -7,7 +7,7 @@ import EditArticleModal from './archive/EditArticleModal';
 import NewArticleModal from './archive/NewArticleModal';
 
 function ArchivePage() {
-  const { articoli, tipologie, updateArticoloNome, deleteArticolo, addArticolo } = useCatalog();
+  const { articoli, tipologie, deleteArticolo, addArticolo, updateArticolo } = useCatalog();
 
   const [query, setQuery] = useState('');
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
@@ -84,8 +84,9 @@ function ArchivePage() {
       <EditArticleModal
         isOpen={isEditArticleOpen && selectedArticle != null}
         article={selectedArticle}
-        onSave={(id, nuovoNome) => {
-          updateArticoloNome(id, nuovoNome);
+        tipologie={tipologie}
+        onSave={({ id, nome, tipologiaId }) => {
+          updateArticolo({ id, nome, tipologiaId });
           setIsEditArticleOpen(false);
           setSelectedArticleId(null);
         }}
