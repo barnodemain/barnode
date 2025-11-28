@@ -105,19 +105,19 @@ export async function restoreBackupSnapshot(): Promise<RepositoryResult<null>> {
   const { tipologie, articoli, missingItems } = latest.data;
 
   return wrapQuery(async () => {
-    const { error: delMissingError } = await supabase.from('missing_items').delete().neq('id', '');
+    const { error: delMissingError } = await supabase.from('missing_items').delete();
 
     if (delMissingError) {
       return { data: null, error: delMissingError };
     }
 
-    const { error: delArticoliError } = await supabase.from('articoli').delete().neq('id', '');
+    const { error: delArticoliError } = await supabase.from('articoli').delete();
 
     if (delArticoliError) {
       return { data: null, error: delArticoliError };
     }
 
-    const { error: delTipologieError } = await supabase.from('tipologie').delete().neq('id', '');
+    const { error: delTipologieError } = await supabase.from('tipologie').delete();
 
     if (delTipologieError) {
       return { data: null, error: delTipologieError };
