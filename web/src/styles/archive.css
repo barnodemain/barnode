@@ -31,7 +31,7 @@
 .archive-item-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.5rem 0 0;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -40,6 +40,12 @@
 .home-page {
   position: relative;
   min-height: 100vh;
+}
+
+.settings-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
 .home-header {
@@ -70,7 +76,7 @@
 .home-item-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.5rem 0 0;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -192,27 +198,19 @@
 }
 
 .settings-grid .settings-button:nth-child(2) {
-  background-color: #1e5b38; /* ARTICOLI - verde medio scuro */
+  background-color: #4f9870; /* TIPOLOGIE - verde medio chiaro */
 }
 
 .settings-grid .settings-button:nth-child(2):hover {
-  background-color: #18452a;
-}
-
-.settings-grid .settings-button:nth-child(3) {
-  background-color: #4f9870; /* TIPOLOGIE - verde medio chiaro, tra ARTICOLI e BACKUP */
-}
-
-.settings-grid .settings-button:nth-child(3):hover {
   background-color: #3e7e5c;
 }
 
-.settings-grid .settings-button:nth-child(4) {
-  background-color: #9ec7ac; /* BACKUP leggermente più scuro */
+.settings-grid .settings-button:nth-child(3) {
+  background-color: #9ec7ac; /* BACKUP - verde chiaro */
   color: #16472a;
 }
 
-.settings-grid .settings-button:nth-child(4):hover {
+.settings-grid .settings-button:nth-child(3):hover {
   background-color: #86b399;
 }
 

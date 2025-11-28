@@ -21,12 +21,6 @@ function SettingsPage() {
             </span>
             <span className="settings-button-label">IMPORTA</span>
           </button>
-          <button type="button" className="db-box settings-button">
-            <span className="settings-button-icon">
-              <AppIcon name="file-text" size={18} />
-            </span>
-            <span className="settings-button-label">ARTICOLI</span>
-          </button>
           <button
             type="button"
             className="db-box settings-button"

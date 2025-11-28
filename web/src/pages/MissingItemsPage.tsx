@@ -21,38 +21,40 @@ function MissingItemsPage() {
           <img src={logo} alt="Barnode" className="page-logo" />
         </div>
         <h1 className="page-title">Lista articoli mancanti</h1>
-        <div className="search-row">
-          <span className="search-icon" aria-hidden="true">
-            <AppIcon name="search" size={16} />
-          </span>
-          <input
-            type="search"
-            placeholder="Cerca per nome"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className="search-input"
-          />
+        <div className="home-search-area">
+          <div className="search-row">
+            <span className="search-icon" aria-hidden="true">
+              <AppIcon name="search" size={16} />
+            </span>
+            <input
+              type="search"
+              placeholder="Cerca per nome"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="search-input"
+            />
+          </div>
+          {query.trim().length > 0 && suggestedItems.length > 0 && (
+            <section className="suggestions-panel home-suggestions-panel">
+              <ul className="suggestions-list">
+                {suggestedItems.map((item) => (
+                  <li
+                    key={item.id}
+                    className="suggestions-item"
+                    onClick={() => {
+                      addMissing(item.id);
+                      setQuery('');
+                    }}
+                  >
+                    <span className="item-name">{toTitleCaseWords(item.nome)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </header>
       <div className="home-scroll">
-        {query.trim().length > 0 && suggestedItems.length > 0 && (
-          <section className="suggestions-panel">
-            <ul className="suggestions-list">
-              {suggestedItems.map((item) => (
-                <li
-                  key={item.id}
-                  className="suggestions-item"
-                  onClick={() => {
-                    addMissing(item.id);
-                    setQuery('');
-                  }}
-                >
-                  <span className="item-name">{toTitleCaseWords(item.nome)}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
         <section className="list">
           {missingItems.length === 0 ? (
             <p className="empty-state">Nessun articolo in lista da acquistare.</p>
