@@ -13,7 +13,7 @@ import {
   deleteTipologia as repoDeleteTipologia,
 } from '../repositories/catalogRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
-import { createAndSaveCurrentSnapshot } from '../repositories/backupRepository';
+import { createAndSaveCurrentSnapshot, hasAnyBackup } from '../repositories/backupRepository';
 import { toTitleCaseWords } from '../utils/text';
 
 export function useCatalog() {
@@ -47,6 +47,15 @@ export function useCatalog() {
       setTipologie(tipRes.data ?? []);
       setArticoli(artRes.data ?? []);
       setLoadedFromSupabase(true);
+
+      try {
+        const alreadyHasBackup = await hasAnyBackup();
+        if (!alreadyHasBackup && isSupabaseConfigured) {
+          void createAndSaveCurrentSnapshot();
+        }
+      } catch {
+        // In caso di errore nel controllo backup iniziale non blocchiamo il caricamento.
+      }
     }
 
     loadInitial();

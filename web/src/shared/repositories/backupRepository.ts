@@ -34,6 +34,33 @@ export type BackupPayload = {
   missingItems: MissingItemWithRelations[];
 };
 
+export async function hasAnyBackup(): Promise<boolean> {
+  if (!isSupabaseConfigured) {
+    return false;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('backups_barnode')
+      .select('id')
+      .limit(1);
+
+    if (error) {
+      console.error('[backupRepository] Errore verifica backup esistenti', error);
+      return false;
+    }
+
+    if (!data) {
+      return false;
+    }
+
+    return Array.isArray(data) ? data.length > 0 : true;
+  } catch (error) {
+    console.error('[backupRepository] Errore inatteso in hasAnyBackup', error);
+    return false;
+  }
+}
+
 export async function saveBackupSnapshot(payload: BackupPayload): Promise<RepositoryResult<null>> {
   return wrapQuery(async () => {
     const { error } = await supabase
