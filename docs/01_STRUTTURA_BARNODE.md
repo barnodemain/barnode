@@ -35,7 +35,11 @@ Definite in `web/src/App.tsx`:
 
 - `/settings`
   - **Componente**: `SettingsPage` (`web/src/pages/SettingsPage.tsx`)
-  - **Ruolo**: pagina Impostazioni, attualmente con 4 pulsanti-card (IMPORTA, ARTICOLI, TIPOLOGIE, BACKUP) usati come entry point per funzionalità gestionali future.
+  - **Ruolo**: pagina Impostazioni, con 3 pulsanti-card (IMPORTA, TIPOLOGIE, BACKUP) usati come entry point per funzionalità gestionali.
+
+- `/settings/tipologie`
+  - **Componente**: `TipologiePage` (`web/src/pages/TipologiePage.tsx`)
+  - **Ruolo**: gestione delle tipologie articoli (CRUD completo) con selezione colore e logica speciale per la tipologia "Varie".
 
 - `*`
   - **Componente**: `MissingItemsPage`
@@ -81,14 +85,14 @@ Per Home (`MissingItemsPage`) e Archivio (`ArchivePage`) viene usato lo stesso p
 - **NavBar fissa** (`.bottom-nav`):
   - definita in `layout.css` come barra verde in basso, con padding e gestione `env(safe-area-inset-bottom)`.
 
-### 3.3 Floating button “+”
+### 3.3 Floating button "+"
 
 - Classe `floating-add-button` in `layout.css`:
   - `position: fixed; right: 1rem; bottom: ~5.5rem; width/height: 60px; border-radius: 50%; background: #215936; box-shadow` ecc.
   - icona `plus` (`AppIcon`) bianca al centro.
 
-Comportamento:
-- In **Home**: naviga a `/archivio`.
+Comportamento attuale:
+- In **Home**: apre la stessa modale "Aggiungi articolo" usata in Archivio, consentendo di creare rapidamente un nuovo articolo nel catalogo.
 - In **Archivio**: apre la modale "Aggiungi articolo".
 
 ---
@@ -105,14 +109,21 @@ Elementi principali:
   - wrapper `.search-row` (box bianco arrotondato).
   - icona lente via `<AppIcon name="search" />`.
   - input `type="search"` con classe `.search-input` (stile custom, iOS nativo disattivato).
-- Lista articoli mancanti (hook `useMissingItems` in `shared/state/missingItemsStore.ts`, non dettagliato qui ma responsabile di `missingItems`, `suggestedItems`, `query`, `setQuery`, `addMissing`, `removeMissing`).
+- **Dropdown suggerimenti**:
+  - calcolato da `useMissingItems` (`suggestedItems`) in base alla `query`.
+  - renderizzato sotto l'input in un wrapper `.home-search-area`.
+  - graficamente è un box `.suggestions-panel` con lista `.suggestions-list` e righe cliccabili `.suggestions-item`.
+  - è ancorato al campo di ricerca (header fisso) e **non scorre** con la lista principale; ha scroll interno se ci sono molti risultati.
+- Lista articoli mancanti (hook `useMissingItems` in `shared/state/missingItemsStore.ts`, responsabile di `missingItems`, `suggestedItems`, `query`, `setQuery`, `addMissing`, `removeMissing`).
+  - ogni riga è una `li.item-card` con struttura `bn-card` e banda colore verticale a sinistra (`bn-card-color`).
+  - il colore della banda dipende dalla **tipologia** dell'articolo; se la tipologia non è trovata viene usato un colore di fallback (tipologia "Varie").
 - Messaggio quando la lista è vuota ("Nessun articolo in lista da acquistare.").
-- Floating button “+” (vedi paragrafo layout) che **naviga verso Archivio**.
+- Floating button "+" (vedi paragrafo layout) che apre la modale "Aggiungi articolo".
 
 Logica principale:
-- **Ricerca**: l’input aggiorna `query`; la lista è filtrata in base al nome.
+- **Ricerca**: l’input aggiorna `query`; la lista è filtrata in base al nome. I suggerimenti mostrati nel dropdown consentono di aggiungere rapidamente un articolo alla lista mancanti con un tap.
 - **Gestione lista**: la logica completa è incapsulata in `useMissingItems`; la Home si limita a renderizzare.
-- **Navigazione**: il pulsante “+” usa `useNavigate` per portare l’utente a `/archivio` dove può gestire il catalogo.
+- **Creazione articoli dal "+"**: il pulsante “+” apre direttamente la modale "Aggiungi articolo" condivisa con Archivio.
 
 ### 4.2 Archivio — Lista articoli (`ArchivePage.tsx`)
 
@@ -122,17 +133,21 @@ Elementi principali:
 - Header con logo + titolo `"Archivio articoli"` + search bar.
 - Lista articoli da `useCatalog` (`articoli`), filtrata per nome (`query`).
 - Card articolo (`li.item-card` + `button.db-item-button`):
-  - nome (`.db-item-name`)
+  - layout basato su `bn-card` con banda verticale colorata `.bn-card-color` a sinistra e contenuto `.bn-card-content` a destra.
+  - nome (`.db-item-name`) visualizzato sempre in **Title Case**.
   - tipologia (`.db-item-meta > span` con `item.tipologiaNome`).
+  - il colore della banda è determinato dalla tipologia associata; per la tipologia speciale "Varie" viene usato un colore fisso (`COLORE_VARIE`) sia in backend che in UI.
 - Modale **"Modifica articolo"** (`EditArticleModal`):
   - usa `AppModal` come wrapper.
-  - campo `Nome articolo`, pulsanti `Elimina`, `Salva`, `Annulla`.
+  - campo `Nome articolo`.
+  - select `Tipologia` per cambiare la tipologia dell'articolo.
+  - pulsanti `Elimina` (rosso) e `Salva` (verde); il layout è centrato sui due pulsanti senza bottone "Annulla" ridondante.
 - Modale **"Aggiungi articolo"** (`NewArticleModal`):
   - titolo "Aggiungi articolo".
   - campo `Nome articolo` (`modal-input`).
-  - select `Tipologia` popolata da `tipologie` di `useCatalog`.
-  - pulsanti in basso: `Annulla` (outline rosso) e `Salva` (verde), stessi stili di `EditArticleModal` ma **senza** bottone Elimina.
-- Floating button “+” che apre `NewArticleModal`.
+  - select `Tipologia` popolata da `tipologie` di `useCatalog`, con default sulla tipologia "Varie".
+  - pulsante in basso: `Salva` (verde), allineato a destra.
+- Floating button "+" che apre `NewArticleModal`.
 
 Logica principale:
 - `useCatalog()` fornisce:
@@ -152,31 +167,45 @@ Logica principale:
 
 ### 4.3 Impostazioni (`SettingsPage.tsx`)
 
-**Scopo:** concentratore per funzioni gestionali future.
+**Scopo:** concentratore per funzioni gestionali e di servizio.
 
 Elementi principali:
 - Header con logo + titolo `"Impostazioni"`.
-- Sezione `.settings-grid` con 4 pulsanti-card grandi:
+- Sezione `.settings-grid` con 3 pulsanti-card grandi:
   1. **IMPORTA**
-     - Card verde pieno (`background:#215936; color:#fff`).
+     - Card verde scuro (`background:#16472a; color:#fff`).
      - Icona `upload` (`AppIcon name="upload"`).
      - Attualmente **non collegato** a logica; pensato per funzionalità di import/export dati.
-  2. **ARTICOLI**
-     - Card bianca con testo verde.
-     - Icona `file-text`.
-     - Placeholder per futura gestione avanzata articoli.
-  3. **TIPOLOGIE**
-     - Card con background bianco/verde chiarissimo.
+  2. **TIPOLOGIE**
+     - Card verde medio (`background:#4f9870; color:#fff`).
      - Icona `tag`.
-     - Placeholder per futura gestione delle tipologie dal frontend.
-  4. **BACKUP**
-     - Card bianca con icona `cloud`.
-     - onClick attuale contiene solo un TODO; concettualmente destinata ad aprire schermate/impostazioni del **sistema di backup** (log Supabase delle modifiche al catalogo, ripristino, ecc.).
+     - Collegata alla route `/settings/tipologie` (gestione tipologie).
+  3. **BACKUP**
+     - Card verde chiaro (`background:#9ec7ac; color:#16472a`).
+     - Icona `cloud`.
+     - onClick attuale contiene solo un TODO; concettualmente destinata ad aprire schermate/impostazioni del **sistema di backup**.
 
 Stile:
 - Card con border-radius alto, ombra morbida, layout `display:flex; align-items:center; justify-content:center; gap:0.5rem;`.
 - Font-size ~1rem, weight 500, uppercase.
-- Nessuno scroll verticale su iPhone medio: layout calibrato con `margin-top` + `gap` contenuti.
+- La pagina Impostazioni è bloccata verticalmente (nessuno scroll percepibile del contenuto principale).
+
+### 4.4 Tipologie (`TipologiePage.tsx`)
+
+**Scopo:** gestione delle tipologie articoli con CRUD completo e scelta colore.
+
+Elementi principali:
+- Header identico ad Archivio, con logo + titolo `"Tipologie articoli"` + search bar.
+- Lista tipologie (`filteredTipologie`) visualizzata come elenco di card `li.item-card` con struttura `bn-card` e banda colore verticale `.bn-card-color`.
+- Il colore di ogni banda è preso da `tipologia.colore`; per la tipologia speciale `"Varie"` viene forzato il colore fisso `COLORE_VARIE`.
+- Floating button `+` dedicato, con stile cromatico diverso, che apre la modale **"Aggiungi tipologia"**.
+- Modali:
+  - `TipologiaModalAdd`: aggiunta nuova tipologia con nome e scelta colore da una palette predefinita.
+  - `TipologiaModalEdit`: modifica di una tipologia esistente, con gestione speciale per `"Varie"` (nome e colore non modificabili, non eliminabile).
+
+Logica principale:
+- Usa `useCatalog` per leggere e mutare l'elenco `tipologie`.
+- Le operazioni CRUD chiamano le funzioni del repository che rispettano i vincoli su `"Varie"` (unicità, non eliminabile, colore fisso).
 
 ---
 

@@ -49,6 +49,18 @@ Lo schema reale utilizzato da BARnode Web è `public` e contiene le seguenti tab
 - `created_at` (`timestamptz`)
 - `articolo_id` (`uuid`, `not null`) → **FK** verso `articoli.id` con `on delete cascade`
 
+#### Tabella `backups_barnode`
+
+- `id` (`uuid`, **PK`)
+- `created_at` (`timestamptz`, default `now()`)
+- `payload` (`jsonb`, `not null`)
+
+La colonna `payload` contiene uno snapshot completo, serializzato in JSON, di:
+
+- elenco `tipologie` (con `id`, `nome`, `colore`);
+- elenco `articoli` (con `id`, `nome`, `tipologia_id`);
+- elenco `missing_items` (con `id`, `articolo_id`).
+
 ### 2.3 Indici attivi
 
 Indici attualmente utilizzati per supportare le query del dominio BARnode Web:
@@ -235,6 +247,13 @@ Quando Supabase è configurato e il caricamento iniziale è andato a buon fine (
   - `deleteArticolo` chiama `deleteArticolo` del repository (delete per `id`).
   - Se l’operazione ha successo, l’articolo viene rimosso dallo stato locale.
 
+Ad ogni operazione di creazione, aggiornamento o cancellazione che va a buon fine (`addArticolo`,
+`updateArticolo`, `updateArticoloNome`, `deleteArticolo`, `addTipologia`, `updateTipologia`,
+`deleteTipologia`, `addMissing`, `removeMissing`), quando Supabase è configurato e lo store sta
+utilizzando il DB reale, l’app crea automaticamente un nuovo record nella tabella
+`backups_barnode` contenente lo stato completo delle tre tabelle di dominio (`tipologie`,
+`articoli`, `missing_items`). Il backup è quindi **multi-utente e centralizzato** dentro Supabase.
+
 ### 5.3 Uso dei mock
 
 I mock di tipologie e articoli (`mockTipologie`, `mockArticoli`) hanno il seguente ruolo:
@@ -244,6 +263,19 @@ I mock di tipologie e articoli (`mockTipologie`, `mockArticoli`) hanno il seguen
 - Quando Supabase è configurato correttamente:
   - lo store **non** ricorre ai mock, nemmeno in caso di errore di query;
   - in caso di errore le liste risultano vuote, in modo da non confondere dati reali e dati finti.
+
+Nel flusso di backup/ripristino:
+
+- quando `isSupabaseConfigured === false` lo snapshot automatico non viene creato e le chiamate
+  verso `backups_barnode` restituiscono un errore logico gestito a livello di repository (nessun
+  impatto sulla UI);
+- quando Supabase è configurato e le query vanno a buon fine, dopo ogni operazione di mutazione
+  viene salvato uno snapshot completo nella tabella `backups_barnode`;
+- dalla pagina **Backup** dell’app è possibile richiamare `restoreBackupSnapshot`, che legge
+  l’ultimo record di `backups_barnode` (ordinato per `created_at DESC`) e ripristina il contenuto
+  delle tabelle `tipologie`, `articoli` e `missing_items` cancellando prima lo stato corrente e
+  reinserendo i record presenti nello snapshot, rispettando le relazioni FK
+  (`tipologie` → `articoli` → `missing_items`).
 
 ---
 

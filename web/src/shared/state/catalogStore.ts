@@ -13,6 +13,7 @@ import {
   deleteTipologia as repoDeleteTipologia,
 } from '../repositories/catalogRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
+import { createAndSaveCurrentSnapshot } from '../repositories/backupRepository';
 import { toTitleCaseWords } from '../utils/text';
 
 export function useCatalog() {
@@ -81,6 +82,10 @@ export function useCatalog() {
     setArticoli((current) =>
       current.map((art) => (art.id === id ? { ...art, nome: data.nome } : art))
     );
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   const deleteArticolo = async (id: string) => {
@@ -92,6 +97,10 @@ export function useCatalog() {
     const { error } = await repoDeleteArticolo(id);
     if (error) return;
     setArticoli((current) => current.filter((art) => art.id !== id));
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   type AddArticoloInput = {
@@ -144,6 +153,10 @@ export function useCatalog() {
 
       return [...current, nuovo];
     });
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   type UpdateArticoloInput = {
@@ -186,7 +199,7 @@ export function useCatalog() {
       const fallbackTipologia =
         tipologie.find((t) => t.id === data.tipologiaId) ?? tipologie[0] ?? null;
 
-      return current.map((art) =>
+      const updated = current.map((art) =>
         art.id === id
           ? {
               ...art,
@@ -196,7 +209,13 @@ export function useCatalog() {
             }
           : art
       );
+
+      return updated;
     });
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   type AddTipologiaInput = {
@@ -227,6 +246,10 @@ export function useCatalog() {
     if (error || !data) return;
 
     setTipologie((current) => [...current, data]);
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   const updateTipologia = async (id: string, payload: { nome: string; colore: string }) => {
@@ -255,6 +278,10 @@ export function useCatalog() {
     if (error || !data) return;
 
     setTipologie((current) => current.map((t) => (t.id === id ? data : t)));
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   const deleteTipologia = async (id: string) => {
@@ -266,7 +293,11 @@ export function useCatalog() {
     const { error } = await repoDeleteTipologia(id);
     if (error) return;
 
-    setTipologie((current) => current.filter((t) => t.id !== id));
+    setTipologie((current) => current.filter((t) => (t.id === id ? false : true)));
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   return {

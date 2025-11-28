@@ -35,7 +35,7 @@ function SettingsPage() {
             type="button"
             className="db-box settings-button"
             onClick={() => {
-              // TODO: collegare azione BACKUP quando disponibile
+              navigate('/settings/backup');
             }}
           >
             <span className="settings-button-icon">

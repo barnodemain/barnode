@@ -6,6 +6,7 @@ const MissingItemsPage = lazy(() => import('./pages/MissingItemsPage'));
 const ArchivePage = lazy(() => import('./pages/ArchivePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const TipologiePage = lazy(() => import('./pages/TipologiePage'));
+const BackupPage = lazy(() => import('./pages/BackupPage'));
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/database" element={<Navigate to="/archivio" replace />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/tipologie" element={<TipologiePage />} />
+            <Route path="/settings/backup" element={<BackupPage />} />
             <Route path="*" element={<MissingItemsPage />} />
           </Routes>
         </Suspense>

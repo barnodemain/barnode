@@ -230,3 +230,33 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+/* Backup page specific styles */
+
+.backup-page-section {
+  text-align: center;
+}
+
+.backup-restore-button {
+  background-color: #8b0000 !important; /* rosso scuro, sovrascrive il verde di base */
+  color: #ffffff;
+}
+
+.backup-restore-button:hover {
+  background-color: #a53832;
+}
+
+.backup-restore-button:disabled {
+  opacity: 0.85;
+}
+
+.backup-warning-text {
+  margin-top: 1.5rem;
+  color: #c6453d;
+  font-weight: 400;
+}
+
+.backup-page-section p {
+  font-weight: 400;
+  font-size: 0.9rem;
+}

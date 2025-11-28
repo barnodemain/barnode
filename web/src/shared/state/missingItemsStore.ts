@@ -8,6 +8,7 @@ import {
   removeMissingItem as repoRemoveMissingItem,
 } from '../repositories/missingItemsRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
+import { createAndSaveCurrentSnapshot } from '../repositories/backupRepository';
 
 export function useMissingItems() {
   const [allItems, setAllItems] = useState<ArticoloWithRelations[]>(mockArticoli);
@@ -104,6 +105,10 @@ export function useMissingItems() {
       if (previous.includes(data.articoloId)) return previous;
       return [...previous, data.articoloId];
     });
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   const removeMissing = async (id: string) => {
@@ -122,6 +127,10 @@ export function useMissingItems() {
       if (!toRemove) return previous;
       return previous.filter((itemId) => itemId !== toRemove.articoloId);
     });
+
+    if (loadedFromSupabase && isSupabaseConfigured) {
+      void createAndSaveCurrentSnapshot();
+    }
   };
 
   return {
