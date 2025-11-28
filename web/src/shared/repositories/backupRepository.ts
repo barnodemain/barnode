@@ -183,6 +183,16 @@ export async function createAndSaveCurrentSnapshot(): Promise<RepositoryResult<n
     return { data: null, error: firstError ?? null };
   }
 
+  const countTipologie = tipRes.data?.length ?? 0;
+  const countArticoli = artRes.data?.length ?? 0;
+  const countMissing = missRes.data?.length ?? 0;
+
+  const latest = await getLatestBackupSnapshot();
+
+  if (!latest.error && latest.data && countTipologie === 0 && countArticoli === 0 && countMissing === 0) {
+    return { data: null, error: null };
+  }
+
   const payload: BackupPayload = {
     tipologie: tipRes.data ?? [],
     articoli: artRes.data ?? [],
