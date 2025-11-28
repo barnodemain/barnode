@@ -3,6 +3,7 @@ import { useCatalog } from '../shared/state/catalogStore';
 import logo from '../assets/logo.png';
 import { AppIcon } from '../components/AppIcon';
 import { COLORE_VARIE } from '../shared/constants/tipologie';
+import { toTitleCaseWords } from '../shared/utils/text';
 import EditArticleModal from './archive/EditArticleModal';
 import NewArticleModal from './archive/NewArticleModal';
 
@@ -67,7 +68,7 @@ function ArchivePage() {
                       }}
                     >
                       <div className="db-item-main">
-                        <div className="db-item-name">{item.nome}</div>
+                        <div className="db-item-name">{toTitleCaseWords(item.nome)}</div>
                         <div className="db-item-meta">
                           <span>{item.tipologiaNome}</span>
                         </div>

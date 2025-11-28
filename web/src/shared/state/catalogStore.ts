@@ -13,6 +13,7 @@ import {
   deleteTipologia as repoDeleteTipologia,
 } from '../repositories/catalogRepository';
 import { isSupabaseConfigured } from '../services/supabaseClient';
+import { toTitleCaseWords } from '../utils/text';
 
 export function useCatalog() {
   const [tipologie, setTipologie] = useState<Tipologia[]>([]);
@@ -65,14 +66,16 @@ export function useCatalog() {
   );
 
   const updateArticoloNome = async (id: string, nuovoNome: string) => {
+    const normalized = toTitleCaseWords(nuovoNome);
+
     if (!loadedFromSupabase) {
       setArticoli((current) =>
-        current.map((art) => (art.id === id ? { ...art, nome: nuovoNome } : art))
+        current.map((art) => (art.id === id ? { ...art, nome: normalized } : art))
       );
       return;
     }
 
-    const { data, error } = await repoUpdateArticoloNome(id, nuovoNome);
+    const { data, error } = await repoUpdateArticoloNome(id, normalized);
     if (error || !data) return;
 
     setArticoli((current) =>
@@ -99,6 +102,7 @@ export function useCatalog() {
   const addArticolo = async ({ nome, tipologiaId }: AddArticoloInput) => {
     const trimmed = nome.trim();
     if (!trimmed) return;
+    const normalized = toTitleCaseWords(trimmed);
 
     if (!loadedFromSupabase || !isSupabaseConfigured) {
       setArticoli((current) => {
@@ -113,7 +117,7 @@ export function useCatalog() {
 
         const nuovo: ArticoloWithRelations = {
           id: newId,
-          nome: trimmed,
+          nome: normalized,
           tipologiaId: fallbackTipologia.id,
           tipologiaNome: fallbackTipologia.nome,
         };
@@ -124,7 +128,7 @@ export function useCatalog() {
       return;
     }
 
-    const { data, error } = await repoCreateArticolo({ nome: trimmed, tipologiaId });
+    const { data, error } = await repoCreateArticolo({ nome: normalized, tipologiaId });
     if (error || !data) return;
 
     setArticoli((current) => {
@@ -151,6 +155,7 @@ export function useCatalog() {
   const updateArticolo = async ({ id, nome, tipologiaId }: UpdateArticoloInput) => {
     const trimmed = nome.trim();
     if (!trimmed) return;
+    const normalized = toTitleCaseWords(trimmed);
 
     if (!loadedFromSupabase || !isSupabaseConfigured) {
       setArticoli((current) => {
@@ -163,7 +168,7 @@ export function useCatalog() {
           art.id === id
             ? {
                 ...art,
-                nome: trimmed,
+                nome: normalized,
                 tipologiaId: fallbackTipologia.id,
                 tipologiaNome: fallbackTipologia.nome,
               }
@@ -174,7 +179,7 @@ export function useCatalog() {
       return;
     }
 
-    const { data, error } = await repoUpdateArticolo(id, { nome: trimmed, tipologiaId });
+    const { data, error } = await repoUpdateArticolo(id, { nome: normalized, tipologiaId });
     if (error || !data) return;
 
     setArticoli((current) => {

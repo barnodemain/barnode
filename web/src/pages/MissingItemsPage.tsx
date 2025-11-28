@@ -5,6 +5,7 @@ import { AppIcon } from '../components/AppIcon';
 import { useCatalog } from '../shared/state/catalogStore';
 import { COLORE_VARIE } from '../shared/constants/tipologie';
 import NewArticleModal from './archive/NewArticleModal';
+import { toTitleCaseWords } from '../shared/utils/text';
 
 function MissingItemsPage() {
   const { missingItems, suggestedItems, query, setQuery, addMissing, removeMissing } =
@@ -46,7 +47,7 @@ function MissingItemsPage() {
                     setQuery('');
                   }}
                 >
-                  <span className="item-name">{item.nome}</span>
+                  <span className="item-name">{toTitleCaseWords(item.nome)}</span>
                 </li>
               ))}
             </ul>
@@ -58,7 +59,8 @@ function MissingItemsPage() {
           ) : (
             <ul className="home-item-list">
               {missingItems.map((item) => {
-                const nomeArticolo = 'articoloNome' in item ? item.articoloNome : item.nome;
+                const nomeArticoloRaw = 'articoloNome' in item ? item.articoloNome : item.nome;
+                const nomeArticolo = toTitleCaseWords(nomeArticoloRaw);
                 const tipo = tipologie.find(
                   (t) => t.nome.trim().toLowerCase() === item.tipologiaNome?.trim().toLowerCase()
                 );

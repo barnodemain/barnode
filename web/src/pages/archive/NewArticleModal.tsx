@@ -65,10 +65,7 @@ function NewArticleModal({ isOpen, onClose, onSave, tipologie }: NewArticleModal
           </select>
         </label>
       </div>
-      <div className="modal-actions modal-actions-edit">
-        <button type="button" className="btn-secondary btn-outline-danger" onClick={onClose}>
-          Annulla
-        </button>
+      <div className="modal-actions">
         <div className="modal-actions-edit-right">
           <button type="button" className="btn-primary" onClick={handleSave}>
             Salva
