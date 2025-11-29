@@ -25,7 +25,7 @@
   bottom: 80px; /* altezza stimata NavBar inclusi padding/safe-area */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 1rem 1.5rem;
+  padding: 0.5rem 1rem 1.5rem;
 }
 
 .archive-item-list {
@@ -70,7 +70,7 @@
   bottom: 80px; /* altezza stimata NavBar */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 1rem 1.5rem;
+  padding: 0.5rem 1rem 1.5rem;
 }
 
 .home-item-list {

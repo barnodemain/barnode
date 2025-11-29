@@ -7,6 +7,10 @@ const ArchivePage = lazy(() => import('./pages/ArchivePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const TipologiePage = lazy(() => import('./pages/TipologiePage'));
 const BackupPage = lazy(() => import('./pages/BackupPage'));
+const ImportPage = lazy(() => import('./pages/ImportPage'));
+const TextImportPage = lazy(() => import('./pages/import/TextImportPage'));
+const CSVImportPage = lazy(() => import('./pages/import/CSVImportPage'));
+const PDFImportPage = lazy(() => import('./pages/import/PDFImportPage'));
 
 function App() {
   return (
@@ -20,6 +24,10 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/tipologie" element={<TipologiePage />} />
             <Route path="/settings/backup" element={<BackupPage />} />
+            <Route path="/settings/import" element={<ImportPage />} />
+            <Route path="/settings/import/text" element={<TextImportPage />} />
+            <Route path="/settings/import/csv" element={<CSVImportPage />} />
+            <Route path="/settings/import/pdf" element={<PDFImportPage />} />
             <Route path="*" element={<MissingItemsPage />} />
           </Routes>
         </Suspense>

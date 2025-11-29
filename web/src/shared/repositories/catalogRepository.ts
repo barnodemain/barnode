@@ -61,6 +61,33 @@ export async function updateArticolo(
   });
 }
 
+export async function getArticoli(): Promise<RepositoryResult<Articolo[]>> {
+  return wrapQuery(async () => {
+    const { data, error } = await supabase
+      .from('articoli')
+      .select('id, nome, tipologia_id')
+      .order('nome', { ascending: true });
+
+    if (error) {
+      return { data: null, error };
+    }
+
+    const mapped: Articolo[] = (data ?? []).map((row: { id: string; nome: string; tipologia_id: string | null }) => ({
+      id: row.id,
+      nome: row.nome,
+      tipologiaId: row.tipologia_id ?? '',
+    }));
+
+    return { data: mapped, error: null };
+  });
+}
+
+export async function addArticolo(
+  input: CreateArticoloInput
+): Promise<RepositoryResult<Articolo>> {
+  return createArticolo(input);
+}
+
 export interface CreateTipologiaInput {
   nome: string;
   colore: string;
