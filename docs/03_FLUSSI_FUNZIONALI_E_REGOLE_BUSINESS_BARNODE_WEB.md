@@ -2,7 +2,20 @@
 
 ## Flusso Quick-Add su Archivio
 
-- Quando l'utente tappa il pulsante "+" su una carta articolo nella pagina Archivio, l'articolo viene aggiunto immediatamente alla lista dei mancanti
-- Non viene aperto alcun modal - è un'azione diretta
-- Il flusso utilizza il medesimo hook `useMissingItems` già utilizzato nella Home
-- La UI rimane consistente: lo spazio verticale tra titolo, ricerca e lista è stato affinato per una migliore leggibilità su dispositivi mobili
+- Tap su "+" aggiunge l'articolo ai mancanti senza modal
+- Duplicate protection: "+" visibile solo se articolo NON è già in missing_items
+- Stesso hook `useMissingItems` della Home per consistency
+- Backup automatico dopo addMissingItem
+
+## Flusso Home (Lista articoli mancanti)
+
+- Autocomplete mostra solo articoli non in missing_items
+- Tap su suggerimento aggiunge ai mancanti
+- Manual add: crea articolo se non esiste, poi aggiunge ai mancanti
+- Trash icon rimuove da missing_items
+
+## Archivio (Catalogo)
+
+- Click card: apre edit modal
+- Trash icon: elimina articolo (e da missing_items se presente)
+- "+" icon: quick-add ai mancanti (hidden se già present)

@@ -24,7 +24,7 @@ function Archivio() {
     deleteArticolo
   } = useArticoli()
 
-  const { addMissingItem } = useMissingItems()
+  const { addMissingItem, isArticoloMissing } = useMissingItems()
 
   const filteredArticoli = searchQuery.trim()
     ? articoli.filter(a => a.nome.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -130,13 +130,15 @@ function Archivio() {
               <div key={articolo.id} className="item-card archivio-card" onClick={() => handleEditClick(articolo)}>
                 <span className="item-name">{articolo.nome}</span>
                 <div className="item-actions">
-                  <button
-                    className="icon-button add"
-                    onClick={(e) => handleQuickAdd(e, articolo)}
-                    aria-label="Aggiungi a mancanti"
-                  >
-                    <IoAddOutline size={22} />
-                  </button>
+                  {!isArticoloMissing(articolo.id) && (
+                    <button
+                      className="icon-button add"
+                      onClick={(e) => handleQuickAdd(e, articolo)}
+                      aria-label="Aggiungi a mancanti"
+                    >
+                      <IoAddOutline size={22} />
+                    </button>
+                  )}
                   <button
                     className="icon-button delete"
                     onClick={(e) => {

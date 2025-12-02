@@ -1,0 +1,114 @@
+Update the existing BARnode React + TypeScript + Vite mobile web app with the following tasks.
+Do not modify Supabase schemas or RPCs, and do not change any scroll/page-lock behavior. Only adjust UI and small pieces of logic where explicitly requested.
+
+“+” quick-add button on Archivio cards (with duplicate protection)
+
+On the /archivio page, each article card already has a trash icon on the right.
+
+Add a “+” icon to each article card, positioned immediately to the left of the trash icon, matching the style (size, color, spacing) of the other icons.
+
+When the user taps the “+” icon, add that article to the missing_items list using the same logic currently used on the Home page to add a missing item:
+
+create a missing_items row with the correct articolo_id (and created_at if needed),
+
+update the UI so the missing-items list is in sync.
+
+Duplicate protection:
+
+If an article is already present in the missing-items list, the “+” icon for that article must not be visible.
+
+Use existing state/store or queries to know which articolo_id values are already in missing_items, and conditionally render the “+” icon only when the article is not missing.
+
+Tapping the article card itself must still open the edit modal as before.
+
+Tapping the trash icon must still delete the article as before (use event.stopPropagation() so icons do not trigger the card click).
+
+The “+” icon must not open any modal; it is a direct quick-add.
+
+Do not change list containers or scroll behavior.
+
+Title and spacing adjustments on Home and Archivio
+
+On both the Home page (/) and the Archivio page (/archivio):
+
+Increase slightly the vertical space between the page title and the search box, so the title is not too close to the filter.
+
+Reduce the vertical gap between the search box and the first list item (the first card), so the list appears closer to the search box.
+
+Constraints:
+
+Do not modify scroll/overflow logic or the structural layout (no changes to which elements are scrollable).
+
+Only adjust margins/padding for titles, search box, and the gap above the list.
+
+Codebase analysis and cleanup for stability and performance
+
+Perform a careful analysis of the entire codebase and apply small, safe improvements. The goal is to increase stability and speed without changing app behavior.
+
+Specifically:
+
+Identify and remove:
+
+dead/unused files (components, hooks, styles) that are never imported,
+
+obviously obsolete or duplicate files that serve no purpose.
+
+For files that are similar but both in use, do not merge them; just clean up truly unused code.
+
+Check for:
+
+unused imports,
+
+variables or functions that are never used,
+
+obvious console warnings or TypeScript warnings that can be safely fixed.
+
+Where useful and low-risk, improve performance by:
+
+avoiding unnecessary re-renders (e.g. memoizing simple components or callbacks where clearly beneficial),
+
+ensuring list items have stable key props,
+
+cleaning up any heavy computations inside render that can be moved out or memoized.
+
+Do not introduce large refactors or change the overall architecture.
+
+Ensure npm run build and npm run dev work cleanly without errors.
+
+Documentation updates in docs/
+
+After implementing the feature and cleanup, update the documentation files in the docs folder to reflect the current state of the app, especially the new quick-add button and the spacing tweaks:
+
+01_STRUTTURA_BARNODE.md
+
+02_STRUTTURA_SUPABASE_RENDER.md
+
+03_FLUSSI_FUNZIONALI_E_REGOLE_BUSINESS_BARNODE_WEB.md
+
+04_GOVERNANCE_CASCADE_E_MANUTENZIONE_BARNODE_WEB.md
+
+05_CHECKLIST_QA_E_TEST_REGRESSIONE.md
+
+06_LINEE_GUIDA_LAYOUT_UI_UX_BARNODE.md
+
+07_STANDARD_CODICE_E_CONVENZIONI_TS_REACT.md
+
+Add short, relevant notes where appropriate, describing:
+
+that the Archivio page now has a “+” quick-add icon on each article card, which is shown only when the article is not already in the missing-items list, and adds the article directly to the Home missing-items list;
+
+that the vertical spacing between titles, search boxes, and lists on Home/Archivio has been refined for better readability;
+
+that a general cleanup pass was done on unused files and imports to improve stability and performance.
+
+Do not mention any specific development platform in these docs.
+
+Final summary
+
+After completing all tasks, provide a concise summary that includes:
+
+a list of code files that were added, removed, or modified, with a brief description of the changes,
+
+a list of documentation files that were updated and what was added,
+
+any notable stability or performance improvements you made.

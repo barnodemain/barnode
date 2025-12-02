@@ -2,13 +2,38 @@
 
 ## Spacing e Layout
 
-- **Spacing verticale tra titolo e search box**: gap di 16px tra `.page-header` e `.search-container` per respiro visivo
-- **Spacing tra search box e lista**: margin-bottom di 8px su `.search-container` per mantenere vicinanza
-- **Consistenza su tutti i page**: Home e Archivio seguono lo stesso pattern di spacing
+### Verticale tra elementi
+- **Title ↔ Search box**: gap 18px per respiro visivo
+- **Search box ↔ First item**: 6px margin-bottom per vicinanza
+- **Item cards**: gap 4px per densità compatta
+- **Header margin**: 6px bottom per evitare excessive spacing
+
+### Consistenza
+- Home e Archivio seguono lo stesso pattern
+- Scrollable content inizia subito dopo search box
 
 ## Icone d'azione
 
-- **Pulsante "+"**: colore verde chiaro, posizionato immediatamente a sinistra del trash icon
-- **Pulsante "-" (trash)**: rosso, comportamento invariato
-- **Grandezza**: tutti i pulsanti mantengono 44px x 44px con border-radius 50%
-- **Gap tra icone**: 8px di spazio per evitare overlap visivo
+### "+" (Quick-add)
+- Colore: verde chiaro (`--color-green-light`)
+- Posizione: sinistra del trash icon
+- Visibilità: condizionale (nascosto se articolo già in mancanti)
+- Non apre modal
+
+### Trash (Delete)
+- Colore: rosso (`--color-red`)
+- Posizione: destra della card
+- Comportamento: sempre visibile, elimina articolo
+
+### Dimensioni
+- Tutti i button: 44px × 44px, border-radius 50%
+- Gap tra icone: 8px
+- Icon size: 22px
+
+## Colori
+
+- Titolo: `--color-text` (#333)
+- Background card: `--color-white`
+- Background pagina: `--color-cream`
+- Green light: `--color-green-light` (#4a9c3d)
+- Red: `--color-red` (#c04a4a)
