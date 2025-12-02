@@ -22,14 +22,18 @@
 
 ## Analysis (Rilevamento duplicati)
 
+**Data source:** Solo tabella `articoli`, mai `missing_items` per il raggruppamento
+
 - Algoritmo migliorato: Raggruppa solo articoli che condividono keywords comuni (2+ DISTINTI articoli per gruppo)
 - Articoli singoli: Non vengono mostrati nemmeno se hanno multiple keywords
 - Tokenizzazione: Lowercase, remove accenti, split per spazi, filter stopwords e numeri puri
 - Raggruppamento: Se articolo A e B condividono keyword K → stesso gruppo
 - Deduplicazione: Stesso set di articoli non appare in multiple gruppi
 - UI: Mostra keywords condivisi, radio button per nome primario, due button: "Consolida" e "Ignora"
-- Consolida: Renomina tutti gli altri articoli al nome primario selezionato
+- Consolida: Elimina i duplicati (articoli non-primari), conserva solo il primario
+  - Prima di eliminare: missing_items vengono puliti via cascata
+  - Dopo consolidazione: gruppo scompare se rimane solo 1 articolo
 - Ignora: Nasconde il gruppo dalla visualizzazione (non modifica database)
-- Auto-refresh: I gruppi si ricompilano quando articoli cambiano
+- Auto-refresh: I gruppi si ricompilano quando articoli cambiano (dopo consolidazione, gruppo sparisce)
 - Backup: Snapshot dopo ogni consolidamento
-- Sicurezza: Update cascata su missing_items quando articolo viene rinominato
+- Sicurezza: Eliminazione cascata via deleteArticolo su missing_items

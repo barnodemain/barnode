@@ -1,0 +1,49 @@
+Fix and clarify the Analysis feature so it works only on the article catalog (articoli) and never uses the missing items list as a source for grouping. Also fix the behavior so that once a duplicate group is resolved, it is not shown again if there are no real duplicates left.
+
+Current bug example:
+
+I had a duplicate group for “pane frico”.
+
+I selected one of the two options and clicked Consolida.
+
+The consolidation was applied (now there is only one “pane frico” in Archivio), but the duplicate group is still shown on the Analysis page.
+
+This means the Analysis logic is not correctly using fresh data, or it is looking at the wrong source.
+
+Please do the following.
+
+Verify data sources (must be only articoli)
+
+Inspect the code for the Analysis page (e.g. src/pages/Analysis.tsx or similar):
+
+Confirm that the grouping algorithm and the list of items used for Analysis come only from the articoli table (the catalog of articles).
+
+Ensure that the missing_items table is never used as a source when building duplicate groups.
+
+It is allowed to update missing_items after a consolidation (to keep names in sync), but missing_items must not create or influence Analysis groups.
+
+If you find any place where missing_items is used to build or influence Analysis groups, remove that logic and rely strictly on articoli for Analysis.
+
+Guarantee groups are based on fresh articoli data
+
+After a successful consolidation:
+
+Reload the current list of articles from articoli (via Supabase or the shared store that represents that table).
+
+Recompute duplicate groups using this updated list.
+
+Ensure that the grouping function never uses stale copies of data.
+
+If there is now only one article “pane frico” in articoli, the Analysis page must not generate any group for it.
+
+Strengthen the grouping rule
+
+Update the grouping logic so that:
+
+A group is created only when there are at least two distinct article IDs in that group.
+
+A single article (even with multiple keywords) must never produce a group.
+
+After consolidation, if the updated articoli data contains only one matching article, the corresponding group must disappear.
+
+Add explicit guards if needed, for example:

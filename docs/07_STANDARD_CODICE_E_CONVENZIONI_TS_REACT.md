@@ -35,6 +35,7 @@
 - Rimozione prima di raggruppamento
 
 ### Raggruppamento (CORRETTO)
+- **FONTE DATI:** Solo `articoli`, mai `missing_items`
 - Per ogni articolo: estrai keywords non-stopword
 - Mappa keyword → Set di article IDs che contengono quel keyword
 - Per OGNI articolo, trova tutti gli articoli che condividono almeno UN keyword
@@ -42,6 +43,8 @@
 - Deduplicazione: Stesso set di articoli non appare due volte
 - Sort per dimensione decrescente
 - IMPORTANTE: Un singolo articolo con multiple keywords NON crea gruppo
+- **CONSOLIDAMENTO:** Elimina non-primari (via `deleteArticolo`), non rinomina
+- **RISULTATO:** Dopo consolidazione, solo 1 articolo rimane → nessun gruppo mostrato
 
 ## Reusability
 

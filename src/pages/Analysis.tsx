@@ -104,7 +104,7 @@ function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
 
 function Analysis() {
   const navigate = useNavigate()
-  const { articoli, loading, error, updateArticolo } = useArticoli()
+  const { articoli, loading, error, deleteArticolo } = useArticoli()
   const [selectedPrimary, setSelectedPrimary] = useState<{[groupId: string]: string}>({})
   const [consolidating, setConsolidating] = useState(false)
   const [consolidationMessage, setConsolidationMessage] = useState<string | null>(null)
@@ -128,10 +128,11 @@ function Analysis() {
     setConsolidationMessage(null)
 
     try {
-      // Update all other articles in the group to have the primary name
+      // Delete all non-primary articles (consolidation = keep primary, remove duplicates)
       for (const article of group.articles) {
         if (article.id !== primaryId) {
-          await updateArticolo(article.id, primaryArticle.nome)
+          // deleteArticolo also updates missing_items references
+          await deleteArticolo(article.id)
         }
       }
 
