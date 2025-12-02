@@ -120,96 +120,100 @@ function ImportText() {
   const currentCandidate = candidates[currentIndex]
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <img src="/logo.png" alt="BARnode" className="logo" />
-        <h1 className="page-title">Importa da testo</h1>
+    <div className="page-wrapper">
+      <div className="page-header-fixed">
+        <div className="page-header">
+          <img src="/logo.png" alt="BARnode" className="logo" />
+          <h1 className="page-title">Importa da testo</h1>
+        </div>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      <div className="page-content-scrollable">
+        {error && <div className="error-message">{error}</div>}
 
-      {wizardState === 'input' && (
-        <div className="import-section">
-          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Importa da testo</h2>
-          <p className="import-description">
-            Incolla qui l'elenco di articoli, uno per riga. Righe vuote o non valide verranno ignorate.
-          </p>
-          <textarea
-            className="import-textarea"
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-            placeholder="Es. latte intero
+        {wizardState === 'input' && (
+          <div>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '10px' }}>Importa da testo</h2>
+            <p className="import-description">
+              Incolla qui l'elenco di articoli, uno per riga. Righe vuote o non valide verranno ignorate.
+            </p>
+            <textarea
+              className="import-textarea"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Es. latte intero
 Pasta integrale
 Biscotti senza zucchero"
-          />
-          <button
-            className="btn btn-primary btn-full"
-            onClick={handleAnalyze}
-            disabled={!textInput.trim()}
-          >
-            ANALIZZA TESTO
-          </button>
-        </div>
-      )}
-
-      {wizardState === 'reviewing' && currentCandidate && (
-        <div>
-          <div className="wizard-progress">
-            Articolo {currentIndex + 1} di {candidates.length}
-          </div>
-          <div className="wizard-card">
-            <div className="wizard-item-name">{currentCandidate.originalName}</div>
-            <input
-              type="text"
-              className="wizard-input"
-              value={currentCandidate.editedName}
-              onChange={(e) => handleEditName(e.target.value)}
-              placeholder="Modifica nome se necessario"
             />
-            <div className="wizard-buttons">
-              <button
-                className="btn btn-secondary"
-                onClick={handleSkip}
-                disabled={isSubmitting}
-              >
-                Salta
+            <button
+              className="btn btn-primary btn-full"
+              onClick={handleAnalyze}
+              disabled={!textInput.trim()}
+            >
+              ANALIZZA TESTO
+            </button>
+          </div>
+        )}
+
+        {wizardState === 'reviewing' && currentCandidate && (
+          <div>
+            <div className="wizard-progress">
+              Articolo {currentIndex + 1} di {candidates.length}
+            </div>
+            <div className="wizard-card">
+              <div className="wizard-item-name">{currentCandidate.originalName}</div>
+              <input
+                type="text"
+                className="wizard-input"
+                value={currentCandidate.editedName}
+                onChange={(e) => handleEditName(e.target.value)}
+                placeholder="Modifica nome se necessario"
+              />
+              <div className="wizard-buttons">
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleSkip}
+                  disabled={isSubmitting}
+                >
+                  Salta
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleConfirm}
+                  disabled={isSubmitting || !currentCandidate.editedName.trim()}
+                >
+                  {isSubmitting ? '...' : 'Conferma'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {wizardState === 'complete' && (
+          <div className="summary-card">
+            <h2 className="summary-title">Importazione completata</h2>
+            {candidates.length === 0 ? (
+              <p className="summary-stats">
+                Nessun nuovo articolo da importare.<br />
+                Tutti gli articoli esistono già nell'archivio.
+              </p>
+            ) : (
+              <p className="summary-stats">
+                {stats.created} articoli creati<br />
+                {stats.skipped} articoli saltati
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button className="btn btn-secondary" onClick={handleReset}>
+                Nuova importazione
               </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleConfirm}
-                disabled={isSubmitting || !currentCandidate.editedName.trim()}
-              >
-                {isSubmitting ? '...' : 'Conferma'}
+              <button className="btn btn-primary" onClick={() => navigate('/archivio')}>
+                Vai all'archivio
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {wizardState === 'complete' && (
-        <div className="summary-card">
-          <h2 className="summary-title">Importazione completata</h2>
-          {candidates.length === 0 ? (
-            <p className="summary-stats">
-              Nessun nuovo articolo da importare.<br />
-              Tutti gli articoli esistono già nell'archivio.
-            </p>
-          ) : (
-            <p className="summary-stats">
-              {stats.created} articoli creati<br />
-              {stats.skipped} articoli saltati
-            </p>
-          )}
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <button className="btn btn-secondary" onClick={handleReset}>
-              Nuova importazione
-            </button>
-            <button className="btn btn-primary" onClick={() => navigate('/archivio')}>
-              Vai all'archivio
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

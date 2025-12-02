@@ -80,11 +80,26 @@ ul, ol {
   position: relative;
 }
 
-.page-content {
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.page-header-fixed {
+  flex-shrink: 0;
+  background-color: var(--color-cream);
+  padding: 16px;
+  z-index: 10;
+}
+
+.page-content-scrollable {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
-  padding-bottom: calc(var(--nav-height) + 80px);
+  overflow-x: hidden;
+  padding: 0 16px 16px 16px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -92,17 +107,16 @@ ul, ol {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 0;
-  gap: 8px;
+  gap: 12px;
 }
 
 .logo {
-  height: 80px;
+  height: 60px;
   width: auto;
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-text);
   text-align: center;
@@ -110,17 +124,17 @@ ul, ol {
 
 .search-container {
   position: relative;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .search-input {
   width: 100%;
-  padding: 14px 16px;
-  padding-left: 44px;
+  padding: 12px 16px;
+  padding-left: 40px;
   background: var(--color-white);
   border: 1px solid var(--color-gray-light);
   border-radius: var(--radius-input);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--color-text);
   box-shadow: var(--shadow-card);
 }
@@ -131,7 +145,7 @@ ul, ol {
 
 .search-icon {
   position: absolute;
-  left: 16px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-gray);
@@ -154,7 +168,7 @@ ul, ol {
 }
 
 .suggestion-item {
-  padding: 14px 16px;
+  padding: 12px 16px;
   cursor: pointer;
   border-bottom: 1px solid var(--color-gray-light);
   transition: background-color 0.15s;
@@ -173,13 +187,14 @@ ul, ol {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-bottom: 80px;
 }
 
 .item-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 14px 16px;
   background: var(--color-white);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -338,25 +353,25 @@ ul, ol {
 
 .modal-input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 14px;
   background: var(--color-white);
   border: 1px solid var(--color-gray-light);
   border-radius: var(--radius-input);
   font-size: 16px;
   color: var(--color-text);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .modal-buttons {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
 }
 
 .btn {
-  padding: 14px 32px;
+  padding: 12px 28px;
   border-radius: var(--radius-button);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   transition: opacity 0.15s, transform 0.1s;
 }
@@ -394,7 +409,7 @@ ul, ol {
 
 .btn-full {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   border-radius: var(--radius-button);
   font-size: 16px;
   font-weight: 600;
@@ -402,16 +417,12 @@ ul, ol {
   letter-spacing: 0.5px;
 }
 
-.settings-page {
-  padding-top: 40px;
-}
-
 .settings-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 18px 20px;
+  padding: 16px 18px;
   background: var(--color-white);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -426,10 +437,6 @@ ul, ol {
   background-color: var(--color-cream-light);
 }
 
-.import-section {
-  margin-bottom: 24px;
-}
-
 .import-description {
   font-size: 14px;
   color: var(--color-text-light);
@@ -440,16 +447,16 @@ ul, ol {
 
 .import-textarea {
   width: 100%;
-  min-height: 180px;
-  padding: 16px;
+  min-height: 140px;
+  padding: 12px;
   background: var(--color-white);
   border: 1px solid var(--color-gray-light);
   border-radius: var(--radius-card);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--color-text);
   resize: vertical;
-  margin-bottom: 20px;
-  font-family: inherit;
+  margin-bottom: 16px;
+  font-family: monospace;
 }
 
 .import-textarea::placeholder {
@@ -459,64 +466,66 @@ ul, ol {
 .wizard-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 20px;
+  padding: 18px;
   margin-bottom: 16px;
   box-shadow: var(--shadow-card);
 }
 
 .wizard-item-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   text-align: center;
 }
 
 .wizard-input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 14px;
   background: var(--color-cream-light);
   border: 1px solid var(--color-gray-light);
   border-radius: var(--radius-input);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--color-text);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .wizard-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .wizard-buttons .btn {
   flex: 1;
+  padding: 10px 16px;
 }
 
 .wizard-progress {
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-light);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .summary-card {
   background: var(--color-white);
   border-radius: var(--radius-card);
-  padding: 24px;
+  padding: 20px;
   text-align: center;
   box-shadow: var(--shadow-card);
+  margin-bottom: 80px;
 }
 
 .summary-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: var(--color-green-dark);
 }
 
 .summary-stats {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--color-text);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .loading-spinner {
@@ -544,11 +553,11 @@ ul, ol {
 .error-message {
   background-color: #fee;
   color: var(--color-red);
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: var(--radius-input);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .empty-state {
@@ -559,12 +568,12 @@ ul, ol {
 
 .empty-state-icon {
   font-size: 48px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   opacity: 0.5;
 }
 
 .empty-state-text {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 @media (min-width: 431px) {

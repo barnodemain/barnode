@@ -42,7 +42,7 @@ src/
 │   └── index.ts          # TypeScript type definitions
 ├── App.tsx            # Main app with routing
 ├── main.tsx           # Entry point
-└── index.css          # Global styles
+└── index.css          # Global styles (600+ lines)
 ```
 
 ## Database Schema (Supabase)
@@ -68,13 +68,40 @@ Required environment variables:
 ## User Preferences
 
 - Language: Italian (all UI text in Italian)
-- Design: Mobile-first, cream background, green accents
+- Design: Mobile-first, cream background, green accents, white rounded cards
 - No authentication required (shared access)
 
-## Recent Changes
+## Layout & Scrolling
 
-- Initial project setup with Vite + React + TypeScript
-- Implemented all core features: missing items, catalog, import
-- Mobile-optimized UI matching provided design references
-- Supabase integration with full CRUD operations
-- Updated queries to use join for fetching article names in missing items
+All pages follow a consistent mobile layout pattern:
+- **Fixed Header**: Logo, page title, and search bar stay at top
+- **Scrollable Content**: Lists, forms, and content scroll independently in middle area
+- **Fixed Bottom Nav**: Navigation bar fixed at bottom of viewport
+
+Layout implemented via:
+- `.page-wrapper`: Flex column container filling entire viewport
+- `.page-header-fixed`: Flex-shrink-0 header (no padding-bottom on content needed)
+- `.page-content-scrollable`: Flex: 1 with overflow-y: auto for independent scrolling
+- `.bottom-nav`: Position fixed at bottom (z-index: 100)
+
+This ensures no double scrollbars, no horizontal scrolling, and proper mobile UX.
+
+## Recent Changes (Dec 2, 2025)
+
+### Layout & UX Refactor
+- Restructured all pages to use fixed header + scrollable content pattern
+- Fixed header sections now contain logo, title, and search elements
+- Content areas scroll independently between fixed header and bottom nav
+- Eliminated whole-page scrolling and layout shift issues
+- Consistent mobile app experience across all four pages
+
+### CSS Improvements
+- Cleaned up and consolidated stylesheet (now 576 lines)
+- Added `.page-wrapper`, `.page-header-fixed`, `.page-content-scrollable` classes
+- Improved spacing, padding, and sizing for mobile screens
+- Better visual hierarchy with adjusted font sizes and spacing
+
+### Code Quality
+- Removed redundant old page-content structure
+- All pages now use consistent layout wrapper pattern
+- Cleaner separation of concerns (header, content, nav)

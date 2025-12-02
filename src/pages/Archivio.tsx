@@ -83,61 +83,65 @@ function Archivio() {
   }
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <img src="/logo.png" alt="BARnode" className="logo" />
-        <h1 className="page-title">Archivio articoli</h1>
+    <div className="page-wrapper">
+      <div className="page-header-fixed">
+        <div className="page-header">
+          <img src="/logo.png" alt="BARnode" className="logo" />
+          <h1 className="page-title">Archivio articoli</h1>
+        </div>
+
+        <div className="search-container">
+          <IoSearch className="search-icon" />
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Cerca per nome articolo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="search-container">
-        <IoSearch className="search-icon" />
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Cerca per nome articolo..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      <div className="page-content-scrollable">
+        {error && <div className="error-message">{error}</div>}
 
-      {error && <div className="error-message">{error}</div>}
-
-      {loading ? (
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-        </div>
-      ) : filteredArticoli.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-state-icon">📦</div>
-          <p className="empty-state-text">
-            {searchQuery ? 'Nessun articolo trovato' : 'Nessun articolo in archivio'}
-          </p>
-        </div>
-      ) : (
-        <div className="item-list">
-          {filteredArticoli.map(articolo => (
-            <div key={articolo.id} className="item-card">
-              <span className="item-name">{articolo.nome}</span>
-              <div className="item-actions">
-                <button
-                  className="icon-button edit"
-                  onClick={() => handleEditClick(articolo)}
-                  aria-label="Modifica"
-                >
-                  <IoCreateOutline size={22} />
-                </button>
-                <button
-                  className="icon-button delete"
-                  onClick={() => handleDeleteClick(articolo)}
-                  aria-label="Elimina"
-                >
-                  <IoTrashOutline size={22} />
-                </button>
+        {loading ? (
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+          </div>
+        ) : filteredArticoli.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">📦</div>
+            <p className="empty-state-text">
+              {searchQuery ? 'Nessun articolo trovato' : 'Nessun articolo in archivio'}
+            </p>
+          </div>
+        ) : (
+          <div className="item-list">
+            {filteredArticoli.map(articolo => (
+              <div key={articolo.id} className="item-card">
+                <span className="item-name">{articolo.nome}</span>
+                <div className="item-actions">
+                  <button
+                    className="icon-button edit"
+                    onClick={() => handleEditClick(articolo)}
+                    aria-label="Modifica"
+                  >
+                    <IoCreateOutline size={22} />
+                  </button>
+                  <button
+                    className="icon-button delete"
+                    onClick={() => handleDeleteClick(articolo)}
+                    aria-label="Elimina"
+                  >
+                    <IoTrashOutline size={22} />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
       <FloatingActionButton onClick={() => setIsAddModalOpen(true)} />
 

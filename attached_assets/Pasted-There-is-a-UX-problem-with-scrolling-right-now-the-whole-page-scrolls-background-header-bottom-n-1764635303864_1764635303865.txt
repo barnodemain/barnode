@@ -1,0 +1,33 @@
+There is a UX problem with scrolling: right now the whole page scrolls (background, header, bottom navigation, etc.) instead of scrolling only the content lists. I want you to review the layout and CSS of the entire app (Home, Archivio, Settings, Import from text) and fix the scrolling behavior.
+
+Goal: full-screen mobile layout where the header and bottom navigation are fixed, and only the main content area (lists / tables / long content) is scrollable.
+
+Please do the following:
+
+Analyze the current JSX and CSS/Styled components for all pages and the main layout wrapper (App, layout components, etc.).
+
+Make sure the root containers (html, body, #root, main app wrapper) are set up so the app uses the full viewport height on mobile (e.g. flex column layout) without creating double scrollbars.
+
+For each page:
+
+Home: keep the logo, title, and search bar fixed at the top; the list of missing items must be inside a scrollable container that scrolls independently while the header and bottom nav stay in place.
+
+Archivio: keep the header and search bar fixed; only the catalog list should scroll (the list of articles).
+
+Settings and Import from text: keep the general layout consistent with the other pages. If there is content that can grow vertically (e.g. textarea, wizard steps), make that central content area scrollable inside the fixed header + bottom nav frame.
+
+Ensure the bottom navigation bar remains fixed at the bottom of the viewport on all pages and never scrolls away.
+
+Avoid horizontal scrolling. The app should behave like a typical mobile app: one vertical scrollable area between a fixed header and a fixed bottom nav.
+
+Do not change any business logic or Supabase calls. This task is only about layout and scrolling behavior.
+
+After the changes, manually test all pages in mobile view (DevTools) to confirm:
+
+only the intended content areas scroll,
+
+header and bottom nav remain fixed,
+
+there are no overlapping elements or broken layouts.
+
+Please implement the necessary layout and CSS refactors to achieve this behavior across the whole app.

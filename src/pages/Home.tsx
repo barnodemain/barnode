@@ -82,70 +82,74 @@ function Home() {
   const error = articoliError || missingError
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <img src="/logo.png" alt="BARnode" className="logo" />
-        <h1 className="page-title">Lista articoli mancanti</h1>
+    <div className="page-wrapper">
+      <div className="page-header-fixed">
+        <div className="page-header">
+          <img src="/logo.png" alt="BARnode" className="logo" />
+          <h1 className="page-title">Lista articoli mancanti</h1>
+        </div>
+
+        <div className="search-container" ref={searchContainerRef}>
+          <IoSearch className="search-icon" />
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Cerca per nome"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setShowSuggestions(true)
+            }}
+            onFocus={() => setShowSuggestions(true)}
+          />
+          
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="suggestions-dropdown">
+              {suggestions.map(articolo => (
+                <div
+                  key={articolo.id}
+                  className="suggestion-item"
+                  onClick={() => handleSuggestionClick(articolo)}
+                >
+                  {articolo.nome}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="search-container" ref={searchContainerRef}>
-        <IoSearch className="search-icon" />
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Cerca per nome"
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value)
-            setShowSuggestions(true)
-          }}
-          onFocus={() => setShowSuggestions(true)}
-        />
-        
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="suggestions-dropdown">
-            {suggestions.map(articolo => (
-              <div
-                key={articolo.id}
-                className="suggestion-item"
-                onClick={() => handleSuggestionClick(articolo)}
-              >
-                {articolo.nome}
+      <div className="page-content-scrollable">
+        {error && <div className="error-message">{error}</div>}
+
+        {loading ? (
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+          </div>
+        ) : missingItems.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">📋</div>
+            <p className="empty-state-text">Nessun articolo mancante</p>
+          </div>
+        ) : (
+          <div className="item-list">
+            {missingItems.map(item => (
+              <div key={item.id} className="item-card">
+                <span className="item-name">{item.articoloNome}</span>
+                <div className="item-actions">
+                  <button
+                    className="icon-button delete"
+                    onClick={() => handleRemoveItem(item.id)}
+                    aria-label="Rimuovi"
+                  >
+                    <IoTrashOutline size={22} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
-
-      {error && <div className="error-message">{error}</div>}
-
-      {loading ? (
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-        </div>
-      ) : missingItems.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-state-icon">📋</div>
-          <p className="empty-state-text">Nessun articolo mancante</p>
-        </div>
-      ) : (
-        <div className="item-list">
-          {missingItems.map(item => (
-            <div key={item.id} className="item-card">
-              <span className="item-name">{item.articoloNome}</span>
-              <div className="item-actions">
-                <button
-                  className="icon-button delete"
-                  onClick={() => handleRemoveItem(item.id)}
-                  aria-label="Rimuovi"
-                >
-                  <IoTrashOutline size={22} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
       <FloatingActionButton onClick={() => setIsModalOpen(true)} />
 
