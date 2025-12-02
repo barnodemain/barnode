@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import BottomNav from './components/BottomNav'
 import SplashScreen from './components/SplashScreen'
@@ -10,14 +10,10 @@ import BackupPage from './pages/BackupPage'
 import Analysis from './pages/Analysis'
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true)
-
-  useEffect(() => {
+  const [showSplash, setShowSplash] = useState(() => {
     const hasSeenSplash = sessionStorage.getItem('hasSeenSplash')
-    if (hasSeenSplash) {
-      setShowSplash(false)
-    }
-  }, [])
+    return !hasSeenSplash
+  })
 
   const handleSplashComplete = () => {
     sessionStorage.setItem('hasSeenSplash', 'true')

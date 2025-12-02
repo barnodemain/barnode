@@ -31,6 +31,3 @@ dist-ssr
 .env.local
 .env.*.local
 
-# Replit
-.cache
-.local

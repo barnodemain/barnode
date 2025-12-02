@@ -22,6 +22,13 @@
 - No console warnings o TypeScript errors
 - Analysis grouping: Stopwords hardcoded set per performance (non database-driven)
 
+## Linting e qualità codice
+
+- ESLint configurato con preset standard per TypeScript + React
+- Script `npm run lint` per eseguire i controlli statici sull'intero progetto
+- Possibile usare `npm run lint -- --fix` per applicare automaticamente i fix non breaking
+- Lint pulito (nessun errore) richiesto prima di considerare una modifica "completa"
+
 ## Safety (Consolidamento)
 
 - Consolidamento non è reversibile senza backup manuale

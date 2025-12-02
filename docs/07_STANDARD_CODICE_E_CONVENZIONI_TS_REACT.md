@@ -75,3 +75,10 @@
 - Conditional render prima di JSX render
 - No inline object/array creation in render
 - Analysis useMemo() per memoizzare grouping computation
+
+## Linting e formattazione
+
+- ESLint configurato con regole standard per JavaScript/TypeScript e React
+- Controlli di lint eseguiti tramite `npm run lint`
+- Correzioni automatiche applicabili con `npm run lint -- --fix` (senza modificare la logica di business)
+- Obiettivo: nessun warning o errore ESLint nei file di produzione
