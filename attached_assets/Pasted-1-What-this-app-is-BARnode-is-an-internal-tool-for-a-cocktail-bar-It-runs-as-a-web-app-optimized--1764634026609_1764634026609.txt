@@ -1,0 +1,359 @@
+1. What this app is
+
+BARnode is an internal tool for a cocktail bar.
+It runs as a web app optimized for mobile screens, not as a native app and not with Expo.
+
+Multiple staff members can use it at the same time.
+There is no authentication for now: everyone shares the same data.
+
+The app must let us:
+
+Manage the list of missing items (things we need to buy).
+
+Manage the catalog of items (all drink products).
+
+Import multiple items at once from a plain text textarea.
+
+No stock/warehouse, no quantities, no backup system, no PDF import, no orders.
+
+2. Attachments (very important)
+
+You should see 4 image attachments:
+
+The first 3 images are UI references that show roughly how I want the app to look:
+
+light cream background
+
+white rounded cards
+
+green bottom navigation bar
+
+green floating “+” button
+
+simple forms and modals
+
+The 4th image is a PNG logo for BARnode.
+Use this PNG in the app header (for example on the Home page) and wherever a logo makes sense.
+
+Please keep the layout and visual style very close to these references.
+
+3. Tech stack and project setup
+
+Use React + TypeScript with Vite (normal SPA, not Expo, not React Native).
+
+Structure the project so it can run with:
+
+npm install
+
+npm run dev
+
+npm run build
+
+Use React Router for page navigation.
+
+The app is mobile-first:
+
+design for a typical phone width (e.g. 375–430px),
+
+single column layout,
+
+bottom navigation bar always visible.
+
+Prepare environment variables for Supabase:
+
+VITE_SUPABASE_URL
+
+VITE_SUPABASE_ANON_KEY
+
+I will fill the real values; for now use placeholders and show in the README how to set them.
+
+The final code must be easy to deploy as a static site on Render.
+
+4. Data model (Supabase)
+
+Please create a small Supabase client abstraction and the TypeScript types for these two tables:
+
+articoli (catalog items)
+
+id: string (uuid)
+
+nome: string
+
+created_at: string
+
+missing_items (missing items list)
+
+id: string (uuid)
+
+articolo_id: string (uuid, references articoli.id)
+
+articolo_nome: string
+
+created_at: string
+
+Logic rules:
+
+Adding a missing item creates a row in missing_items.
+
+Removing a missing item deletes that row.
+
+When an article’s nome is changed in articoli, update articolo_nome in all related missing_items.
+
+When an article is deleted from articoli, delete all related missing_items.
+
+(You can implement this logic on the client side with extra queries; I will later mirror it in Supabase if needed.)
+
+5. Navigation and routes
+
+Create a bottom navigation bar with 3 tabs:
+
+Home
+
+Archivio (Italian for “Archive”)
+
+Settings
+
+Use React Router with these routes:
+
+/ → Home (missing items list)
+
+/archivio → Archivio (catalog)
+
+/settings → Settings
+
+/settings/import/text → Import from text
+
+The bottom nav must highlight the active tab and navigate to the correct route.
+
+6. UI style and layout
+
+Follow the look and feel from the attached screenshots:
+
+Background: light cream color.
+
+Cards: white, big border radius, light shadow.
+
+Bottom nav: dark green background, icons + labels in white/yellowish.
+
+Floating action button (FAB): circular, dark green, white “+” icon, positioned bottom-right.
+
+Fonts: simple sans-serif (system font is fine).
+
+Components must be touch-friendly:
+
+minimum tap area ~44x44 px for icons like trash and FAB.
+
+7. Pages and behavior
+7.1 Home — “Lista articoli mancanti” (/)
+
+This is the main page.
+
+UI:
+
+At the top: BARnode logo (use the provided PNG) and maybe the app name.
+
+Title text: “Lista articoli mancanti”.
+
+A search field with placeholder “Cerca per nome”.
+
+Below: a scrollable list of cards, one per missing item:
+
+show articolo_nome.
+
+on the right: a red trash icon to remove the item.
+
+A floating “+” button at the bottom-right to add an item manually.
+
+Behavior:
+
+The search bar does not only filter the missing items:
+it must search across all articles in articoli.
+
+While typing, show a dropdown of suggestions directly under the search field:
+
+each suggestion is an article from articoli whose name matches the search term.
+
+If the user taps a suggestion:
+
+add that article to missing_items (create row with articolo_id and articolo_nome).
+
+If the user taps the “+” FAB:
+
+open a modal:
+
+input text: “Nome articolo”
+
+buttons “Cancel” and “Confirm”
+
+On confirm:
+
+if an article with that name does not exist in articoli, create it,
+
+then create the corresponding missing_items row.
+
+Trash icon:
+
+deletes the corresponding missing_items row from Supabase
+
+removes the card from the UI.
+
+Show loading states and simple error messages when calling Supabase.
+
+7.2 Archivio — Catalog of articles (/archivio)
+
+UI:
+
+Header with a search input (“Cerca per nome”).
+
+Below: scrollable list of all articles from articoli, sorted alphabetically by nome.
+
+Each article card:
+
+article name,
+
+edit icon,
+
+trash icon.
+
+FAB “+” in bottom-right to add a new article.
+
+Behavior:
+
+Search filters the list in real time on the client side.
+
+FAB “+”:
+
+opens a modal with:
+
+input “Nome articolo”
+
+Cancel / Save.
+
+Save → create new article row in articoli.
+
+Edit icon:
+
+opens modal with current name in the input.
+
+On Save → update the article in articoli.
+
+After updating:
+
+find all missing_items rows with that articolo_id and update articolo_nome.
+
+Trash icon:
+
+confirm deletion (simple confirm dialog).
+
+On confirm:
+
+delete the article row from articoli,
+
+delete all related rows from missing_items.
+
+Keep UI responsive and close modals after successful operations.
+
+7.3 Settings (/settings) and Import from text (/settings/import/text)
+
+Settings page:
+
+Very simple page with:
+
+Title “Settings”
+
+One main button: “Import items from text”
+
+Clicking the button navigates to /settings/import/text.
+
+Import from text page:
+
+UI:
+
+Title: “Import items from text”.
+
+A large textarea with placeholder like:
+“Paste the list of items here, one per line…”.
+
+Button: “Analyze text”.
+
+Below, a simple wizard view for confirming items (can be reused component).
+
+Behavior:
+
+When the user clicks “Analyze text”:
+
+split the textarea content by line,
+
+trim each line,
+
+discard empty lines,
+
+deduplicate names (case-insensitive),
+
+exclude names that already exist in articoli.
+
+If no new items remain, show a message like “No new items to import”.
+
+Otherwise start a step-by-step wizard:
+
+For each candidate name:
+
+show it in a card,
+
+allow:
+
+Confirm
+
+Skip
+
+Edit name (input field)
+
+Confirm → create articoli row with that name.
+
+Skip → do nothing for that entry.
+
+At the end, show a summary:
+
+“X items created, Y skipped”.
+
+No backup, no PDF import in this version.
+
+8. Code organization
+
+Please:
+
+Use separate components for:
+
+Bottom navigation bar,
+
+Item list cards,
+
+Modals (add/edit),
+
+Import wizard steps.
+
+Create a small hook or store for fetching and updating articoli and missing_items, wrapping all Supabase calls.
+
+Keep files reasonably small and modular.
+
+9. What I expect from you
+
+Initialize the project with Vite + React + TypeScript.
+
+Set up routing and basic pages.
+
+Implement the Supabase client and the data model.
+
+Build the UI following the screenshots and using the PNG logo.
+
+Make sure npm run dev runs without errors.
+
+Provide a short README that explains:
+
+how to set the Supabase env variables,
+
+how to run the app locally,
+
+the expected Supabase schema.
+
+If anything is unclear, ask clarification questions before making big architectural decisions.
