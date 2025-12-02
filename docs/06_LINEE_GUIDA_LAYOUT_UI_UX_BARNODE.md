@@ -35,7 +35,9 @@
 - Tutti i button: 44px × 44px, border-radius 50%
 - Gap tra icone: 8px
 - Icon size: 22px
-- Analysis group button: full-width, 40px height
+- Analysis group buttons: full-width, 40px height, side-by-side layout
+  - Consolida: Green (enabled when primary selected)
+  - Ignora: Light grey, always enabled
 
 ## Colori
 

@@ -21,23 +21,27 @@
 - `removeMissingItem(id)`: remove from missing
 - `isArticoloMissing(id)`: boolean check for conditional renders
 
-## Analysis Algorithm
+## Analysis Algorithm (Fixed)
 
 ### Normalizzazione
 - Lowercase tutti i nomi
 - Remove accenti tramite `normalize('NFD')`
 - Split per whitespace
+- Filter: length > 2, not pure numbers, not stopwords
 
 ### Filtraggio Stopwords
-- Set hardcoded di ~40 stopwords comuni (vodka, rum, gin, di, al, con, etc.)
+- Set hardcoded di ~45 stopwords comuni (vodka, rum, gin, di, al, con, mini, size, ml, cc, etc.)
 - Case-insensitive matching
 - Rimozione prima di raggruppamento
 
-### Raggruppamento
-- Per ogni articolo: estrai keywords (parole non-stopword)
-- Mappa keyword → Set di article IDs
-- Crea gruppi: keyword con 2+ articoli
+### Raggruppamento (CORRETTO)
+- Per ogni articolo: estrai keywords non-stopword
+- Mappa keyword → Set di article IDs che contengono quel keyword
+- Per OGNI articolo, trova tutti gli articoli che condividono almeno UN keyword
+- Crea gruppo solo se risulta hanno 2+ DISTINTI articoli
+- Deduplicazione: Stesso set di articoli non appare due volte
 - Sort per dimensione decrescente
+- IMPORTANTE: Un singolo articolo con multiple keywords NON crea gruppo
 
 ## Reusability
 

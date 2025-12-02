@@ -1,0 +1,147 @@
+Analyze and fix the current “Analysis” page of the BARnode React + TypeScript + Vite app. Do not change Supabase schemas or the overall layout/scroll behavior of the app.
+
+I’m seeing confusing behavior:
+
+On /settings/analysis I get three groups “Whisky (2)”, “Jack (2)”, “Daniels (2)” for the same article “Whisky Jack Daniels”, even though there is only one article with that name in the database.
+
+I can select one of the options in each group and click “Consolida”, but nothing visible happens. I just see a message like “articoli raggruppati”, and no names are actually merged or changed.
+
+I need you to first explain clearly what the current logic is, and then fix it according to the specification below.
+
+REPORT – Explain the current behavior
+
+Before changing anything, inspect the code related to:
+
+the Analysis route and page (likely under /settings/analysis),
+
+how groups are built from the articoli table,
+
+what happens when the user clicks the “Consolida” button.
+
+Then write a short, clear report in chat that answers:
+
+How are groups currently computed? (based on single words, tokens, keywords, etc.)
+
+Why am I seeing three groups “Whisky / Jack / Daniels (2)” even if there is only one “Whisky Jack Daniels” article in the catalog?
+
+What does the “Consolida” button do right now in code? Does it call Supabase? Does it just recompute groups? Is it updating any article names or missing_items?
+
+After this explanation, you can proceed with the implementation changes below.
+
+Add an “IGNORA” button for each group
+
+On the Analysis page, each group card (e.g. “Whisky (2)”) currently shows:
+
+the group title (keyword and count),
+
+the list of article options with radio buttons,
+
+a disabled/enabled “Consolida” button.
+
+Extend this UI as follows:
+
+Add a second button next to or under “Consolida”, labeled “Ignora”.
+
+Behavior of “Ignora”:
+
+does not perform any changes in Supabase,
+
+simply removes that group from the list of groups being displayed,
+
+treats the group as “resolved/ignored” so it does not reappear until the next analysis refresh.
+
+Make the button touch-friendly and visually consistent (same card style, mobile-friendly size). You can use a neutral color style (e.g. light grey) so it’s clearly different from a destructive action.
+
+Fix grouping logic so only real duplicates appear
+
+The current grouping behavior is wrong: it is showing separate groups for single words (“Whisky”, “Jack”, “Daniels”) even when there is only one article name.
+
+Update the grouping algorithm so that:
+
+Groups are based on articles, not just tokens.
+
+You must only show a group when it contains at least two distinct article IDs.
+
+A single article on its own should never produce a group.
+
+Suggested approach (you can adapt the implementation to the existing codebase):
+
+For each article name from articoli:
+
+normalize to lowercase,
+
+remove accents/punctuation,
+
+split into words,
+
+filter out stopwords (generic words like: vodka, rum, gin, vino, birra, amaro, liquore, soda, acqua, cibo, articolo, drink, bottle, etc., plus prepositions like di, al, alla, con, the, a, da, per, and, or, la, le, il, lo, un, uno, una and very short tokens / pure numbers).
+
+Build a mapping from “keyword signature” → array of articles.
+
+You can use one or more keywords per article, but only create a group when at least 2 different articles share that signature.
+
+Do not create separate groups for each single token of the same article if there is no real second article to compare with.
+
+Make sure that in the example case with just one “Whisky Jack Daniels” article, no groups are displayed.
+
+Make “Consolida” actually consolidate articles
+
+Update the behavior of the “Consolida” button so that:
+
+It is enabled only when the user has selected exactly one article inside that group as the “primary” or “preferred” name.
+
+On click:
+
+For all other articles in the group (except the chosen one), perform the chosen consolidation behavior (you can follow one of these safe options; describe in the report which one you implement):
+
+Option A (rename duplicates to the primary name):
+
+Update the nome field in articoli for the other articles, setting it equal to the chosen primary article name.
+
+Keep all article IDs, but their names become identical.
+
+Option B (merge and delete duplicates):
+
+If the two articles are truly duplicates, keep the selected primary article, update references in missing_items (if any), and delete the extra article rows.
+
+This option is more invasive; pick it only if it is safe and easy to implement.
+
+Also update any missing_items entries that reference affected articles so the displayed name remains consistent (reuse the existing logic used when renaming an article from the edit modal).
+
+After a successful consolidation:
+
+show a clear success message (in Italian, e.g. “Articoli consolidati con successo”),
+
+recompute the groups and remove the group from the UI if it no longer has duplicates.
+
+If there is an error (e.g. Supabase error), show a clear error message.
+
+Keep UI consistent and mobile-friendly
+
+Do not change the overall page structure, header, logo, or bottom navigation.
+
+Keep the cards, radio buttons, and messages touch-friendly.
+
+Ensure the “Consolida” and “Ignora” buttons are easy to tap on mobile.
+
+Documentation update (optional but preferred)
+
+If the project has documentation in a /docs folder (e.g. 03_FLUSSI_FUNZIONALI_E_REGOLE_BUSINESS_BARNODE_WEB.md and 06_LINEE_GUIDA_LAYOUT_UI_UX_BARNODE.md), add a short note describing:
+
+that the Analysis page shows only real duplicate/similar article groups (at least two different articles),
+
+that each group can be either consolidated or ignored with the new buttons,
+
+what “Consolida” does at a high level (rename/merge behavior).
+
+Final summary
+
+At the end, provide in chat:
+
+the report from step 1 (current behavior explanation),
+
+a list of files you modified,
+
+a short explanation of how the grouping logic now works,
+
+and how “Consolida” + “Ignora” behave for the user.

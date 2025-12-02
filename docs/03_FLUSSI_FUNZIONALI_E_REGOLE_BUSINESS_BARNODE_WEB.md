@@ -22,9 +22,14 @@
 
 ## Analysis (Rilevamento duplicati)
 
-- Algoritmo: Tokenizzazione articoli, rimozione stopwords, raggruppamento per parole chiave comuni
-- Due o più articoli con stessa parola chiave → gruppo
-- UI: Card per ogni gruppo, radio button per scegliere nome primario
-- Consolidamento: User seleziona nome primario, tap "Consolida" → Tutti gli articoli del gruppo rinominati
+- Algoritmo migliorato: Raggruppa solo articoli che condividono keywords comuni (2+ DISTINTI articoli per gruppo)
+- Articoli singoli: Non vengono mostrati nemmeno se hanno multiple keywords
+- Tokenizzazione: Lowercase, remove accenti, split per spazi, filter stopwords e numeri puri
+- Raggruppamento: Se articolo A e B condividono keyword K → stesso gruppo
+- Deduplicazione: Stesso set di articoli non appare in multiple gruppi
+- UI: Mostra keywords condivisi, radio button per nome primario, due button: "Consolida" e "Ignora"
+- Consolida: Renomina tutti gli altri articoli al nome primario selezionato
+- Ignora: Nasconde il gruppo dalla visualizzazione (non modifica database)
+- Auto-refresh: I gruppi si ricompilano quando articoli cambiano
 - Backup: Snapshot dopo ogni consolidamento
 - Sicurezza: Update cascata su missing_items quando articolo viene rinominato
