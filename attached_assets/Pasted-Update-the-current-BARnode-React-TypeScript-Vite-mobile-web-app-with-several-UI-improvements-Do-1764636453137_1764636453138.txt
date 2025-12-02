@@ -1,0 +1,100 @@
+Update the current BARnode React + TypeScript + Vite mobile web app with several UI improvements. Do not touch any business logic, Supabase logic, scroll/locking logic, or table structures. Only update layout, UI, and the specific behaviors described below.
+
+Important: I will attach an image file that must be used as the app icon for installation on mobile home screens (PWA icon). This icon must be integrated correctly into the project manifest and optimized for all platforms (iOS, iPadOS, Android, Chrome, Safari). Make sure the app uses this icon for home-screen installation on all supported devices.
+
+Backup page – confirmation dialog and button color
+
+On the Backup page (/settings/backup):
+
+When the user taps “RIPRISTINA ULTIMO BACKUP”, do NOT run the RPC immediately.
+
+First show a confirmation dialog in Italian:
+
+“Sei sicuro di voler ripristinare l’ultimo backup? Questa operazione sovrascriverà i dati attuali.”
+
+With two actions:
+
+“Annulla” → cancel and close the dialog.
+
+“Conferma” → proceed with the restore.
+
+Only after confirmation, call the existing supabase.rpc('restore_last_backup') exactly as it currently works.
+
+On success: show a success message and then force a full reload so the restored data appears.
+
+On error: show an error message and do nothing else.
+
+Update the restore button’s visual style:
+
+Background = dark red (warning style)
+
+Text = white
+Keep everything else (size, radius, layout) unchanged.
+
+Import from text page – titles and paragraph formatting
+
+On /settings/import/text:
+
+Remove the duplicate subtitle “Importa da testo” that appears under the main title. Keep only the main centered title at the top.
+
+Modify the descriptive paragraph below:
+
+Insert a line break before “Righe vuote o non valide verranno ignorate” so the paragraph becomes more readable.
+
+Center-align the entire paragraph so it matches the centered title.
+
+Do NOT touch textarea logic, import logic, or scroll behavior.
+
+Home and Archivio item cards – reduce height and spacing
+
+On the Home (missing items) and Archivio (articles) lists:
+
+Reduce the height of each white item card by approximately 20% (e.g., reduce vertical padding or min-height).
+
+Reduce vertical spacing between cards to the minimum that still looks clean.
+
+Keep colors, fonts, border radius, icons, and click behaviors as they are.
+
+Do NOT modify any scroll logic or container setup. Only adjust card styling.
+
+Preserve all scrolling and page-locking logic
+
+The current behavior—header and bottom navigation fixed, only list content scrolling—is correct and must remain EXACTLY as it is. No changes or side effects must affect scrolling, page locking, or layout structure. Only visual adjustments are allowed.
+
+PWA icon integration (attachment included)
+
+I will attach a new image that must be used as the PWA icon for the app. Integrate it correctly into the application:
+
+Add the icon to the public assets.
+
+Update or create the manifest.webmanifest (or Vite PWA config) so the app includes proper icon sizes (192×192, 256×256, 512×512, plus iOS splash/icon requirements).
+
+Ensure correct support for:
+
+iOS home screen installation (Apple touch icon, maskable icon if needed, correct meta tags).
+
+Android/Chrome installation (standard PWA manifest icons).
+
+Make sure the icon is used everywhere required for PWA installability on mobile devices.
+
+Do NOT change the app name, theme color, or background color unless required for correct PWA behavior.
+
+General constraints
+
+Do not modify Supabase schema or RPC logic in any way.
+
+Do not modify core business logic for articles or missing items.
+
+Do not modify the scroll system or page-layout mechanics.
+
+Only update UI components, CSS, and the confirmation flow for backup restore.
+
+After changes, provide a summary of:
+
+files modified,
+
+components updated,
+
+any new components or dialogs added,
+
+PWA manifest updates.

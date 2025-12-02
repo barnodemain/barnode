@@ -186,7 +186,7 @@ ul, ol {
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   padding-bottom: 80px;
 }
 
@@ -194,7 +194,7 @@ ul, ol {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 11px 16px;
   background: var(--color-white);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -472,6 +472,15 @@ ul, ol {
 
 .settings-big-button-secondary:hover {
   opacity: 0.9;
+}
+
+.btn-danger {
+  background-color: #b5374a !important;
+  color: var(--color-white) !important;
+}
+
+.btn-danger:hover {
+  background-color: #a03030 !important;
 }
 
 .archivio-card {

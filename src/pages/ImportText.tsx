@@ -133,9 +133,9 @@ function ImportText() {
 
         {wizardState === 'input' && (
           <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '10px' }}>Importa da testo</h2>
             <p className="import-description">
-              Incolla qui l'elenco di articoli, uno per riga. Righe vuote o non valide verranno ignorate.
+              Incolla qui l'elenco di articoli, uno per riga.<br />
+              Righe vuote o non valide verranno ignorate.
             </p>
             <textarea
               className="import-textarea"

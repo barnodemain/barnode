@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import ConfirmationDialog from '../components/ConfirmationDialog'
 
 function BackupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
-  const handleRestore = async () => {
-    if (!window.confirm('Sei sicuro di voler ripristinare l\'ultimo backup? I dati attuali verranno sostituiti.')) {
-      return
-    }
+  const handleRestore = () => {
+    setShowConfirmDialog(true)
+  }
+
+  const handleConfirmRestore = async () => {
+    setShowConfirmDialog(false)
 
     if (!isSupabaseConfigured() || !supabase) {
       setMessage({ type: 'error', text: 'Supabase non configurato' })
@@ -67,13 +71,24 @@ function BackupPage() {
           )}
 
           <button
-            className="btn btn-primary btn-full"
+            className="btn btn-primary btn-full btn-danger"
             onClick={handleRestore}
             disabled={isLoading}
             style={{ marginBottom: '80px' }}
           >
             {isLoading ? 'In corso...' : 'Ripristina ultimo backup'}
           </button>
+
+          <ConfirmationDialog
+            isOpen={showConfirmDialog}
+            title="Ripristina backup"
+            message="Sei sicuro di voler ripristinare l'ultimo backup? Questa operazione sovrascriverà i dati attuali."
+            cancelText="Annulla"
+            confirmText="Conferma"
+            isDangerous={true}
+            onCancel={() => setShowConfirmDialog(false)}
+            onConfirm={handleConfirmRestore}
+          />
         </div>
       </div>
     </div>
