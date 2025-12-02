@@ -93,7 +93,8 @@ This ensures no double scrollbars, no horizontal scrolling, and proper mobile UX
 - Plus button now sole action button on cards (positioned on right)
 - Delete via Edit modal Elimina button with confirmation dialog
 - Delete flow verified: removes from articoli + cascades to missing_items
-- Fixed card heights: all article cards now exactly 56px (min-height) with 12px padding
+- Fixed card heights: all article cards now exactly 68px (min-height) with 12px padding
+  - Formula: 44px button + 12px top padding + 12px bottom padding = 68px
   - Consistent height regardless of button presence
   - No layout shift or height variation
 - Cleaned up unused imports and handlers
