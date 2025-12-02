@@ -88,6 +88,20 @@ This ensures no double scrollbars, no horizontal scrolling, and proper mobile UX
 
 ## Recent Changes (Dec 2, 2025)
 
+### Analysis with Fuzzy Matching & Name Normalization
+- Added `src/lib/normalize.ts` with `normalizeArticleName()` and `isFuzzySimilar()` helpers
+- Enhanced Analysis algorithm: Now detects similar articles via Levenshtein edit distance ≤ 1
+  - Example: "Birra Ipa" and "birra tipa" now grouped together in Analysis
+  - Fuzzy matching only for tokens ≥ 3 chars (conservative approach)
+- Implemented Title Case normalization for all article names:
+  - Applied on create/edit in Archivio, Home, ImportText pages
+  - Applied on consolidation in Analysis page
+  - Names stored and displayed as "Vodka Grey Goose" format
+- Analysis still uses only `articoli` table (never `missing_items` for grouping)
+- Groups disappear after consolidation when only 1 article remains
+
+### Previous Changes (Dec 2, 2025)
+
 ### Layout & UX Refactor
 - Restructured all pages to use fixed header + scrollable content pattern
 - Fixed header sections now contain logo, title, and search elements

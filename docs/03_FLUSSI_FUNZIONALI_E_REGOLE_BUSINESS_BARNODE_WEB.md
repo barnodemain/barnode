@@ -24,10 +24,12 @@
 
 **Data source:** Solo tabella `articoli`, mai `missing_items` per il raggruppamento
 
-- Algoritmo migliorato: Raggruppa solo articoli che condividono keywords comuni (2+ DISTINTI articoli per gruppo)
-- Articoli singoli: Non vengono mostrati nemmeno se hanno multiple keywords
+- Algoritmo con fuzzy matching: Rileva duplicati anche con piccole variazioni (typo, case diverso)
 - Tokenizzazione: Lowercase, remove accenti, split per spazi, filter stopwords e numeri puri
-- Raggruppamento: Se articolo A e B condividono keyword K → stesso gruppo
+- Raggruppamento: Se articolo A e B condividono keyword K (esatto o fuzzy) → stesso gruppo
+- Fuzzy matching: Edit distance Levenshtein ≤ 1 per token di lunghezza ≥ 3
+  - Esempio: "ipa" e "tipa" → distanza 1 → raggruppati
+- Articoli singoli: Non vengono mostrati nemmeno se hanno multiple keywords
 - Deduplicazione: Stesso set di articoli non appare in multiple gruppi
 - UI: Mostra keywords condivisi, radio button per nome primario, due button: "Consolida" e "Ignora"
 - Consolida: Elimina i duplicati (articoli non-primari), conserva solo il primario
@@ -37,3 +39,4 @@
 - Auto-refresh: I gruppi si ricompilano quando articoli cambiano (dopo consolidazione, gruppo sparisce)
 - Backup: Snapshot dopo ogni consolidamento
 - Sicurezza: Eliminazione cascata via deleteArticolo su missing_items
+- Normalizzazione: Tutti i nomi articoli salvati in Title Case (prima lettera maiuscola per word)

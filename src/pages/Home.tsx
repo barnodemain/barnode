@@ -4,6 +4,7 @@ import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
 import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
+import { normalizeArticleName } from '../lib/normalize'
 import type { Articolo } from '../types'
 
 function Home() {
@@ -61,10 +62,11 @@ function Home() {
     
     setIsSubmitting(true)
     try {
-      let articolo: Articolo | null | undefined = findByName(newItemName.trim())
+      const normalizedName = normalizeArticleName(newItemName)
+      let articolo: Articolo | null | undefined = findByName(normalizedName)
       
       if (!articolo) {
-        articolo = await createArticolo(newItemName.trim())
+        articolo = await createArticolo(normalizedName)
       }
       
       if (articolo) {

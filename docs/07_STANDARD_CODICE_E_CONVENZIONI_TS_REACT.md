@@ -34,17 +34,27 @@
 - Case-insensitive matching
 - Rimozione prima di raggruppamento
 
-### Raggruppamento (CORRETTO)
+### Raggruppamento con Fuzzy Matching
 - **FONTE DATI:** Solo `articoli`, mai `missing_items`
 - Per ogni articolo: estrai keywords non-stopword
 - Mappa keyword → Set di article IDs che contengono quel keyword
-- Per OGNI articolo, trova tutti gli articoli che condividono almeno UN keyword
+- Per OGNI keyword: cerca esatta match E fuzzy match
+  - Fuzzy: Edit distance Levenshtein ≤ 1 per token ≥ 3 caratteri
+  - Esempio: "ipa" vs "tipa" = distanza 1 = raggruppati
 - Crea gruppo solo se risulta hanno 2+ DISTINTI articoli
 - Deduplicazione: Stesso set di articoli non appare due volte
 - Sort per dimensione decrescente
 - IMPORTANTE: Un singolo articolo con multiple keywords NON crea gruppo
 - **CONSOLIDAMENTO:** Elimina non-primari (via `deleteArticolo`), non rinomina
 - **RISULTATO:** Dopo consolidazione, solo 1 articolo rimane → nessun gruppo mostrato
+
+### Normalizzazione Nomi
+- Helper: `normalizeArticleName(name: string): string` in `src/lib/normalize.ts`
+- Converte: "birra tipa" → "Birra Tipa" (Title Case per ogni word)
+- Applica in: Archivio add/edit, Home FAB add, ImportText create, Analysis consolidazione
+- Salva: Nome normalizzato in Supabase articoli.nome
+- Visualizza: Nome normalizzato in UI
+- Regola: Trim, uppercase prima lettera, lowercase resto, collapse spazi multipli
 
 ## Reusability
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useArticoli } from '../hooks/useArticoli'
+import { normalizeArticleName } from '../lib/normalize'
 
 type WizardState = 'input' | 'reviewing' | 'complete'
 
@@ -64,7 +65,7 @@ function ImportText() {
 
     setIsSubmitting(true)
     try {
-      const success = await createArticolo(current.editedName.trim())
+      const success = await createArticolo(normalizeArticleName(current.editedName))
       
       setCandidates(prev => prev.map((c, i) => 
         i === currentIndex ? { ...c, status: success ? 'confirmed' : 'skipped' } : c

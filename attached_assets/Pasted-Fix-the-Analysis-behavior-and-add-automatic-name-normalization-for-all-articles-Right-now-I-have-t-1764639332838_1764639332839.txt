@@ -1,0 +1,109 @@
+Fix the Analysis behavior and add automatic name normalization for all articles.
+
+Right now I have two very similar articles in Archivio:
+
+Birra Ipa
+
+birra tipa
+
+The Analysis page does not detect them as a possible duplicate group. This suggests the algorithm is too strict (exact keyword match only) and does not handle small typos or near matches.
+
+I also want all article names to be stored and displayed with each word capitalized (first letter uppercase, the rest lowercase), no matter how the user types them.
+
+Please do all of the following.
+
+Make Analysis use fuzzy matching for similar names (but still safe)
+
+In the Analysis page code (e.g. src/pages/Analysis.tsx):
+
+Keep the current pipeline (normalize, lowercase, remove accents/punctuation, split into words, remove stopwords).
+
+Keep using only articoli as the source for Analysis (do NOT use missing_items to build groups; missing_items can be updated only after a consolidation, to sync names).
+
+Then improve the grouping logic so that:
+
+Two articles can be considered “similar” not only when they share an identical keyword, but also when they share at least one fuzzily similar keyword.
+
+Use a simple fuzzy-match rule such as Levenshtein/edit distance or similar string similarity.
+
+For two non-stopword tokens of length ≥ 3:
+
+consider them a match if their edit distance is small (e.g. 1 or 2) or their similarity is above a reasonable threshold (you choose the exact implementation, but document it in the summary).
+
+Example: after filtering stopwords like birra, the keywords ipa and tipa should be considered similar enough to be grouped.
+
+A group is still created only if there are at least 2 distinct article IDs in that group.
+
+Make sure the algorithm remains conservative:
+
+Do NOT create huge groups of unrelated items.
+
+Prefer grouping only a few very close matches; if in doubt, do not group.
+
+Ensure groups disappear when resolved
+
+Keep or fix the existing logic so that:
+
+Consolidation (Consolida) updates only articoli (and optionally the names in missing_items used for display).
+
+After a successful consolidation:
+
+reload or recompute the groups from the updated articoli data,
+
+if only one article remains (e.g. “Birra Ipa” after merging “birra tipa”), that pair must no longer appear in Analysis,
+
+the group disappears from the UI.
+
+Keep the Ignora button behavior as-is: it hides the group without touching the database.
+
+Normalize article names to Title Case everywhere
+
+Implement a single reusable helper, something like normalizeArticleName(name: string): string, that:
+
+trims whitespace,
+
+converts the string so that each word:
+
+first letter uppercase,
+
+remaining letters lowercase,
+
+collapses multiple spaces into a single space.
+
+Examples:
+
+birra tipa → Birra Tipa
+
+BIRRA IPA → Birra Ipa
+
+vodka GREY goose → Vodka Grey Goose
+
+Then apply this normalization in all flows that create or update article names:
+
+Manual add/edit in Archivio.
+
+Add-from-FAB on the Home page (when creating a new article from missing items).
+
+Import from text (each created article).
+
+Consolidation/rename actions in the Analysis page (when you rename or merge duplicate articles).
+
+The normalized value must be what gets saved to Supabase (articoli.nome) and also what is displayed in the UI.
+
+Do not change layout or scrolling
+
+Do not modify the general page structure, scroll behavior, or styling outside of what is strictly necessary for the Analysis logic and name normalization.
+
+Keep the app mobile-first and touch-friendly.
+
+Final summary
+
+At the end, provide a short summary in chat:
+
+how the new fuzzy-matching rule works (which distance/threshold you used) and how it treats the example Birra Ipa vs birra tipa,
+
+confirmation that Analysis uses only articoli as a source,
+
+confirmation that, after consolidating a pair, the group disappears if only one article remains,
+
+where the normalizeArticleName helper is used (list of main flows/files).

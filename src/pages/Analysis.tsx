@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { IoArrowBack, IoClose } from 'react-icons/io5'
 import { useArticoli } from '../hooks/useArticoli'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
+import { isFuzzySimilar } from '../lib/normalize'
 import type { Articolo } from '../types'
 
 interface ArticleGroup {
@@ -56,12 +57,24 @@ function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
   const articleById = new Map(articoli.map(a => [a.id, a]))
 
   articleKeywords.forEach((keywords, articleId) => {
-    // Find all article IDs that share at least one keyword with this article
+    // Find all article IDs that share at least one keyword (exact or fuzzy) with this article
     const relatedArticleIds = new Set<string>([articleId])
     
     keywords.forEach(keyword => {
+      // Exact match
       keywordToArticles.get(keyword)?.forEach(id => {
         relatedArticleIds.add(id)
+      })
+      
+      // Fuzzy match: check all keywords in all articles
+      articleKeywords.forEach((otherKeywords, otherId) => {
+        if (otherId !== articleId) {
+          otherKeywords.forEach(otherKeyword => {
+            if (isFuzzySimilar(keyword, otherKeyword)) {
+              relatedArticleIds.add(otherId)
+            }
+          })
+        }
       })
     })
 

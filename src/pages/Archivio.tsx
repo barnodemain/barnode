@@ -4,6 +4,7 @@ import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
 import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
+import { normalizeArticleName } from '../lib/normalize'
 import type { Articolo } from '../types'
 
 function Archivio() {
@@ -35,7 +36,7 @@ function Archivio() {
     
     setIsSubmitting(true)
     try {
-      await createArticolo(newItemName.trim())
+      await createArticolo(normalizeArticleName(newItemName))
       setNewItemName('')
       setIsAddModalOpen(false)
     } finally {
@@ -54,7 +55,7 @@ function Archivio() {
     
     setIsSubmitting(true)
     try {
-      await updateArticolo(editingArticle.id, editName.trim())
+      await updateArticolo(editingArticle.id, normalizeArticleName(editName))
       setIsEditModalOpen(false)
       setEditingArticle(null)
       setEditName('')
