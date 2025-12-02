@@ -290,10 +290,11 @@ ul, ol {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 8px 16px;
+  padding: 8px;
   color: rgba(255, 255, 255, 0.7);
   transition: color 0.15s;
-  min-width: 70px;
+  flex: 1;
+  min-width: 0;
 }
 
 .nav-item.active {
@@ -435,6 +436,55 @@ ul, ol {
 
 .settings-button:hover {
   background-color: var(--color-cream-light);
+}
+
+.settings-big-button {
+  width: 100%;
+  padding: 32px 24px;
+  border-radius: 24px;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s, opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.settings-big-button:active {
+  transform: scale(0.98);
+}
+
+.settings-big-button-primary {
+  background-color: var(--color-green-dark);
+  color: var(--color-white);
+}
+
+.settings-big-button-primary:hover {
+  opacity: 0.9;
+}
+
+.settings-big-button-secondary {
+  background-color: var(--color-green-light);
+  color: var(--color-white);
+}
+
+.settings-big-button-secondary:hover {
+  opacity: 0.9;
+}
+
+.archivio-card {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.archivio-card:hover {
+  background-color: var(--color-cream-light);
+}
+
+.archivio-card:active {
+  transform: scale(0.98);
 }
 
 .import-description {

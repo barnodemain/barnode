@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IoSearch, IoTrashOutline, IoCreateOutline } from 'react-icons/io5'
+import { IoSearch, IoTrashOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
 import { useArticoli } from '../hooks/useArticoli'
@@ -119,19 +119,15 @@ function Archivio() {
         ) : (
           <div className="item-list">
             {filteredArticoli.map(articolo => (
-              <div key={articolo.id} className="item-card">
+              <div key={articolo.id} className="item-card archivio-card" onClick={() => handleEditClick(articolo)}>
                 <span className="item-name">{articolo.nome}</span>
                 <div className="item-actions">
                   <button
-                    className="icon-button edit"
-                    onClick={() => handleEditClick(articolo)}
-                    aria-label="Modifica"
-                  >
-                    <IoCreateOutline size={22} />
-                  </button>
-                  <button
                     className="icon-button delete"
-                    onClick={() => handleDeleteClick(articolo)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteClick(articolo)
+                    }}
                     aria-label="Elimina"
                   >
                     <IoTrashOutline size={22} />

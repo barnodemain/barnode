@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Archivio from './pages/Archivio'
 import Settings from './pages/Settings'
 import ImportText from './pages/ImportText'
+import BackupPage from './pages/BackupPage'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/archivio" element={<Archivio />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/import/text" element={<ImportText />} />
+        <Route path="/settings/backup" element={<BackupPage />} />
       </Routes>
       <BottomNav />
     </div>

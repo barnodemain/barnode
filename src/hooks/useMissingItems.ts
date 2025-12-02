@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { createAndSaveCurrentSnapshot } from '../lib/backupService'
 import type { MissingItemWithRelation, Articolo } from '../types'
 
 interface MissingItemRow {
@@ -102,6 +103,7 @@ export function useMissingItems() {
       setMissingItems(prev => 
         [...prev, newItem].sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
       )
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nell\'aggiunta dell\'articolo mancante')
@@ -125,6 +127,7 @@ export function useMissingItems() {
       if (deleteError) throw deleteError
 
       setMissingItems(prev => prev.filter(m => m.id !== id))
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nella rimozione dell\'articolo mancante')

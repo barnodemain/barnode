@@ -1,0 +1,151 @@
+I want you to add a proper Backup / Restore feature and a few small UX fixes to the current BARnode React + TypeScript + Vite mobile web app. Supabase is already configured and I already have a backup table and RPC; you just need to use them from the frontend and adjust the UI.
+
+Supabase backup setup (existing, do not change schema)
+
+In my Supabase project there is already:
+
+A table backups_barnode with columns:
+
+id (uuid, primary key)
+
+created_at (timestamptz, default now())
+
+payload (jsonb, not null)
+
+The payload JSON stores a full snapshot of the app data with this shape (no tipologie in this app):
+
+articoli: array of objects { id: string; nome: string; created_at?: string }
+
+missing_items: array of objects { id: string; articolo_id: string; created_at?: string }
+
+There is also a RPC function called restore_last_backup that, in a single transaction:
+
+reads the latest row from backups_barnode (ORDER BY created_at DESC LIMIT 1),
+
+extracts the payload,
+
+deletes all rows from missing_items and articoli,
+
+reinserts the data from the snapshot into articoli and missing_items.
+
+Important:
+
+Do NOT modify any Supabase schema.
+
+Do NOT change the backups_barnode table.
+
+Do NOT change the restore_last_backup RPC.
+
+The frontend must only use these as they are.
+
+Frontend backup logic
+
+Create a small backup service (for example backupService.ts or backupRepository.ts) with a function:
+
+createAndSaveCurrentSnapshot(): Promise<void>
+
+Behavior of createAndSaveCurrentSnapshot:
+
+If Supabase is not configured (missing env vars or client not ready), return immediately and do nothing.
+
+Read all rows from articoli and missing_items using the existing Supabase client.
+
+Build a payload object:
+
+articoli: array with { id, nome, created_at }
+
+missing_items: array with { id, articolo_id, created_at }
+
+If both arrays are completely empty, do NOT create a new backup (this prevents overriding the last valid backup with an empty snapshot).
+
+Otherwise insert a new row into backups_barnode with this payload.
+
+Then, after every successful CRUD operation in the app, call this function in the background:
+
+After create / update / delete on articoli
+
+After add / remove on missing_items
+
+Do not block the UI while the backup is being saved; log errors to the console but keep the app usable.
+
+Backup page and Settings layout
+
+On the /settings route:
+
+Keep the BARnode logo and the “Impostazioni” title.
+
+Replace the current layout with two big rounded buttons stacked vertically, matching the style from the last screenshot:
+
+Top button: dark green background, white icon and label “IMPORTA”.
+
+Bottom button: lighter green background, dark text/icon and label “BACKUP”.
+
+Both buttons should have large padding, big border radius and a soft shadow.
+
+When the user taps “IMPORTA”, navigate to /settings/import/text.
+
+When the user taps “BACKUP”, navigate to a new route /settings/backup.
+
+Create a new BackupPage component for /settings/backup:
+
+Show a title “Backup”.
+
+Short explanatory text, e.g.: “The app automatically saves backups of all data. You can restore the last backup if something goes wrong.”
+
+One main button in the center: “Restore last backup”.
+
+Button behavior:
+
+Ask for user confirmation (simple confirm dialog or an in-page warning).
+
+If confirmed:
+
+Call supabase.rpc('restore_last_backup').
+
+Show a loading state while the RPC is running.
+
+On error: show a clear error message like “Backup restore failed, please try again later”.
+
+On success:
+
+show a success message like “Backup restored successfully”,
+
+then force a full reload of the app (so that all data is refetched from Supabase and all stores show the restored state).
+
+Do not create backups from this page; backups are created automatically by createAndSaveCurrentSnapshot after CRUD operations.
+
+Bottom navigation spacing
+
+Fix the bottom navigation bar so the three items (Home, Archivio, Impostazioni) are evenly spaced:
+
+Use flexbox or similar so each item (icon + label) is horizontally centered and the overall spacing is symmetrical.
+
+Keep the current colors, icons and fonts; only adjust alignment/spacing.
+
+Archivio page edit behavior
+
+On the /archivio page:
+
+Remove the separate green “edit” icon from each article card.
+
+Make the entire article card clickable:
+
+clicking anywhere on the card should open the existing edit modal, pre-filled with the article name.
+
+Keep the red trash icon on the right side to delete the article.
+
+Make sure clicking the trash icon does not trigger the edit modal (use event.stopPropagation() or similar).
+
+Constraints
+
+Do not change any Supabase schemas or RPC implementations.
+
+Do not alter the business logic for articles or missing items except for:
+
+calling createAndSaveCurrentSnapshot after successful CRUD,
+
+calling restore_last_backup from the Backup page.
+
+Keep the mobile-first visual style consistent with the current app and the provided screenshots.
+
+After implementing all of this, summarize which files you modified and what changes you made (components and functions), so I can review the update easily.

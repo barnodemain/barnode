@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { createAndSaveCurrentSnapshot } from '../lib/backupService'
 import type { Articolo } from '../types'
 
 export function useArticoli() {
@@ -52,6 +53,7 @@ export function useArticoli() {
       if (insertError) throw insertError
       
       setArticoli(prev => [...prev, data].sort((a, b) => a.nome.localeCompare(b.nome)))
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nella creazione dell\'articolo')
@@ -78,6 +80,7 @@ export function useArticoli() {
         prev.map(a => a.id === id ? { ...a, nome } : a)
           .sort((a, b) => a.nome.localeCompare(b.nome))
       )
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nell\'aggiornamento dell\'articolo')
@@ -108,6 +111,7 @@ export function useArticoli() {
       if (deleteError) throw deleteError
 
       setArticoli(prev => prev.filter(a => a.id !== id))
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nell\'eliminazione dell\'articolo')
