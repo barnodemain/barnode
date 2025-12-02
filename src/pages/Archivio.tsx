@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IoSearch, IoTrashOutline, IoAddOutline } from 'react-icons/io5'
+import { IoSearch, IoAddOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
 import { useArticoli } from '../hooks/useArticoli'
@@ -80,12 +80,6 @@ function Archivio() {
     }
   }
 
-  const handleDeleteClick = async (articolo: Articolo) => {
-    if (confirm(`Sei sicuro di voler eliminare "${articolo.nome}"? Verrà rimosso anche dalla lista articoli mancanti.`)) {
-      await deleteArticolo(articolo.id)
-    }
-  }
-
   const handleQuickAdd = async (e: React.MouseEvent, articolo: Articolo) => {
     e.stopPropagation()
     await addMissingItem(articolo)
@@ -140,16 +134,6 @@ function Archivio() {
                       <IoAddOutline size={22} />
                     </button>
                   )}
-                  <button
-                    className="icon-button delete"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDeleteClick(articolo)
-                    }}
-                    aria-label="Elimina"
-                  >
-                    <IoTrashOutline size={22} />
-                  </button>
                 </div>
               </div>
             ))}

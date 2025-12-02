@@ -88,6 +88,14 @@ This ensures no double scrollbars, no horizontal scrolling, and proper mobile UX
 
 ## Recent Changes (Dec 2, 2025)
 
+### Archivio UI Refinement & Delete Behavior
+- Removed trash icon from article cards (cleaner UI)
+- Plus button now sole action button on cards (positioned on right)
+- Delete via Edit modal Elimina button with confirmation dialog
+- Delete flow verified: removes from articoli + cascades to missing_items
+- Cleaned up unused imports and handlers
+- Zero LSP errors
+
 ### Analysis with Fuzzy Matching & Name Normalization
 - Added `src/lib/normalize.ts` with `normalizeArticleName()` and `isFuzzySimilar()` helpers
 - Enhanced Analysis algorithm: Now detects similar articles via Levenshtein edit distance ≤ 1

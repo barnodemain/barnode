@@ -1,0 +1,59 @@
+Please fix the delete behavior on the Archivio page and adjust the UI as described below.
+
+Fix delete logic in Archivio modal
+
+Go to the component that renders the Archivio page (route /archivio, e.g. src/pages/Archive.tsx or similar) and the component that manages the edit article modal.
+
+Currently:
+
+The trash icon on each article card does nothing.
+
+The Elimina button inside the edit modal also doesn’t actually delete the article.
+
+Fix the delete flow so that when the user opens an article, taps the Elimina button in the modal, and confirms:
+
+The article is deleted from the articoli table in Supabase.
+
+All related rows in missing_items with articolo_id equal to the deleted article’s id are also deleted.
+
+The article disappears from the Archivio list without needing a manual refresh.
+
+If the deleted article was present in the Home “missing items” list, those entries also disappear because missing_items has been cleaned up.
+
+If there is already a confirmation step in the modal, reuse it; if not, show a simple confirmation dialog before deleting.
+
+Remove trash icon from article cards and reposition the “+” button
+
+In the Archivio article list UI, remove the trash icon from each article card entirely (no more delete button on the card).
+
+Keep the existing “+” button (which adds the article to the missing items list) but move it to the position previously occupied by the trash icon on the right side of the card.
+
+The plus button should now be the only action icon visible on the card.
+
+Maintain touch-friendly sizing and spacing; do not break the current scrolling behavior or layout.
+
+Keep all other behaviors unchanged
+
+Do not change how the plus button works logically: it must still add the article to missing_items only if it is not already present.
+
+Do not change the way articles are loaded, sorted, or searched in Archivio.
+
+Do not modify other pages (Home, Settings, Analysis, Backup, Import) or their scroll logic.
+
+Final check and summary
+
+After your changes, verify:
+
+Clicking on an article card opens the modal.
+
+The modal allows editing the name and deleting the article via the Elimina button, and deletion works end-to-end with Supabase updates and UI refresh.
+
+The article cards show only the “+” icon on the right side, and it still correctly adds to the missing items list.
+
+In the chat, provide a short summary of:
+
+Which files were modified.
+
+What was wrong with the previous delete implementation.
+
+How the new delete flow and UI now behave from the user’s point of view.
