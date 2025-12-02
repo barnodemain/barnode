@@ -1,0 +1,157 @@
+Add a new “Analysis” feature to the BARnode React + TypeScript + Vite mobile web app.
+Do not modify Supabase schemas, scroll behavior, page locking, or existing business logic unless explicitly requested.
+
+1) Add an “ANALYSIS” button to the Settings page
+
+On the /settings page:
+
+Add a third button under IMPORTA and BACKUP.
+
+Label: ANALYSIS
+
+Style:
+
+same layout, size, rounded shape and typography as the other two buttons,
+
+background color: yellow-amber, with dark text/icon,
+
+same mobile-friendly spacing and elevation/shadow.
+
+When tapped, it should navigate to a new route:
+/settings/analysis
+
+2) Create the new page: Analysis
+
+Create a new page component for route /settings/analysis with:
+
+BARnode logo at the top (same as other pages),
+
+centered title: Analysis,
+
+same background, spacing, and mobile-first layout as the rest of the app.
+
+This page must analyze all article names in the articoli table and detect groups of similar or duplicate articles, allowing the user to consolidate or clean them.
+
+3) Similarity detection logic
+
+Implement a lightweight, client-side grouping algorithm with these rules:
+
+For each article name:
+
+convert to lowercase,
+
+normalize (remove accents),
+
+split into words,
+
+remove all stopwords (common words that must be ignored).
+
+Stopwords include:
+
+product categories or generic words like:
+vodka, rum, gin, vino, birra, amaro, liquore, soda, acqua, cibo, articolo, drink, bottle
+
+prepositions and filler words:
+di, al, alla, con, the, a, da, per, and, or, la, le, il, lo, un, uno, una
+
+You can also add other obvious common words if needed.
+
+After filtering stopwords, the remaining words are the keywords for comparison.
+
+Grouping logic:
+
+Two or more articles belong to the same group if they share at least one relevant keyword.
+
+Example:
+“Vodka Grey Goose”, “Grey Goose 1L”, “Grey Goose Mini”
+→ group under keyword “grey goose”.
+
+Create an array of groups, each containing:
+
+group keyword(s),
+
+list of article objects that are considered similar.
+
+Only show groups that contain 2 or more articles.
+
+4) Analysis page UI
+
+For each detected group:
+
+Show a white rounded card (matching existing styling) containing:
+
+a group header (main keyword or combined keywords),
+
+a vertical list of all articles in the group.
+
+In each article row inside the group:
+
+Display the article name.
+
+Add a radio button / selector to allow the user to choose a primary name (the “corrected” name to keep).
+
+Add one action button (inside each row or group footer) to apply consolidation.
+
+Consolidation behavior:
+
+When the user chooses a “primary” name:
+
+Option to rename all other articles in the group to the primary name.
+
+Or optionally allow the user to skip and leave the group unchanged.
+
+All interactions must be:
+
+touch-friendly,
+
+mobile-optimized,
+
+using BARnode colors and typography,
+
+consistent with Home and Archivio cards.
+
+Do not change the fullscreen scroll behavior of the page.
+
+5) Safety rules for consolidation
+
+When the user confirms consolidation:
+
+Update the affected articles in the articoli table with the selected primary name.
+
+For each updated article, also update any corresponding rows in missing_items so their articolo_id and displayed name remain consistent.
+
+Use the same logic used in the app when renaming an article from the edit modal.
+
+6) Documentation updates
+
+Update the following documentation files inside the /docs folder:
+
+01_STRUTTURA_BARNODE.md
+
+03_FLUSSI_FUNZIONALI_E_REGOLE_BUSINESS_BARNODE_WEB.md
+
+04_GOVERNANCE_CASCADE_E_MANUTENZIONE_BARNODE_WEB.md
+
+05_CHECKLIST_QA_E_TEST_REGRESSIONE.md
+
+06_LINEE_GUIDA_LAYOUT_UI_UX_BARNODE.md
+
+For each file, add a short section describing:
+
+the new ANALYSIS button in Settings,
+
+the existence and purpose of the Analysis page,
+
+the algorithm that groups similar articles by keywords,
+
+the ability to consolidate duplicate/similar article names.
+
+7) Final summary
+
+At the end, provide a concise summary listing:
+
+which components/files were created or modified,
+
+how the Analysis algorithm was implemented,
+
+which documentation files were updated.

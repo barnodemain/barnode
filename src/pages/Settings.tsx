@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { IoDocumentTextOutline, IoCopyOutline } from 'react-icons/io5'
+import { IoDocumentTextOutline, IoCopyOutline, IoAnalyticsOutline } from 'react-icons/io5'
 
 function Settings() {
   const navigate = useNavigate()
@@ -32,6 +32,16 @@ function Settings() {
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
               <IoCopyOutline size={32} />
               <span style={{ fontSize: '18px', fontWeight: '600' }}>BACKUP</span>
+            </span>
+          </button>
+
+          <button
+            className="settings-big-button settings-big-button-tertiary"
+            onClick={() => navigate('/settings/analysis')}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+              <IoAnalyticsOutline size={32} />
+              <span style={{ fontSize: '18px', fontWeight: '600' }}>ANALYSIS</span>
             </span>
           </button>
         </div>

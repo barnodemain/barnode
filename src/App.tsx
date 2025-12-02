@@ -7,6 +7,7 @@ import Archivio from './pages/Archivio'
 import Settings from './pages/Settings'
 import ImportText from './pages/ImportText'
 import BackupPage from './pages/BackupPage'
+import Analysis from './pages/Analysis'
 
 function App() {
   const [showSplash, setShowSplash] = useState(true)
@@ -35,6 +36,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/import/text" element={<ImportText />} />
         <Route path="/settings/backup" element={<BackupPage />} />
+        <Route path="/settings/analysis" element={<Analysis />} />
       </Routes>
       <BottomNav />
     </div>

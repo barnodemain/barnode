@@ -19,3 +19,12 @@
 - Click card: apre edit modal
 - Trash icon: elimina articolo (e da missing_items se presente)
 - "+" icon: quick-add ai mancanti (hidden se già present)
+
+## Analysis (Rilevamento duplicati)
+
+- Algoritmo: Tokenizzazione articoli, rimozione stopwords, raggruppamento per parole chiave comuni
+- Due o più articoli con stessa parola chiave → gruppo
+- UI: Card per ogni gruppo, radio button per scegliere nome primario
+- Consolidamento: User seleziona nome primario, tap "Consolida" → Tutti gli articoli del gruppo rinominati
+- Backup: Snapshot dopo ogni consolidamento
+- Sicurezza: Update cascata su missing_items quando articolo viene rinominato

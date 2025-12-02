@@ -10,6 +10,19 @@
 - [ ] Trash icon elimina articolo
 - [ ] Spacing consistente tra Home e Archivio
 
+## Test Analysis page
+
+- [ ] Button ANALYSIS visibile in Settings con background giallo-ambrato
+- [ ] Tap ANALYSIS naviga a /settings/analysis
+- [ ] Back button ritorna a /settings
+- [ ] Rilevamento duplicati funziona (articoli con keyword comuni in stesso gruppo)
+- [ ] Stopwords filtrati correttamente (vodka, di, al, etc. non influenzano grouping)
+- [ ] Mostra solo gruppi con 2+ articoli
+- [ ] Radio button permette selezione nome primario
+- [ ] Tap "Consolida" aggiorna articoli in database
+- [ ] Messaggio di successo appare dopo consolidamento
+- [ ] Articoli rinominati appaiono in Home e Archivio
+
 ## Test Home page
 
 - [ ] Autocomplete mostra articoli non in mancanti
@@ -29,3 +42,4 @@
 - [ ] npm run build completes successfully
 - [ ] No TypeScript errors
 - [ ] Scroll behavior unchanged
+- [ ] Backup snapshot creato dopo consolidamento

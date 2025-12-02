@@ -480,6 +480,15 @@ ul, ol {
   opacity: 0.9;
 }
 
+.settings-big-button-tertiary {
+  background-color: var(--color-yellow-amber);
+  color: var(--color-text);
+}
+
+.settings-big-button-tertiary:hover {
+  opacity: 0.9;
+}
+
 .btn-danger {
   background-color: #b5374a !important;
   color: var(--color-white) !important;

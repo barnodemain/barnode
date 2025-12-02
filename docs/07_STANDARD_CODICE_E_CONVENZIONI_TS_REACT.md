@@ -21,19 +21,40 @@
 - `removeMissingItem(id)`: remove from missing
 - `isArticoloMissing(id)`: boolean check for conditional renders
 
+## Analysis Algorithm
+
+### Normalizzazione
+- Lowercase tutti i nomi
+- Remove accenti tramite `normalize('NFD')`
+- Split per whitespace
+
+### Filtraggio Stopwords
+- Set hardcoded di ~40 stopwords comuni (vodka, rum, gin, di, al, con, etc.)
+- Case-insensitive matching
+- Rimozione prima di raggruppamento
+
+### Raggruppamento
+- Per ogni articolo: estrai keywords (parole non-stopword)
+- Mappa keyword → Set di article IDs
+- Crea gruppi: keyword con 2+ articoli
+- Sort per dimensione decrescente
+
 ## Reusability
 
 - Hooks are used across multiple pages
 - `isArticoloMissing()` per render condizionali (es. hide "+" se già present)
 - Backup `createAndSaveCurrentSnapshot()` called post-CRUD non-blocking
+- Analysis component standalone, importabile in future features
 
 ## Types
 
 - `Articolo`: { id: string; nome: string; created_at?: string }
 - `MissingItemWithRelation`: { id: string; articoloId: string; articoloNome: string }
+- `ArticleGroup`: { keyword: string; articles: Articolo[] }
 
 ## Performance
 
 - List key props: sempre stabile (articolo.id, item.id)
 - Conditional render prima di JSX render
 - No inline object/array creation in render
+- Analysis useMemo() per memoizzare grouping computation
