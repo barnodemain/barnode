@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import BottomNav from './components/BottomNav'
+import SplashScreen from './components/SplashScreen'
 import Home from './pages/Home'
 import Archivio from './pages/Archivio'
 import Settings from './pages/Settings'
@@ -7,6 +9,24 @@ import ImportText from './pages/ImportText'
 import BackupPage from './pages/BackupPage'
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash')
+    if (hasSeenSplash) {
+      setShowSplash(false)
+    }
+  }, [])
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('hasSeenSplash', 'true')
+    setShowSplash(false)
+  }
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />
+  }
+
   return (
     <div className="app-container">
       <Routes>

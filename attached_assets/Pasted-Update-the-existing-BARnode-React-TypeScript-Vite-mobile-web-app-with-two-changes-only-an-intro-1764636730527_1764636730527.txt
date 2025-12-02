@@ -1,0 +1,37 @@
+Update the existing BARnode React + TypeScript + Vite mobile web app with two changes only: an intro splash screen and a different active color for the bottom navigation icons. Do not change any business logic, Supabase logic, scroll behavior, or page layout other than what is strictly necessary for these two features.
+
+Intro splash screen
+
+Add an intro page (splash screen) that is shown every time the app is loaded for the first time or after a full reload (i.e. when the user closes and reopens the app or reloads the page).
+
+The splash screen should be visible for 3 seconds, then automatically transition to the normal app (the Home page) without user interaction.
+
+Use the existing BARnode logo asset that is already used in the app header:
+
+On the splash screen, render the logo at double the size compared to its size in the current pages.
+
+The logo must be centered both horizontally and vertically on the screen.
+
+Below the logo, add the text by DERO:
+
+The text should be positioned at roughly 75% of the viewport height from the top (so closer to the bottom, not directly under the logo).
+
+Center-align this text horizontally.
+
+The splash screen background should match the current app background color so it feels consistent.
+
+After 3 seconds, automatically hide the splash screen and render the normal application with the router and existing pages.
+
+The splash screen should only appear once per page load; when the user navigates between Home, Archivio, and Impostazioni, it must NOT reappear.
+
+Bottom navigation active icon color
+
+In the bottom navigation bar, change the style of the active tab:
+
+When a tab (Home, Archivio, or Impostazioni) is selected, its icon (and label, if applicable) should use a yellow-amber color instead of the current active color.
+
+The inactive tabs must keep their existing color and style.
+
+Do not change the layout, spacing, or structure of the bottom navigation; only update the active color styling.
+
+After implementing these changes, keep all other behaviors exactly as they are.
