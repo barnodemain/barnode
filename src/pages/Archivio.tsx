@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { IoSearch, IoTrashOutline } from 'react-icons/io5'
+import { IoSearch, IoTrashOutline, IoAddOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
 import { useArticoli } from '../hooks/useArticoli'
+import { useMissingItems } from '../hooks/useMissingItems'
 import type { Articolo } from '../types'
 
 function Archivio() {
@@ -22,6 +23,8 @@ function Archivio() {
     updateArticolo,
     deleteArticolo
   } = useArticoli()
+
+  const { addMissingItem } = useMissingItems()
 
   const filteredArticoli = searchQuery.trim()
     ? articoli.filter(a => a.nome.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -82,6 +85,11 @@ function Archivio() {
     }
   }
 
+  const handleQuickAdd = async (e: React.MouseEvent, articolo: Articolo) => {
+    e.stopPropagation()
+    await addMissingItem(articolo)
+  }
+
   return (
     <div className="page-wrapper">
       <div className="page-header-fixed">
@@ -122,6 +130,13 @@ function Archivio() {
               <div key={articolo.id} className="item-card archivio-card" onClick={() => handleEditClick(articolo)}>
                 <span className="item-name">{articolo.nome}</span>
                 <div className="item-actions">
+                  <button
+                    className="icon-button add"
+                    onClick={(e) => handleQuickAdd(e, articolo)}
+                    aria-label="Aggiungi a mancanti"
+                  >
+                    <IoAddOutline size={22} />
+                  </button>
                   <button
                     className="icon-button delete"
                     onClick={(e) => {

@@ -1,0 +1,86 @@
+Add the following changes to the existing BARnode React + TypeScript + Vite mobile web app.
+Do not modify any business logic, Supabase schema, scroll behavior, or page-locking logic. Only adjust UI and the small interaction described below.
+
+“+” quick-add button on Archivio cards
+
+On the /archivio page, each article card currently shows a trash icon on the right.
+
+Add a new “+” icon to each article card, positioned immediately to the left of the trash icon, with consistent size, color and spacing.
+
+When the user taps the “+” icon:
+
+Add that article to the missing_items table using the same logic already used to add an item to the missing list from the Home page.
+
+This means creating a missing_items row with the correct articolo_id (and created_at or equivalent), and updating the UI to reflect that the item is now in the missing list.
+
+Tapping the card itself must still open the edit modal as it does now.
+
+Tapping the trash icon must still delete the article as it does now (use event.stopPropagation() or similar so the icons do not trigger card click).
+
+The new “+” icon must not open any modal; it’s a direct quick-add to the missing items list.
+
+Do not change list scrolling, layout containers, or page structure.
+
+Title and spacing adjustments on Home and Archivio
+
+On both the Home page (/) and the Archivio page (/archivio):
+
+The page titles (“Lista articoli mancanti” and “Archivio articoli”) are currently too close to the search box.
+
+Increase the vertical spacing between the title and the search box slightly so the layout breathes more.
+
+The space between the search box and the first list item (the cards area) is currently too large.
+
+Reduce this vertical spacing so the cards appear closer to the search box.
+
+Constraints for this change:
+
+Do not alter any scroll or page-locking logic (no changes to scroll containers, overflow rules, or fixed headers).
+
+Only adjust margins/padding for the title and search box area and for the gap between the search box and the list.
+
+Ensure the visual result is consistent on both Home and Archivio.
+
+Documentation updates in docs/
+
+After implementing the changes above, update all existing Markdown documentation files in the docs folder to reflect the new behavior:
+
+01_STRUTTURA_BARNODE.md
+
+02_STRUTTURA_SUPABASE_RENDER.md
+
+03_FLUSSI_FUNZIONALI_E_REGOLE_BUSINESS_BARNODE_WEB.md
+
+04_GOVERNANCE_CASCADE_E_MANUTENZIONE_BARNODE_WEB.md
+
+05_CHECKLIST_QA_E_TEST_REGRESSIONE.md
+
+06_LINEE_GUIDA_LAYOUT_UI_UX_BARNODE.md
+
+07_STANDARD_CODICE_E_CONVENZIONI_TS_REACT.md
+
+For each file, add a short, relevant note where appropriate, mentioning:
+
+that on the Archivio page every article card now includes a “+” quick-add icon that adds the article directly to the missing items list on Home;
+
+that the vertical spacing between titles, search boxes, and lists on Home/Archivio has been refined for better readability and mobile layout.
+
+Keep the documentation style consistent with the existing tone of each file and do not add any platform-specific references.
+
+General constraints
+
+Do not change Supabase schemas or RPCs.
+
+Do not modify existing business logic except where strictly needed to wire the new “+” button into the existing missing-items add flow.
+
+Do not touch any scroll, overflow, or page-locking behavior.
+
+Keep the mobile-first design and current color palette and typography; only introduce the new icon and spacing tweaks.
+
+At the end, provide a concise summary of:
+
+which code files were modified (components, hooks, styles),
+
+which documentation files were updated,
+
+and the main changes applied.

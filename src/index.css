@@ -108,7 +108,8 @@ ul, ol {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  margin-bottom: 8px;
 }
 
 .logo {
@@ -125,7 +126,7 @@ ul, ol {
 
 .search-container {
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .search-input {
@@ -229,6 +230,10 @@ ul, ol {
 
 .icon-button.delete {
   color: var(--color-red);
+}
+
+.icon-button.add {
+  color: var(--color-green-light);
 }
 
 .icon-button.edit {
