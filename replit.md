@@ -30,7 +30,7 @@ src/
 │   └── Modal.tsx         # Reusable modal component
 ├── hooks/             # Custom React hooks for data management
 │   ├── useArticoli.ts    # CRUD operations for articles
-│   └── useMissingItems.ts # CRUD for missing items
+│   └── useMissingItems.ts # CRUD for missing items (with join)
 ├── lib/
 │   └── supabase.ts       # Supabase client configuration
 ├── pages/             # Route pages
@@ -45,18 +45,19 @@ src/
 └── index.css          # Global styles
 ```
 
-## Database Schema
+## Database Schema (Supabase)
 
 ### articoli (catalog items)
 - `id`: UUID (primary key)
 - `nome`: TEXT (article name)
-- `created_at`: TIMESTAMP
+- `created_at`: TIMESTAMPTZ
 
 ### missing_items (shopping list)
 - `id`: UUID (primary key)
-- `articolo_id`: UUID (foreign key to articoli)
-- `articolo_nome`: TEXT (denormalized name for display)
-- `created_at`: TIMESTAMP
+- `articolo_id`: UUID (foreign key to articoli.id)
+- `created_at`: TIMESTAMPTZ
+
+Note: The `missing_items` table does not have an `articolo_nome` column. The article name is fetched via a join with the `articoli` table.
 
 ## Environment Variables
 
@@ -76,3 +77,4 @@ Required environment variables:
 - Implemented all core features: missing items, catalog, import
 - Mobile-optimized UI matching provided design references
 - Supabase integration with full CRUD operations
+- Updated queries to use join for fetching article names in missing items

@@ -1,9 +1,23 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
-import type { MissingItem, Articolo } from '../types'
+import type { MissingItemWithRelation, Articolo } from '../types'
+
+interface MissingItemRow {
+  id: string
+  articolo_id: string
+  articoli: { nome: string }[] | { nome: string } | null
+}
+
+function getArticoloNome(articoli: MissingItemRow['articoli']): string {
+  if (!articoli) return 'Articolo sconosciuto'
+  if (Array.isArray(articoli)) {
+    return articoli[0]?.nome || 'Articolo sconosciuto'
+  }
+  return articoli.nome || 'Articolo sconosciuto'
+}
 
 export function useMissingItems() {
-  const [missingItems, setMissingItems] = useState<MissingItem[]>([])
+  const [missingItems, setMissingItems] = useState<MissingItemWithRelation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -17,13 +31,27 @@ export function useMissingItems() {
     try {
       setLoading(true)
       setError(null)
+      
       const { data, error: fetchError } = await supabase
         .from('missing_items')
-        .select('*')
-        .order('articolo_nome', { ascending: true })
+        .select(`
+          id,
+          articolo_id,
+          articoli (
+            nome
+          )
+        `)
+        .order('created_at', { ascending: true })
 
       if (fetchError) throw fetchError
-      setMissingItems(data || [])
+
+      const mappedItems: MissingItemWithRelation[] = ((data || []) as unknown as MissingItemRow[]).map((item) => ({
+        id: item.id,
+        articoloId: item.articolo_id,
+        articoloNome: getArticoloNome(item.articoli)
+      })).sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
+
+      setMissingItems(mappedItems)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nel caricamento degli articoli mancanti')
     } finally {
@@ -41,7 +69,7 @@ export function useMissingItems() {
       return false
     }
 
-    const exists = missingItems.some(m => m.articolo_id === articolo.id)
+    const exists = missingItems.some(m => m.articoloId === articolo.id)
     if (exists) {
       return true
     }
@@ -51,16 +79,28 @@ export function useMissingItems() {
       const { data, error: insertError } = await supabase
         .from('missing_items')
         .insert([{
-          articolo_id: articolo.id,
-          articolo_nome: articolo.nome
+          articolo_id: articolo.id
         }])
-        .select()
+        .select(`
+          id,
+          articolo_id,
+          articoli (
+            nome
+          )
+        `)
         .single()
 
       if (insertError) throw insertError
 
+      const row = data as unknown as MissingItemRow
+      const newItem: MissingItemWithRelation = {
+        id: row.id,
+        articoloId: row.articolo_id,
+        articoloNome: getArticoloNome(row.articoli) || articolo.nome
+      }
+
       setMissingItems(prev => 
-        [...prev, data].sort((a, b) => a.articolo_nome.localeCompare(b.articolo_nome))
+        [...prev, newItem].sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
       )
       return true
     } catch (err) {
@@ -93,7 +133,7 @@ export function useMissingItems() {
   }
 
   const isArticoloMissing = (articoloId: string): boolean => {
-    return missingItems.some(m => m.articolo_id === articoloId)
+    return missingItems.some(m => m.articoloId === articoloId)
   }
 
   return {

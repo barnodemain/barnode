@@ -7,6 +7,11 @@ export interface Articolo {
 export interface MissingItem {
   id: string
   articolo_id: string
-  articolo_nome: string
   created_at: string
+}
+
+export interface MissingItemWithRelation {
+  id: string
+  articoloId: string
+  articoloNome: string
 }

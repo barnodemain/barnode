@@ -74,13 +74,6 @@ export function useArticoli() {
 
       if (updateError) throw updateError
 
-      const { error: syncError } = await supabase
-        .from('missing_items')
-        .update({ articolo_nome: nome })
-        .eq('articolo_id', id)
-
-      if (syncError) throw syncError
-
       setArticoli(prev => 
         prev.map(a => a.id === id ? { ...a, nome } : a)
           .sort((a, b) => a.nome.localeCompare(b.nome))

@@ -132,7 +132,7 @@ function Home() {
         <div className="item-list">
           {missingItems.map(item => (
             <div key={item.id} className="item-card">
-              <span className="item-name">{item.articolo_nome}</span>
+              <span className="item-name">{item.articoloNome}</span>
               <div className="item-actions">
                 <button
                   className="icon-button delete"
