@@ -20,6 +20,12 @@
 - Trash icon: elimina articolo (e da missing_items se presente)
 - "+" icon: quick-add ai mancanti (hidden se già present)
 
+## Backup e ripristino
+
+- Dopo le operazioni CRUD critiche viene creato automaticamente uno snapshot dei dati in `backups_barnode`.
+- La pagina **Backup** espone il pulsante "Ripristina ultimo backup" che, previa conferma utente, chiama la RPC `restore_last_backup`.
+- Il ripristino sovrascrive completamente le tabelle `articoli` e `missing_items` con l'ultimo backup non vuoto.
+
 ## Analysis (Rilevamento duplicati)
 
 **Data source:** Solo tabella `articoli`, mai `missing_items` per il raggruppamento

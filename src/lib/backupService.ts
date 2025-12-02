@@ -2,7 +2,7 @@ import { supabase, isSupabaseConfigured } from './supabase'
 
 interface BackupPayload {
   articoli: Array<{ id: string; nome: string; created_at?: string }>
-  missing_items: Array<{ id: string; articolo_id: string; created_at?: string }>
+  missing_items: Array<{ id: string; articolo_id: string; articolo_nome: string; created_at?: string }>
 }
 
 export async function createAndSaveCurrentSnapshot(): Promise<void> {
@@ -13,7 +13,7 @@ export async function createAndSaveCurrentSnapshot(): Promise<void> {
   try {
     const [articoliResult, missingItemsResult] = await Promise.all([
       supabase.from('articoli').select('id, nome, created_at'),
-      supabase.from('missing_items').select('id, articolo_id, created_at')
+      supabase.from('missing_items').select('id, articolo_id, articolo_nome, created_at')
     ])
 
     const articoli = articoliResult.data || []
@@ -32,6 +32,7 @@ export async function createAndSaveCurrentSnapshot(): Promise<void> {
       missing_items: missing_items.map(m => ({
         id: m.id,
         articolo_id: m.articolo_id,
+        articolo_nome: m.articolo_nome,
         created_at: m.created_at
       }))
     }
