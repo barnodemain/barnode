@@ -32,7 +32,7 @@ function BackupPage() {
       setTimeout(() => {
         window.location.reload()
       }, 1500)
-    } catch (error) {
+    } catch {
       setMessage({
         type: 'error',
         text: 'Ripristino del backup fallito. Riprova più tardi.'

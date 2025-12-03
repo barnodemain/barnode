@@ -30,19 +30,29 @@
 
 **Data source:** Solo tabella `articoli`, mai `missing_items` per il raggruppamento
 
-- Algoritmo con fuzzy matching: Rileva duplicati anche con piccole variazioni (typo, case diverso)
-- Tokenizzazione: Lowercase, remove accenti, split per spazi, filter stopwords e numeri puri
-- Raggruppamento: Se articolo A e B condividono keyword K (esatto o fuzzy) → stesso gruppo
-- Fuzzy matching: Edit distance Levenshtein ≤ 1 per token di lunghezza ≥ 3
-  - Esempio: "ipa" e "tipa" → distanza 1 → raggruppati
-- Articoli singoli: Non vengono mostrati nemmeno se hanno multiple keywords
-- Deduplicazione: Stesso set di articoli non appare in multiple gruppi
-- UI: Mostra keywords condivisi, radio button per nome primario, due button: "Consolida" e "Ignora"
-- Consolida: Elimina i duplicati (articoli non-primari), conserva solo il primario
-  - Prima di eliminare: missing_items vengono puliti via cascata
-  - Dopo consolidazione: gruppo scompare se rimane solo 1 articolo
-- Ignora: Nasconde il gruppo dalla visualizzazione (non modifica database)
-- Auto-refresh: I gruppi si ricompilano quando articoli cambiano (dopo consolidazione, gruppo sparisce)
-- Backup: Snapshot dopo ogni consolidamento
-- Sicurezza: Eliminazione cascata via deleteArticolo su missing_items
-- Normalizzazione: Tutti i nomi articoli salvati in Title Case (prima lettera maiuscola per word)
+- Algoritmo con fuzzy matching: rileva duplicati anche con piccole variazioni (typo, case diverso)
+- Tokenizzazione: lowercase, rimozione accenti, split per spazi, filtro stopwords e numeri puri
+- Stopwords: set esteso (vodka, rum, gin, di, al, mini, size, ml, cc, special, especial, apa, ipa, belvedere, havana, etc.)
+- Categoria semantica: gli articoli vengono raggruppati solo se condividono la stessa prima parola (es. "Birra ...", "Vodka ...")
+- Un gruppo è valido solo se tra i suoi membri ci sono almeno **2 keyword condivise** (esatte o fuzzy)
+- Deduplicazione: lo stesso insieme di articoli non appare in più gruppi
+- UI: per ogni gruppo viene mostrato
+  - Titolo: "Possibile gruppo duplicato (X articoli)"
+  - Sottotitolo: parole chiave condivise
+  - Sezione "Articoli trovati" con checkbox per selezione multipla
+  - Sezione "Nome finale" con
+    - radio "Usa nome esistente" (tra gli articoli selezionati)
+    - radio "Inserisci nuovo nome" + input testo
+  - Pulsanti in fondo alla card: "Consolida" (verde) e "Ignora" (grigio)
+- Consolidamento avanzato (multi-merge):
+  - L'utente seleziona uno o più articoli da un gruppo
+  - Il primo selezionato diventa il **master** (mantiene l'`id`)
+  - Nome finale sempre normalizzato in Title Case tramite `normalizeArticleName`
+  - Tutti gli altri articoli selezionati vengono eliminati
+  - Tutti i `missing_items` che puntavano agli articoli eliminati vengono aggiornati per puntare al master, con `articolo_nome` aggiornato
+  - Viene creato uno snapshot di backup tramite `createAndSaveCurrentSnapshot()`
+  - Gli articoli vengono ricaricati e i gruppi ricalcolati; il gruppo consolidato sparisce
+- Ignora gruppo:
+  - Il pulsante "Ignora" nasconde il gruppo solo per la sessione corrente
+  - Nessuna modifica a Supabase o alle tabelle
+- Normalizzazione: tutti i nomi articoli consolidati vengono salvati in Title Case (prima lettera maiuscola per parola)

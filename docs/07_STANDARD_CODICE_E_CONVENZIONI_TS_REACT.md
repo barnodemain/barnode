@@ -30,23 +30,36 @@
 - Filter: length > 2, not pure numbers, not stopwords
 
 ### Filtraggio Stopwords
-- Set hardcoded di ~45 stopwords comuni (vodka, rum, gin, di, al, con, mini, size, ml, cc, etc.)
+- Set hardcoded di ~50+ stopwords comuni (vodka, rum, gin, di, al, con, mini, size, ml, cc, special, especial, apa, ipa, belvedere, havana, etc.)
 - Case-insensitive matching
 - Rimozione prima di raggruppamento
 
 ### Raggruppamento con Fuzzy Matching
 - **FONTE DATI:** Solo `articoli`, mai `missing_items`
 - Per ogni articolo: estrai keywords non-stopword
-- Mappa keyword → Set di article IDs che contengono quel keyword
-- Per OGNI keyword: cerca esatta match E fuzzy match
-  - Fuzzy: Edit distance Levenshtein ≤ 1 per token ≥ 3 caratteri
-  - Esempio: "ipa" vs "tipa" = distanza 1 = raggruppati
-- Crea gruppo solo se risulta hanno 2+ DISTINTI articoli
-- Deduplicazione: Stesso set di articoli non appare due volte
-- Sort per dimensione decrescente
-- IMPORTANTE: Un singolo articolo con multiple keywords NON crea gruppo
-- **CONSOLIDAMENTO:** Elimina non-primari (via `deleteArticolo`), non rinomina
-- **RISULTATO:** Dopo consolidazione, solo 1 articolo rimane → nessun gruppo mostrato
+- Categoria semantica: articoli raggruppati solo se condividono la stessa prima parola normalizzata
+- Per ogni categoria:
+  - Mappa keyword → Set di article IDs che contengono quel keyword
+  - Per OGNI keyword: cerca match esatto E fuzzy (edit distance ≤ 1 per token ≥ 3 caratteri)
+  - Calcola le keyword condivise tra i membri del gruppo; il gruppo è valido solo se ci sono almeno **2 keyword condivise**
+- Deduplicazione: stesso insieme di articoli non appare due volte
+- Ordinamento gruppi per numero di articoli discendente
+
+### Consolidamento avanzato (multi-merge)
+
+- L'utente può selezionare più articoli in un gruppo tramite checkbox
+- Scelta del nome finale:
+  - "Usa nome esistente" tra i selezionati
+  - "Inserisci nuovo nome" tramite input
+- Nome finale sempre normalizzato con `normalizeArticleName`
+- Il primo articolo selezionato diventa il **master** (mantiene l'id)
+- Per ogni articolo selezionato non-master:
+  - `missing_items` vengono aggiornati per puntare al master (`articolo_id`, `articolo_nome`)
+  - l'articolo viene eliminato da `articoli`
+- Dopo il consolidamento:
+  - viene chiamato `createAndSaveCurrentSnapshot()`
+  - gli articoli vengono ricaricati e i gruppi ricostruiti
+  - il gruppo consolidato scompare dalla vista
 
 ### Normalizzazione Nomi
 - Helper: `normalizeArticleName(name: string): string` in `src/lib/normalize.ts`

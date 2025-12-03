@@ -13,6 +13,25 @@
 - Scrollable content inizia subito dopo search box
 - Back button su Analysis page allineato con logo
 
+### Layout gruppi Analysis
+
+- Ogni gruppo duplicato è mostrato come card a larghezza quasi piena con padding interno
+- Header card:
+  - Titolo grande: "Possibile gruppo duplicato (X articoli)" in verde scuro
+  - Sottotitolo piccolo e in corsivo: parole chiave condivise
+  - Icona/pulsante "Ignora" in alto a destra
+- Sezione "Articoli trovati":
+  - Etichetta in bold
+  - Lista verticale di card compatte con checkbox + nome articolo in Title Case
+- Sezione "Nome finale":
+  - Due radio:
+    - "Usa nome esistente" → elenco di nomi tra quelli selezionati, ciascuno selezionabile con radio
+    - "Inserisci nuovo nome" → input testo a tutta larghezza con placeholder
+- Footer card:
+  - Due pulsanti grandi, affiancati, min-height 44px
+  - Sinistra: "Consolida" (verde, enabled solo quando input valido)
+  - Destra: "Ignora" (grigio chiaro, sempre enabled)
+
 ## Icone d'azione
 
 ### "+" (Quick-add)

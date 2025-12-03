@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IoArrowBack, IoClose } from 'react-icons/io5'
+import { IoArrowBack } from 'react-icons/io5'
 import { useArticoli } from '../hooks/useArticoli'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
-import { isFuzzySimilar } from '../lib/normalize'
+import { isFuzzySimilar, normalizeArticleName } from '../lib/normalize'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { Articolo } from '../types'
 
 interface ArticleGroup {
@@ -15,7 +16,8 @@ interface ArticleGroup {
 const STOPWORDS = new Set([
   'vodka', 'rum', 'gin', 'vino', 'birra', 'amaro', 'liquore', 'soda', 'acqua', 'cibo', 'articolo', 'drink', 'bottle',
   'di', 'al', 'alla', 'con', 'the', 'a', 'da', 'per', 'and', 'or', 'la', 'le', 'il', 'lo', 'un', 'uno', 'una',
-  'è', 'su', 'da', 'e', 'che', 'this', 'it', 'in', 'on', 'at', 'by', 'l', 'is', 'mini', 'size', 'bottle', 'ml', 'cc'
+  'è', 'su', 'da', 'e', 'che', 'this', 'it', 'in', 'on', 'at', 'by', 'l', 'is', 'mini', 'size', 'bottle', 'ml', 'cc',
+  'special', 'especial', 'apa', 'ipa', 'belvedere', 'havana'
 ])
 
 function normalizeAndTokenize(name: string): string[] {
@@ -30,95 +32,143 @@ function normalizeAndTokenize(name: string): string[] {
     })
 }
 
+function getCategory(name: string): string | null {
+  const normalized = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+  const firstWord = normalized.split(/\s+/).find(Boolean)
+  return firstWord || null
+}
+
 function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
   if (articoli.length === 0) return []
 
-  // Build keyword signatures for each article
-  const articleKeywords = new Map<string, Set<string>>()
-  const keywordToArticles = new Map<string, Set<string>>()
-
-  articoli.forEach(article => {
-    const keywords = normalizeAndTokenize(article.nome)
-    if (keywords.length > 0) {
-      articleKeywords.set(article.id, new Set(keywords))
-      
-      keywords.forEach(keyword => {
-        if (!keywordToArticles.has(keyword)) {
-          keywordToArticles.set(keyword, new Set())
-        }
-        keywordToArticles.get(keyword)!.add(article.id)
-      })
-    }
-  })
-
-  // Find articles that share keywords
-  const grouped = new Set<Set<string>>()
-  const groups: ArticleGroup[] = []
   const articleById = new Map(articoli.map(a => [a.id, a]))
 
-  articleKeywords.forEach((keywords, articleId) => {
-    // Find all article IDs that share at least one keyword (exact or fuzzy) with this article
-    const relatedArticleIds = new Set<string>([articleId])
-    
-    keywords.forEach(keyword => {
-      // Exact match
-      keywordToArticles.get(keyword)?.forEach(id => {
-        relatedArticleIds.add(id)
-      })
-      
-      // Fuzzy match: check all keywords in all articles
-      articleKeywords.forEach((otherKeywords, otherId) => {
-        if (otherId !== articleId) {
-          otherKeywords.forEach(otherKeyword => {
-            if (isFuzzySimilar(keyword, otherKeyword)) {
-              relatedArticleIds.add(otherId)
-            }
-          })
-        }
-      })
-    })
-
-    // Only create a group if there are 2+ distinct articles
-    if (relatedArticleIds.size >= 2) {
-      const groupKey = Array.from(relatedArticleIds).sort().join('|')
-      
-      if (!grouped.has(new Set(relatedArticleIds))) {
-        grouped.add(new Set(relatedArticleIds))
-        
-        const groupArticles = Array.from(relatedArticleIds)
-          .map(id => articleById.get(id)!)
-          .sort((a, b) => a.nome.localeCompare(b.nome))
-        
-        const sharedKeywords = relatedArticleIds.size >= 2
-          ? Array.from(keywords).slice(0, 3)
-          : []
-        
-        groups.push({
-          id: groupKey,
-          articles: groupArticles,
-          sharedKeywords
-        })
-      }
+  // Raggruppa per categoria semantica (prima parola)
+  const categoryMap = new Map<string, Articolo[]>()
+  articoli.forEach(article => {
+    const category = getCategory(article.nome)
+    if (!category) return
+    if (!categoryMap.has(category)) {
+      categoryMap.set(category, [])
     }
+    categoryMap.get(category)!.push(article)
   })
 
-  // Deduplicate groups (remove if same article set already exists)
+  const allGroups: ArticleGroup[] = []
+
+  categoryMap.forEach(categoryArticles => {
+    if (categoryArticles.length < 2) return
+
+    const articleKeywords = new Map<string, Set<string>>()
+    const keywordToArticles = new Map<string, Set<string>>()
+
+    categoryArticles.forEach(article => {
+      const keywords = normalizeAndTokenize(article.nome)
+      if (keywords.length > 0) {
+        const kwSet = new Set(keywords)
+        articleKeywords.set(article.id, kwSet)
+
+        kwSet.forEach(keyword => {
+          if (!keywordToArticles.has(keyword)) {
+            keywordToArticles.set(keyword, new Set())
+          }
+          keywordToArticles.get(keyword)!.add(article.id)
+        })
+      }
+    })
+
+    const groupedKeys = new Set<string>()
+
+    articleKeywords.forEach((keywords, articleId) => {
+      const relatedArticleIds = new Set<string>([articleId])
+
+      keywords.forEach(keyword => {
+        keywordToArticles.get(keyword)?.forEach(id => {
+          relatedArticleIds.add(id)
+        })
+
+        articleKeywords.forEach((otherKeywords, otherId) => {
+          if (otherId !== articleId) {
+            otherKeywords.forEach(otherKeyword => {
+              if (isFuzzySimilar(keyword, otherKeyword)) {
+                relatedArticleIds.add(otherId)
+              }
+            })
+          }
+        })
+      })
+
+      if (relatedArticleIds.size < 2) {
+        return
+      }
+
+      // Calcola le keyword condivise (almeno 2) tra gli articoli del gruppo
+      const sharedKeywordsSet = new Set<string>()
+      keywords.forEach(keyword => {
+        let isShared = false
+        relatedArticleIds.forEach(otherId => {
+          if (otherId === articleId) return
+          const otherKeywords = articleKeywords.get(otherId)
+          if (!otherKeywords) return
+          otherKeywords.forEach(otherKeyword => {
+            if (!isShared && (otherKeyword === keyword || isFuzzySimilar(keyword, otherKeyword))) {
+              isShared = true
+            }
+          })
+        })
+        if (isShared) {
+          sharedKeywordsSet.add(keyword)
+        }
+      })
+
+      if (sharedKeywordsSet.size < 2) {
+        return
+      }
+
+      const groupIds = Array.from(relatedArticleIds).sort()
+      const groupKey = groupIds.join('|')
+
+      if (groupedKeys.has(groupKey)) {
+        return
+      }
+      groupedKeys.add(groupKey)
+
+      const groupArticles = groupIds
+        .map(id => articleById.get(id)!)
+        .sort((a, b) => a.nome.localeCompare(b.nome))
+
+      const sharedKeywords = Array.from(sharedKeywordsSet).slice(0, 4)
+
+      allGroups.push({
+        id: groupKey,
+        articles: groupArticles,
+        sharedKeywords
+      })
+    })
+  })
+
+  // Deduplica globalmente per insieme di articoli
   const uniqueGroups = new Map<string, ArticleGroup>()
-  groups.forEach(group => {
+  allGroups.forEach(group => {
     const key = group.articles.map(a => a.id).sort().join('|')
     if (!uniqueGroups.has(key)) {
       uniqueGroups.set(key, group)
     }
   })
 
-  return Array.from(uniqueGroups.values())
-    .sort((a, b) => b.articles.length - a.articles.length)
+  return Array.from(uniqueGroups.values()).sort((a, b) => b.articles.length - a.articles.length)
 }
 
 function Analysis() {
   const navigate = useNavigate()
-  const { articoli, loading, error, deleteArticolo } = useArticoli()
-  const [selectedPrimary, setSelectedPrimary] = useState<{[groupId: string]: string}>({})
+  const { articoli, loading, error, fetchArticoli } = useArticoli()
+  const [selectedByGroup, setSelectedByGroup] = useState<Record<string, string[]>>({})
+  const [finalNameModeByGroup, setFinalNameModeByGroup] = useState<Record<string, 'existing' | 'new'>>({})
+  const [selectedNameSourceByGroup, setSelectedNameSourceByGroup] = useState<Record<string, string | null>>({})
+  const [finalNameInputByGroup, setFinalNameInputByGroup] = useState<Record<string, string>>({})
   const [consolidating, setConsolidating] = useState(false)
   const [consolidationMessage, setConsolidationMessage] = useState<string | null>(null)
   const [ignoredGroupIds, setIgnoredGroupIds] = useState<Set<string>>(new Set())
@@ -131,32 +181,94 @@ function Analysis() {
   const visibleGroups = groups.filter(g => !ignoredGroupIds.has(g.id))
 
   const handleConsolidate = async (group: ArticleGroup) => {
-    const primaryId = selectedPrimary[group.id]
-    if (!primaryId) return
+    const selectedIds = selectedByGroup[group.id] || []
+    if (selectedIds.length === 0) return
 
-    const primaryArticle = group.articles.find(a => a.id === primaryId)
-    if (!primaryArticle) return
+    if (!isSupabaseConfigured() || !supabase) {
+      setConsolidationMessage('Supabase non configurato')
+      return
+    }
+
+    const mode = finalNameModeByGroup[group.id] || 'existing'
+    const articlesById = new Map(group.articles.map(a => [a.id, a]))
+
+    let finalNameRaw: string
+    if (mode === 'existing') {
+      const sourceId = selectedNameSourceByGroup[group.id] || selectedIds[0]
+      const sourceArticle = articlesById.get(sourceId)
+      if (!sourceArticle) return
+      finalNameRaw = sourceArticle.nome
+    } else {
+      const input = (finalNameInputByGroup[group.id] || '').trim()
+      if (!input) return
+      finalNameRaw = input
+    }
+
+    const finalName = normalizeArticleName(finalNameRaw)
+
+    const masterId = selectedIds[0]
+    const masterArticle = articlesById.get(masterId)
+    if (!masterArticle) return
 
     setConsolidating(true)
     setConsolidationMessage(null)
 
     try {
-      // Delete all non-primary articles (consolidation = keep primary, remove duplicates)
-      for (const article of group.articles) {
-        if (article.id !== primaryId) {
-          // deleteArticolo also updates missing_items references
-          await deleteArticolo(article.id)
-        }
+      // Aggiorna il nome del master
+      const { error: updateMasterError } = await supabase
+        .from('articoli')
+        .update({ nome: finalName })
+        .eq('id', masterId)
+
+      if (updateMasterError) throw updateMasterError
+
+      // Reindirizza i missing_items dagli articoli eliminati al master
+      const idsToRemove = selectedIds.filter(id => id !== masterId)
+
+      for (const id of idsToRemove) {
+        const { error: updateMissingError } = await supabase
+          .from('missing_items')
+          .update({ articolo_id: masterId, articolo_nome: finalName })
+          .eq('articolo_id', id)
+
+        if (updateMissingError) throw updateMissingError
+
+        const { error: deleteArticleError } = await supabase
+          .from('articoli')
+          .delete()
+          .eq('id', id)
+
+        if (deleteArticleError) throw deleteArticleError
       }
 
+      await createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
+      await fetchArticoli()
+
       setConsolidationMessage('Articoli consolidati con successo')
-      setSelectedPrimary(prev => {
+
+      setSelectedByGroup(prev => {
         const updated = { ...prev }
         delete updated[group.id]
         return updated
       })
 
-      await createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
+      setFinalNameModeByGroup(prev => {
+        const updated = { ...prev }
+        delete updated[group.id]
+        return updated
+      })
+
+      setSelectedNameSourceByGroup(prev => {
+        const updated = { ...prev }
+        delete updated[group.id]
+        return updated
+      })
+
+      setFinalNameInputByGroup(prev => {
+        const updated = { ...prev }
+        delete updated[group.id]
+        return updated
+      })
 
       setTimeout(() => setConsolidationMessage(null), 3000)
     } catch (err) {
@@ -233,119 +345,253 @@ function Analysis() {
           </div>
         ) : (
           <div style={{ paddingBottom: '80px' }}>
-            {visibleGroups.map((group) => (
-              <div key={group.id} className="item-card" style={{ marginBottom: '16px', cursor: 'default' }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '12px'
-                }}>
-                  <div>
-                    <div style={{
-                      fontWeight: 'bold',
-                      fontSize: '16px',
-                      color: 'var(--color-green-dark)',
-                      marginBottom: '4px'
-                    }}>
-                      Gruppo duplicato ({group.articles.length} articoli)
+            {visibleGroups.map(group => {
+              const selectedIds = selectedByGroup[group.id] || []
+              const mode = finalNameModeByGroup[group.id] || 'existing'
+              const canConsolidate =
+                selectedIds.length > 0 &&
+                ((mode === 'existing' && (selectedNameSourceByGroup[group.id] || selectedIds[0])) ||
+                  (mode === 'new' && (finalNameInputByGroup[group.id] || '').trim().length > 0))
+
+              return (
+                <div
+                  key={group.id}
+                  className="item-card"
+                  style={{
+                    marginBottom: '16px',
+                    cursor: 'default',
+                    padding: '16px',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  <div
+                    style={{
+                      marginBottom: '12px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '16px',
+                        color: 'var(--color-green-dark)',
+                        marginBottom: '4px'
+                      }}
+                    >
+                      Analizza somiglianze
                     </div>
                     {group.sharedKeywords.length > 0 && (
-                      <div style={{
-                        fontSize: '12px',
-                        color: 'var(--color-text-light)',
-                        fontStyle: 'italic'
-                      }}>
-                        Keywords: {group.sharedKeywords.join(', ')}
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: 'var(--color-text-light)',
+                          fontStyle: 'italic'
+                        }}
+                      >
+                        Parole chiave: {group.sharedKeywords.join(', ')}
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleIgnore(group.id)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      padding: '4px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'var(--color-gray)'
-                    }}
-                    aria-label="Ignora questo gruppo"
-                  >
-                    <IoClose size={22} />
-                  </button>
-                </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                  {group.articles.map(article => (
-                    <label
-                      key={article.id}
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {group.articles.map(article => {
+                        const normalizedName = normalizeArticleName(article.nome)
+                        const isChecked = selectedIds.includes(article.id)
+                        return (
+                          <label
+                            key={article.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              padding: '10px',
+                              backgroundColor: 'var(--color-cream-light)',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontSize: '14px'
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => {
+                                setSelectedByGroup(prev => {
+                                  const current = prev[group.id] || []
+                                  const exists = current.includes(article.id)
+                                  const next = exists
+                                    ? current.filter(id => id !== article.id)
+                                    : [...current, article.id]
+                                  return { ...prev, [group.id]: next }
+                                })
+                              }}
+                              style={{ cursor: 'pointer', flexShrink: 0 }}
+                            />
+                            <span>{normalizedName}</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px',
-                        backgroundColor: 'var(--color-cream-light)',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        marginBottom: '8px'
                       }}
                     >
-                      <input
-                        type="radio"
-                        name={`primary-${group.id}`}
-                        checked={selectedPrimary[group.id] === article.id}
-                        onChange={() => setSelectedPrimary(prev => ({
-                          ...prev,
-                          [group.id]: article.id
-                        }))}
-                        style={{ cursor: 'pointer', flexShrink: 0 }}
-                      />
-                      <span>{article.nome}</span>
-                    </label>
-                  ))}
-                </div>
+                      Nome finale
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name={`final-mode-${group.id}`}
+                          checked={mode === 'existing'}
+                          onChange={() =>
+                            setFinalNameModeByGroup(prev => ({ ...prev, [group.id]: 'existing' }))
+                          }
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span>Usa nome esistente</span>
+                      </label>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => handleConsolidate(group)}
-                    disabled={!selectedPrimary[group.id] || consolidating}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      backgroundColor: selectedPrimary[group.id] ? 'var(--color-green-light)' : '#ccc',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: selectedPrimary[group.id] && !consolidating ? 'pointer' : 'not-allowed',
-                      opacity: selectedPrimary[group.id] ? 1 : 0.6
-                    }}
-                  >
-                    {consolidating ? 'Consolidamento...' : 'Consolida'}
-                  </button>
-                  <button
-                    onClick={() => handleIgnore(group.id)}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      backgroundColor: '#f0f0f0',
-                      color: 'var(--color-text)',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Ignora
-                  </button>
+                      {mode === 'existing' && selectedIds.length > 0 && (
+                        <div style={{ marginLeft: '24px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {group.articles
+                            .filter(a => selectedIds.includes(a.id))
+                            .map(article => {
+                              const normalizedName = normalizeArticleName(article.nome)
+                              const selectedSourceId =
+                                selectedNameSourceByGroup[group.id] || selectedIds[0]
+                              return (
+                                <label
+                                  key={article.id}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    fontSize: '14px'
+                                  }}
+                                >
+                                  <input
+                                    type="radio"
+                                    name={`final-existing-${group.id}`}
+                                    checked={selectedSourceId === article.id}
+                                    onChange={() =>
+                                      setSelectedNameSourceByGroup(prev => ({
+                                        ...prev,
+                                        [group.id]: article.id
+                                      }))
+                                    }
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                  <span>{normalizedName}</span>
+                                </label>
+                              )
+                            })}
+                        </div>
+                      )}
+
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name={`final-mode-${group.id}`}
+                          checked={mode === 'new'}
+                          onChange={() =>
+                            setFinalNameModeByGroup(prev => ({ ...prev, [group.id]: 'new' }))
+                          }
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span>Inserisci nuovo nome</span>
+                      </label>
+
+                      {mode === 'new' && (
+                        <input
+                          type="text"
+                          value={finalNameInputByGroup[group.id] || ''}
+                          onChange={e =>
+                            setFinalNameInputByGroup(prev => ({
+                              ...prev,
+                              [group.id]: e.target.value
+                            }))
+                          }
+                          placeholder="Nuovo nome finale"
+                          style={{
+                            marginLeft: '24px',
+                            padding: '8px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid #ddd',
+                            fontSize: '14px',
+                            width: '100%'
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                    <button
+                      onClick={() => handleConsolidate(group)}
+                      disabled={!canConsolidate || consolidating}
+                      style={{
+                        flex: 1,
+                        minHeight: '44px',
+                        padding: '10px',
+                        backgroundColor:
+                          canConsolidate && !consolidating
+                            ? 'var(--color-green-light)'
+                            : '#ccc',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor:
+                          canConsolidate && !consolidating ? 'pointer' : 'not-allowed',
+                        opacity: canConsolidate ? 1 : 0.7
+                      }}
+                    >
+                      {consolidating ? 'Consolidamento...' : 'Consolida'}
+                    </button>
+                    <button
+                      onClick={() => handleIgnore(group.id)}
+                      style={{
+                        flex: 1,
+                        minHeight: '44px',
+                        padding: '10px',
+                        backgroundColor: 'var(--color-red)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Ignora
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
