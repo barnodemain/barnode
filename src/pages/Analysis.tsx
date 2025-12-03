@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { IoArrowBack } from 'react-icons/io5'
 import { useArticoli } from '../hooks/useArticoli'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
-import { isFuzzySimilar, normalizeArticleName } from '../lib/normalize'
+import { normalizeArticleName } from '../lib/normalize'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { Articolo } from '../types'
 
@@ -11,25 +11,6 @@ interface ArticleGroup {
   id: string
   articles: Articolo[]
   sharedKeywords: string[]
-}
-
-const STOPWORDS = new Set([
-  'vodka', 'rum', 'gin', 'vino', 'birra', 'amaro', 'liquore', 'soda', 'acqua', 'cibo', 'articolo', 'drink', 'bottle',
-  'di', 'al', 'alla', 'con', 'the', 'a', 'da', 'per', 'and', 'or', 'la', 'le', 'il', 'lo', 'un', 'uno', 'una',
-  'è', 'su', 'da', 'e', 'che', 'this', 'it', 'in', 'on', 'at', 'by', 'l', 'is', 'mini', 'size', 'bottle', 'ml', 'cc',
-  'special', 'especial', 'apa', 'ipa', 'belvedere', 'havana'
-])
-
-function normalizeAndTokenize(name: string): string[] {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .split(/\s+/)
-    .filter(word => {
-      // Filter: length > 2, not pure numbers, not in stopwords
-      return word.length > 2 && !/^\d+$/.test(word) && !STOPWORDS.has(word)
-    })
 }
 
 function getCategory(name: string): string | null {
@@ -44,9 +25,7 @@ function getCategory(name: string): string | null {
 function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
   if (articoli.length === 0) return []
 
-  const articleById = new Map(articoli.map(a => [a.id, a]))
-
-  // Raggruppa per categoria semantica (prima parola)
+  // Raggruppa per parola chiave principale (prima parola normalizzata)
   const categoryMap = new Map<string, Articolo[]>()
   articoli.forEach(article => {
     const category = getCategory(article.nome)
@@ -61,92 +40,15 @@ function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
 
   categoryMap.forEach(categoryArticles => {
     if (categoryArticles.length < 2) return
+    // Tutti gli articoli con la stessa categoria (prima parola) formano un unico gruppo
+    const sortedArticles = [...categoryArticles].sort((a, b) => a.nome.localeCompare(b.nome))
+    const groupIds = sortedArticles.map(a => a.id)
+    const groupKey = groupIds.join('|')
 
-    const articleKeywords = new Map<string, Set<string>>()
-    const keywordToArticles = new Map<string, Set<string>>()
-
-    categoryArticles.forEach(article => {
-      const keywords = normalizeAndTokenize(article.nome)
-      if (keywords.length > 0) {
-        const kwSet = new Set(keywords)
-        articleKeywords.set(article.id, kwSet)
-
-        kwSet.forEach(keyword => {
-          if (!keywordToArticles.has(keyword)) {
-            keywordToArticles.set(keyword, new Set())
-          }
-          keywordToArticles.get(keyword)!.add(article.id)
-        })
-      }
-    })
-
-    const groupedKeys = new Set<string>()
-
-    articleKeywords.forEach((keywords, articleId) => {
-      const relatedArticleIds = new Set<string>([articleId])
-
-      keywords.forEach(keyword => {
-        keywordToArticles.get(keyword)?.forEach(id => {
-          relatedArticleIds.add(id)
-        })
-
-        articleKeywords.forEach((otherKeywords, otherId) => {
-          if (otherId !== articleId) {
-            otherKeywords.forEach(otherKeyword => {
-              if (isFuzzySimilar(keyword, otherKeyword)) {
-                relatedArticleIds.add(otherId)
-              }
-            })
-          }
-        })
-      })
-
-      if (relatedArticleIds.size < 2) {
-        return
-      }
-
-      // Calcola le keyword condivise (almeno 2) tra gli articoli del gruppo
-      const sharedKeywordsSet = new Set<string>()
-      keywords.forEach(keyword => {
-        let isShared = false
-        relatedArticleIds.forEach(otherId => {
-          if (otherId === articleId) return
-          const otherKeywords = articleKeywords.get(otherId)
-          if (!otherKeywords) return
-          otherKeywords.forEach(otherKeyword => {
-            if (!isShared && (otherKeyword === keyword || isFuzzySimilar(keyword, otherKeyword))) {
-              isShared = true
-            }
-          })
-        })
-        if (isShared) {
-          sharedKeywordsSet.add(keyword)
-        }
-      })
-
-      if (sharedKeywordsSet.size < 2) {
-        return
-      }
-
-      const groupIds = Array.from(relatedArticleIds).sort()
-      const groupKey = groupIds.join('|')
-
-      if (groupedKeys.has(groupKey)) {
-        return
-      }
-      groupedKeys.add(groupKey)
-
-      const groupArticles = groupIds
-        .map(id => articleById.get(id)!)
-        .sort((a, b) => a.nome.localeCompare(b.nome))
-
-      const sharedKeywords = Array.from(sharedKeywordsSet).slice(0, 4)
-
-      allGroups.push({
-        id: groupKey,
-        articles: groupArticles,
-        sharedKeywords
-      })
+    allGroups.push({
+      id: groupKey,
+      articles: sortedArticles,
+      sharedKeywords: [getCategory(sortedArticles[0].nome) || '']
     })
   })
 

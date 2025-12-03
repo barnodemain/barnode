@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { IoSearch, IoTrashOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
@@ -6,6 +6,18 @@ import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
 import { normalizeArticleName } from '../lib/normalize'
 import type { Articolo } from '../types'
+
+function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  return ((...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+    timeoutId = setTimeout(() => {
+      fn(...args)
+    }, delay)
+  }) as T
+}
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -31,6 +43,8 @@ function Home() {
     removeMissingItem,
     isArticoloMissing
   } = useMissingItems()
+
+  const setSearchQueryDebounced = useMemo(() => debounce(setSearchQuery, 250), [])
 
   const suggestions = searchQuery.trim() 
     ? searchArticoli(searchQuery).filter(a => !isArticoloMissing(a.id))
@@ -99,7 +113,7 @@ function Home() {
             placeholder="Cerca per nome"
             value={searchQuery}
             onChange={(e) => {
-              setSearchQuery(e.target.value)
+              setSearchQueryDebounced(e.target.value)
               setShowSuggestions(true)
             }}
             onFocus={() => setShowSuggestions(true)}

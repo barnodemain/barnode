@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { IoSearch, IoAddOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
@@ -6,6 +6,18 @@ import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
 import { normalizeArticleName } from '../lib/normalize'
 import type { Articolo } from '../types'
+
+function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  return ((...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+    timeoutId = setTimeout(() => {
+      fn(...args)
+    }, delay)
+  }) as T
+}
 
 function Archivio() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -26,6 +38,8 @@ function Archivio() {
   } = useArticoli()
 
   const { addMissingItem, isArticoloMissing } = useMissingItems()
+
+  const setSearchQueryDebounced = useMemo(() => debounce(setSearchQuery, 250), [])
 
   const filteredArticoli = searchQuery.trim()
     ? articoli.filter(a => a.nome.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -100,7 +114,7 @@ function Archivio() {
             className="search-input"
             placeholder="Cerca per nome articolo..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQueryDebounced(e.target.value)}
           />
         </div>
       </div>

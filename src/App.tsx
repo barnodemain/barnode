@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import React, { Suspense, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import BottomNav from './components/BottomNav'
 import SplashScreen from './components/SplashScreen'
-import Home from './pages/Home'
-import Archivio from './pages/Archivio'
 import Settings from './pages/Settings'
-import ImportText from './pages/ImportText'
-import BackupPage from './pages/BackupPage'
-import Analysis from './pages/Analysis'
+
+const HomePage = React.lazy(() => import('./pages/Home'))
+const ArchivioPage = React.lazy(() => import('./pages/Archivio'))
+const ImportPage = React.lazy(() => import('./pages/ImportText'))
+const BackupPage = React.lazy(() => import('./pages/BackupPage'))
+const AnalysisPage = React.lazy(() => import('./pages/Analysis'))
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
@@ -26,14 +27,16 @@ function App() {
 
   return (
     <div className="app-container">
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/archivio" element={<Archivio />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/settings/import/text" element={<ImportText />} />
-        <Route path="/settings/backup" element={<BackupPage />} />
-        <Route path="/settings/analysis" element={<Analysis />} />
-      </Routes>
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/archivio" element={<ArchivioPage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/import/text" element={<ImportPage />} />
+          <Route path="/settings/backup" element={<BackupPage />} />
+          <Route path="/settings/analysis" element={<AnalysisPage />} />
+        </Routes>
+      </Suspense>
       <BottomNav />
     </div>
   )
