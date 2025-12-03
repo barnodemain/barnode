@@ -490,6 +490,24 @@ ul, ol {
   opacity: 0.9;
 }
 
+.settings-big-button-export {
+  background-color: var(--color-white);
+  color: var(--color-green-dark);
+}
+
+.settings-big-button-export:hover {
+  opacity: 0.95;
+}
+
+.settings-big-button-notes {
+  background-color: var(--color-white);
+  color: var(--color-red-dark);
+}
+
+.settings-big-button-notes:hover {
+  opacity: 0.95;
+}
+
 .btn-danger {
   background-color: #b5374a !important;
   color: var(--color-white) !important;
@@ -535,6 +553,44 @@ ul, ol {
 }
 
 .import-textarea::placeholder {
+  color: var(--color-gray);
+}
+
+.notes-box-wrapper {
+  position: relative;
+}
+
+.notes-copy-row {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notes-copy-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray);
+  background-color: transparent;
+}
+
+.notes-copy-icon:hover {
+  background-color: var(--color-cream-light);
+}
+
+.notes-box-wrapper .import-textarea {
+  min-height: calc(100vh - 260px);
+  resize: none;
+}
+
+.notes-copy-feedback {
+  font-size: 13px;
   color: var(--color-gray);
 }
 
@@ -649,6 +705,86 @@ ul, ol {
 
 .empty-state-text {
   font-size: 15px;
+}
+
+.pin-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pin-modal-subtitle {
+  font-size: 14px;
+  color: var(--color-text-light);
+  text-align: center;
+}
+
+.pin-dots-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--color-green-dark);
+  background-color: transparent;
+}
+
+.pin-dot.filled {
+  background-color: var(--color-green-dark);
+}
+
+.pin-error-message {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-red);
+  text-align: center;
+}
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.pin-key {
+  height: 52px;
+  border-radius: var(--radius-button);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-card);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-key:hover {
+  background-color: var(--color-cream-light);
+}
+
+.pin-key-secondary {
+  background-color: var(--color-gray-light);
+}
+
+.pin-key-secondary:hover {
+  opacity: 0.9;
+}
+
+.pin-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.pin-actions-button {
+  flex: 1;
 }
 
 .splash-screen {

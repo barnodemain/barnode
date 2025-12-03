@@ -9,6 +9,7 @@ const ArchivioPage = React.lazy(() => import('./pages/Archivio'))
 const ImportPage = React.lazy(() => import('./pages/ImportText'))
 const BackupPage = React.lazy(() => import('./pages/BackupPage'))
 const AnalysisPage = React.lazy(() => import('./pages/Analysis'))
+const NotesPage = React.lazy(() => import('./pages/Notes'))
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/settings/import/text" element={<ImportPage />} />
           <Route path="/settings/backup" element={<BackupPage />} />
           <Route path="/settings/analysis" element={<AnalysisPage />} />
+          <Route path="/settings/notes" element={<NotesPage />} />
         </Routes>
       </Suspense>
       <BottomNav />
