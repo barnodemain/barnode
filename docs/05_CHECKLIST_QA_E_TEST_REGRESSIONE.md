@@ -22,6 +22,7 @@
 - [ ] Tap "Consolida" aggiorna articoli in database
 - [ ] Messaggio di successo appare dopo consolidamento
 - [ ] Articoli rinominati appaiono in Home e Archivio
+ - [ ] Tap "Ignora" su un gruppo lo nasconde in modo persistente (non ricompare dopo refresh / riapertura)
 
 ## Test Home page
 

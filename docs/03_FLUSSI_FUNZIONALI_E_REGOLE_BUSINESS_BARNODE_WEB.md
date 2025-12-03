@@ -79,6 +79,6 @@
   - Viene creato uno snapshot di backup tramite `createAndSaveCurrentSnapshot()`
   - Gli articoli vengono ricaricati e i gruppi ricalcolati; il gruppo consolidato sparisce
 - Ignora gruppo:
-  - Il pulsante "Ignora" nasconde il gruppo solo per la sessione corrente
+  - Il pulsante "Ignora" archivia il gruppo lato client (localStorage) e non lo ripropone più nelle analisi successive
   - Nessuna modifica a Supabase o alle tabelle
-- Normalizzazione: tutti i nomi articoli consolidati vengono salvati in Title Case (prima lettera maiuscola per parola)
+  - Normalizzazione: tutti i nomi articoli consolidati vengono salvati in Title Case (prima lettera maiuscola per parola)
