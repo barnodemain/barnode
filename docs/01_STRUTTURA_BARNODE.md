@@ -8,6 +8,7 @@ BARnode è un'app React + TypeScript + Vite mobile-first per la gestione inventa
 
 - **Quick-add su Archivio**: Ogni articolo nel catalogo ha un pulsante "+" che aggiunge direttamente l'articolo alla lista dei mancanti (solo se non già presente)
 - **Duplicate protection**: Il pulsante "+" è nascosto se l'articolo è già nella lista dei mancanti
+- **FAB Home (aggiungi articolo)**: Il pulsante "+" nella Home crea nuovi articoli nel catalogo ma **non** li aggiunge automaticamente alla lista dei mancanti; la lista mancanti viene aggiornata solo tramite ricerca/autocomplete o quick-add da Archivio
 - **Analysis feature**: Pagina per rilevare articoli simili o duplicati tramite analisi di parole chiave, con consolidamento automatico
 - **Layout mobile-first**: Spacing ottimizzato tra titoli, barre di ricerca e liste per migliore leggibilità
 - **Backup automatico**: Snapshot dei dati dopo ogni operazione CRUD

@@ -11,7 +11,7 @@
 
 - Autocomplete mostra solo articoli non in missing_items
 - Tap su suggerimento aggiunge ai mancanti
-- Manual add: crea articolo se non esiste, poi aggiunge ai mancanti
+- Manual add (FAB "+"): crea l'articolo nel catalogo se non esiste **ma non lo aggiunge automaticamente ai mancanti**
 - Trash icon rimuove da missing_items
 
 ## Archivio (Catalogo)

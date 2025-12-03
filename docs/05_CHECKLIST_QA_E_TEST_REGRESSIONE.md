@@ -27,7 +27,7 @@
 
 - [ ] Autocomplete mostra articoli non in mancanti
 - [ ] Tap suggerimento aggiunge ai mancanti
-- [ ] Manual add funziona (crea + aggiunge)
+- [ ] Manual add funziona (crea solo l'articolo nel catalogo, senza aggiungerlo ai mancanti)
 - [ ] Trash rimuove dai mancanti
 
 ## Test Archivio page

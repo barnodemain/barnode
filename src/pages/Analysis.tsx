@@ -43,10 +43,11 @@ function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
     // Tutti gli articoli con la stessa categoria (prima parola) formano un unico gruppo
     const sortedArticles = [...categoryArticles].sort((a, b) => a.nome.localeCompare(b.nome))
     const groupIds = sortedArticles.map(a => a.id)
-    const groupKey = groupIds.join('|')
+    // ID di gruppo stabile: insieme di ID ordinati alfabeticamente, indipendente dall'ordine o da rinomini
+    const stableGroupKey = [...groupIds].sort().join('|')
 
     allGroups.push({
-      id: groupKey,
+      id: stableGroupKey,
       articles: sortedArticles,
       sharedKeywords: [getCategory(sortedArticles[0].nome) || '']
     })
@@ -73,7 +74,18 @@ function Analysis() {
   const [finalNameInputByGroup, setFinalNameInputByGroup] = useState<Record<string, string>>({})
   const [consolidating, setConsolidating] = useState(false)
   const [consolidationMessage, setConsolidationMessage] = useState<string | null>(null)
-  const [ignoredGroupIds, setIgnoredGroupIds] = useState<Set<string>>(new Set())
+  const [ignoredGroupIds, setIgnoredGroupIds] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set()
+    try {
+      const raw = window.localStorage.getItem('analysis_ignored_group_ids')
+      if (!raw) return new Set()
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return new Set()
+      return new Set(parsed.map(String))
+    } catch {
+      return new Set()
+    }
+  })
 
   const groups = useMemo(() => {
     return groupArticlesBySharedKeywords(articoli)
@@ -184,6 +196,16 @@ function Analysis() {
     setIgnoredGroupIds(prev => {
       const updated = new Set(prev)
       updated.add(groupId)
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem(
+            'analysis_ignored_group_ids',
+            JSON.stringify(Array.from(updated))
+          )
+        } catch {
+          // Ignora eventuali errori di storage senza bloccare la UI
+        }
+      }
       return updated
     })
   }
