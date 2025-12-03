@@ -7,6 +7,17 @@
 - `missing_items`: Lista articoli mancanti (id, articolo_id, created_at)
 - `backups_barnode`: Snapshot automatici (id, payload JSONB, created_at)
 
+> **BACKUP SINGLETON**
+>
+> La tabella `backups_barnode` utilizza un **unico record attivo** per lo snapshot corrente:
+>
+> - ID fisso: `00000000-0000-0000-0000-000000000001`
+> - Colonna `payload`: JSONB con struttura `{ articoli: [...], missing_items: [...] }`
+> - Colonna `created_at`: aggiornata a ogni nuovo snapshot
+>
+> Ogni operazione critica nell'app esegue una `upsert` su questo ID fisso, sovrascrivendo sempre lo snapshot precedente.
+> Eventuali altri record presenti in `backups_barnode` sono considerati **legacy**.
+
 ## Note implementative
 
 - La funzione quick-add su Archivio utilizza la stessa logica di `addMissingItem` dalla Home

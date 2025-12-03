@@ -1,5 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 
+const SINGLETON_BACKUP_ID = '00000000-0000-0000-0000-000000000001' as const
+
 interface BackupPayload {
   articoli: Array<{ id: string; nome: string; created_at?: string }>
   missing_items: Array<{ id: string; articolo_id: string; articolo_nome: string; created_at?: string }>
@@ -37,9 +39,18 @@ export async function createAndSaveCurrentSnapshot(): Promise<void> {
       }))
     }
 
+    const created_at = new Date().toISOString()
+
     await supabase
       .from('backups_barnode')
-      .insert([{ payload }])
+      .upsert(
+        [{
+          id: SINGLETON_BACKUP_ID,
+          payload,
+          created_at,
+        }],
+        { onConflict: 'id' },
+      )
   } catch (error) {
     console.error('Backup failed:', error)
   }

@@ -22,9 +22,10 @@
 
 ## Backup e ripristino
 
-- Dopo le operazioni CRUD critiche viene creato automaticamente uno snapshot dei dati in `backups_barnode`.
+- Dopo le operazioni CRUD critiche viene creato/aggiornato automaticamente **un unico snapshot globale** dei dati in `backups_barnode`.
+- Questo snapshot è memorizzato in un solo record "attivo" con ID fisso `00000000-0000-0000-0000-000000000001`.
 - La pagina **Backup** espone il pulsante "Ripristina ultimo backup" che, previa conferma utente, chiama la RPC `restore_last_backup`.
-- Il ripristino sovrascrive completamente le tabelle `articoli` e `missing_items` con l'ultimo backup non vuoto.
+- Il ripristino sovrascrive completamente le tabelle `articoli` e `missing_items` caricando sempre lo stato più recente di questo snapshot globale.
 
 ## Analysis (Rilevamento duplicati)
 
