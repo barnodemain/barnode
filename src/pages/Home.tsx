@@ -85,10 +85,6 @@ function Home() {
         articolo = await createArticolo(normalizedName)
       }
       
-      if (articolo) {
-        await addMissingItem(articolo)
-      }
-      
       setNewItemName('')
       setIsModalOpen(false)
     } finally {
