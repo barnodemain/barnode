@@ -12,6 +12,9 @@ BARnode è un'app React + TypeScript + Vite mobile-first per la gestione inventa
 - **Layout mobile-first**: Spacing ottimizzato tra titoli, barre di ricerca e liste per migliore leggibilità
 - **Backup automatico**: Snapshot dei dati dopo ogni operazione CRUD
 - **Splash screen**: Introduzione con logo e crediti al primo caricamento per sessione
+ - **Impostazioni protette da PIN**: Accesso alla pagina Settings subordinato all'inserimento di un PIN numerico (1909) tramite tastierino dedicato
+ - **Pagina NOTE sincronizzate**: Testo note modificabile manualmente e sincronizzato tra dispositivi tramite Supabase (`notes`)
+ - **Esportazione articoli**: Pulsante "Esporta articoli" nelle impostazioni per scaricare l'elenco articoli in formato testo
 
 ## Stack
 
@@ -25,7 +28,8 @@ BARnode è un'app React + TypeScript + Vite mobile-first per la gestione inventa
 
 - `/`: Home - Lista articoli mancanti con search e quick-add
 - `/archivio`: Catalogo articoli con CRUD e quick-add
-- `/settings`: Menu impostazioni con IMPORTA, BACKUP, ANALYSIS
+- `/settings`: Menu impostazioni (protetto da PIN) con IMPORTA, BACKUP, ANALYSIS, NOTE ed ESPORTA ARTICOLI
 - `/settings/import/text`: Import bulk da testo
-- `/settings/backup`: Backup/Restore
+- `/settings/backup`: Backup/Restore (snapshop globale singleton)
 - `/settings/analysis`: Rilevamento articoli duplicati e consolidamento
+- `/settings/notes`: Pagina NOTE con textarea a tutto schermo, pulsante copia e sincronizzazione Supabase

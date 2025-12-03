@@ -6,6 +6,7 @@
 - `articoli`: Catalogo articoli (id, nome, created_at)
 - `missing_items`: Lista articoli mancanti (id, articolo_id, created_at)
 - `backups_barnode`: Snapshot automatici (id, payload JSONB, created_at)
+ - `notes`: Testo NOTE condiviso tra dispositivi (id, content, updated_at)
 
 > **BACKUP SINGLETON**
 >
@@ -26,6 +27,7 @@
 - Stopwords filtering: Parole generiche (vodka, rum, gin, di, al, etc.) sono escluse dall'analisi
 - Consolidamento: Updates batch di articoli duplicati nella tabella articoli
 - RPC `restore_last_backup` per il ripristino dei dati
+ - Tabella `notes`: una sola riga attiva usata dalla pagina NOTE per leggere/scrivere il contenuto sincronizzato (accesso consentito al ruolo anon tramite RLS)
 
 ### RPC `restore_last_backup`
 
