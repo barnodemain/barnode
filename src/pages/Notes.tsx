@@ -158,7 +158,7 @@ function Notes() {
               setHasEdited(true)
               setNotesValue(e.target.value)
             }}
-            placeholder="Le note verranno generate automaticamente in base agli articoli presenti."
+            placeholder=""
           />
           <div className="notes-copy-row">
             {copied && <span className="notes-copy-feedback">testo copiato</span>}
