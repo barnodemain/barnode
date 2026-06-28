@@ -38,4 +38,8 @@ dist-ssr
 
 # Backup locali (mai committare)
 BACKUP/
-
+# Playwright
+test-results
+playwright-report
+/blob-report
+.playwright
