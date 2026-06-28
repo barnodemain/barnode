@@ -38,5 +38,5 @@ Gestiti centralmente da **App Control** (bootstrap in `.agent/app-control.json`)
 ## Avvio locale
 `npm run dev` → porta **5001** (standard di progetto). Build: `npm run build`. Lint: `npm run lint`.
 
-## DA COMPLETARE
-- `LINK_DEPLOY` e `LINK_DEPLOY ADMIN` su App Control risultano **vuoti**. Pubblico = `https://barnode-8gbl.onrender.com`. L'app non ha un'area admin separata (tutto dietro PIN), quindi `LINK_DEPLOY ADMIN` va valutato/popolato di conseguenza.
+## Keepalive Supabase
+Workflow GitHub Actions `.github/workflows/keepalive.yml`: ping di lettura minima ogni 2 giorni (cron `0 6 */2 * *`) per evitare la pausa del piano Free (scatta dopo ~7gg). Usa i secret repo `SUPABASE_URL` + `SUPABASE_ANON_KEY` (già configurati). Avvio manuale dalla tab Actions. Rischio residuo: GitHub disabilita i cron dopo 60gg di inattività del repo (mitigato dai commit/deploy regolari). Disattivazione: disabilita il workflow dalla tab Actions.
