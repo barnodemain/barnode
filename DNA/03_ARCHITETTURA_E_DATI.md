@@ -29,6 +29,12 @@
 ## Hook principali (`src/hooks/`)
 - `useArticoli`: `articoli[]`, `createArticolo`, `updateArticolo` (cascade su missing_items), `deleteArticolo`, `searchArticoli`.
 - `useMissingItems`: `missingItems[]`, `addMissingItem` (con duplicate check), `removeMissingItem`, `isArticoloMissing(id)` per render condizionali.
+- `useConsolidation(fetchArticoli)`: stato + handler della pagina Analysis (selezione, nome finale, consolidamento, ignore via localStorage).
+
+## Pagina Analysis (modulare)
+- `lib/analysisGrouping.ts`: logica pura di raggruppamento (`groupArticlesBySharedKeywords`, `getCategory`, tipo `ArticleGroup`).
+- `components/AnalysisGroupCard.tsx`: UI di una card-gruppo.
+- `pages/Analysis.tsx`: orchestrazione (usa hook + componente).
 
 ## Client Supabase
 - `src/lib/supabase.ts`: client creato da `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`; espone `isSupabaseConfigured()`. È `null` se le env mancano.

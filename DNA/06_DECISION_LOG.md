@@ -12,6 +12,7 @@ Decisioni tecniche rilevanti su BARnode. Solo scelte che un agent futuro deve co
 | 2026-06-28 | Favicon = solo bicchiere (verde chiaro #4a9c3d, angoli arrotondati); logo completo per home/PWA | Il logo completo con testo è illeggibile a 16px nella scheda |
 | 2026-06-28 | Keepalive Supabase via **GitHub Actions** (ping ogni 2gg) | Render Free non ha cron; GitHub Actions è gratis e vive nel repo. Era la causa delle pause Supabase |
 | 2026-06-28 | Push via HTTPS + `GITHUB_TOKEN` (non SSH) | La chiave SSH non è autorizzata per l'owner `barnodemain` |
+| 2026-06-28 | `Analysis.tsx` (526 righe) splittato in 4: `lib/analysisGrouping.ts` (logica pura), `hooks/useConsolidation.ts` (stato+handler), `components/AnalysisGroupCard.tsx` (UI card), `pages/Analysis.tsx` (114 righe, orchestrazione) | Governance: file sotto limite righe. Comportamento invariato (verificato lint+build+screenshot) |
 
 ## Rischi noti / da valutare
 - **PIN `1909`** hardcoded client-side ([PinModal.tsx](../src/components/PinModal.tsx)): protezione "soft", visibile nel bundle. Da rafforzare se serve sicurezza reale.
