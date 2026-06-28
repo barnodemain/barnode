@@ -1,0 +1,41 @@
+name: Supabase Keepalive
+
+# Tiene attivo il progetto Supabase Free (pausa dopo ~7 giorni di inattività).
+# Esegue una lettura minima ogni 2 giorni. Nessuna scrittura, payload minimo.
+# Disattivazione: disabilita questo workflow dalla tab Actions del repo, o eliminalo.
+
+on:
+  schedule:
+    # ogni 2 giorni alle 06:00 UTC (la pausa scatta dopo 7gg: ampio margine)
+    - cron: '0 6 */2 * *'
+  workflow_dispatch:        # consente l'avvio manuale dalla tab Actions
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping Supabase REST (lettura minima 1 riga)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Secret SUPABASE_URL o SUPABASE_ANON_KEY mancanti."
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
+            "${SUPABASE_URL}/rest/v1/articoli?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+          echo "HTTP $code"
+          # 200/206 = ok; qualsiasi 2xx tiene sveglio il DB
+          if [ "$code" -ge 200 ] && [ "$code" -lt 300 ]; then
+            echo "Keepalive OK: Supabase attivo."
+          else
+            echo "::error::Keepalive fallito (HTTP $code)."
+            exit 1
+          fi
