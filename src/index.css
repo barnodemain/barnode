@@ -124,6 +124,15 @@ ul, ol {
   text-align: center;
 }
 
+.page-subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text);
+  opacity: 0.6;
+  text-align: center;
+  margin-top: 4px;
+}
+
 .search-container {
   position: relative;
   margin-bottom: 6px;

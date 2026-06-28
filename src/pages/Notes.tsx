@@ -1,18 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { IoCopyOutline } from 'react-icons/io5'
 import { useArticoli } from '../hooks/useArticoli'
-import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 function Notes() {
   const { articoli } = useArticoli()
 
   const [copied, setCopied] = useState(false)
-  const [notesValue, setNotesValue] = useState('')
-  const [hasEdited, setHasEdited] = useState(false)
-  const [notesId, setNotesId] = useState<string | null>(null)
-  const [isSyncedWithSupabase, setIsSyncedWithSupabase] = useState(false)
-  const [hasLoadedNotes, setHasLoadedNotes] = useState(false)
 
+  // Lista sempre aggiornata di tutti i prodotti dal database (ordinata per nome
+  // tramite useArticoli), pronta da copiare/esportare.
   const noteText = useMemo(
     () =>
       articoli
@@ -22,99 +18,11 @@ function Notes() {
     [articoli],
   )
 
-  const displayText = isSyncedWithSupabase
-    ? notesValue
-    : hasEdited
-      ? notesValue
-      : noteText
-
-  useEffect(() => {
-    if (!isSupabaseConfigured() || !supabase) {
-      return
-    }
-
-    if (hasLoadedNotes) return
-    const loadOrCreateNotes = async () => {
-      try {
-        if (!supabase) {
-          return
-        }
-        const { data, error } = await supabase
-          .from('notes')
-          .select('id, content')
-          .limit(1)
-
-        if (error) {
-          console.error('Errore nel caricamento delle note da Supabase', error)
-          setHasLoadedNotes(true)
-          return
-        }
-
-        if (data && data.length > 0) {
-          const row = data[0]
-          setNotesId(row.id as string)
-          setNotesValue((row.content as string) ?? '')
-          setIsSyncedWithSupabase(true)
-          setHasLoadedNotes(true)
-          return
-        }
-
-        const initialContent = noteText
-        const { data: insertData, error: insertError } = await supabase
-          .from('notes')
-          .insert([{ content: initialContent }])
-          .select('id, content')
-          .single()
-
-        if (insertError) {
-          console.error('Errore nella creazione iniziale delle note su Supabase', insertError)
-          setHasLoadedNotes(true)
-          return
-        }
-
-        setNotesId(insertData.id as string)
-        setNotesValue((insertData.content as string) ?? '')
-        setIsSyncedWithSupabase(true)
-        setHasLoadedNotes(true)
-      } catch (error) {
-        console.error('Errore inatteso nella gestione delle note su Supabase', error)
-        setHasLoadedNotes(true)
-      }
-    }
-
-    void loadOrCreateNotes()
-  }, [hasEdited, hasLoadedNotes, noteText])
-
-  useEffect(() => {
-    if (!isSyncedWithSupabase || !notesId || !hasLoadedNotes) return
-    if (!isSupabaseConfigured() || !supabase) return
-
-    const handler = setTimeout(async () => {
-      if (!supabase) {
-        return
-      }
-      try {
-        const { error } = await supabase
-          .from('notes')
-          .update({ content: notesValue })
-          .eq('id', notesId)
-
-        if (error) {
-          console.error('Errore nell\'aggiornamento delle note su Supabase', error)
-        }
-      } catch (error) {
-        console.error('Errore inatteso nell\'aggiornamento delle note su Supabase', error)
-      }
-    }, 500)
-
-    return () => clearTimeout(handler)
-  }, [hasLoadedNotes, isSyncedWithSupabase, notesId, notesValue])
-
   const handleCopyAll = () => {
-    if (!displayText) return
+    if (!noteText) return
 
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(displayText).catch((error) => {
+      navigator.clipboard.writeText(noteText).catch((error) => {
         console.error('Clipboard write failed', error)
       })
       setCopied(true)
@@ -125,7 +33,7 @@ function Notes() {
     if (typeof document === 'undefined') return
 
     const textarea = document.createElement('textarea')
-    textarea.value = displayText
+    textarea.value = noteText
     textarea.style.position = 'fixed'
     textarea.style.opacity = '0'
     document.body.appendChild(textarea)
@@ -145,7 +53,10 @@ function Notes() {
       <div className="page-header-fixed">
         <div className="page-header">
           <img src="/logo.png" alt="BARnode" className="logo" />
-          <h1 className="page-title">Note</h1>
+          <div>
+            <h1 className="page-title">Note</h1>
+            <p className="page-subtitle">Archivio completo prodotti.</p>
+          </div>
         </div>
       </div>
 
@@ -153,11 +64,8 @@ function Notes() {
         <div className="notes-box-wrapper">
           <textarea
             className="import-textarea"
-            value={displayText}
-            onChange={(e) => {
-              setHasEdited(true)
-              setNotesValue(e.target.value)
-            }}
+            value={noteText}
+            readOnly
             placeholder=""
           />
           <div className="notes-copy-row">
@@ -166,7 +74,7 @@ function Notes() {
               type="button"
               className="notes-copy-icon"
               onClick={handleCopyAll}
-              disabled={!displayText}
+              disabled={!noteText}
               aria-label="Copia tutte le note"
             >
               <IoCopyOutline size={20} />

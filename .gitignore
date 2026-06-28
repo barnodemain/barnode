@@ -30,4 +30,12 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+.env.bak.*
+
+# App Control / agent
+.mcp.json
+.agent/
+
+# Backup locali (mai committare)
+BACKUP/
 

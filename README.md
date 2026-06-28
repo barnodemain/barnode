@@ -74,7 +74,7 @@ CREATE POLICY "Allow all operations on missing_items" ON missing_items FOR ALL U
 npm run dev
 ```
 
-The app will be available at `http://localhost:5000`.
+The app will be available at `http://localhost:5001`.
 
 ### 5. Build for Production
 
