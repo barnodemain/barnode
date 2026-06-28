@@ -13,6 +13,7 @@ Decisioni tecniche rilevanti su BARnode. Solo scelte che un agent futuro deve co
 | 2026-06-28 | Keepalive Supabase via **GitHub Actions** (ping ogni 2gg) | Render Free non ha cron; GitHub Actions è gratis e vive nel repo. Era la causa delle pause Supabase |
 | 2026-06-28 | Push via HTTPS + `GITHUB_TOKEN` (non SSH) | La chiave SSH non è autorizzata per l'owner `barnodemain` |
 | 2026-06-28 | `Analysis.tsx` (526 righe) splittato in 4: `lib/analysisGrouping.ts` (logica pura), `hooks/useConsolidation.ts` (stato+handler), `components/AnalysisGroupCard.tsx` (UI card), `pages/Analysis.tsx` (114 righe, orchestrazione) | Governance: file sotto limite righe. Comportamento invariato (verificato lint+build+screenshot) |
+| 2026-06-28 | Aggiunta gestione **safe-area** (notch/gesture-bar) per modalità PWA installata: `viewport-fit=cover` + `env(safe-area-inset-*)` su `.page-header-fixed` (top) e `.bottom-nav` (bottom) | Header/footer rischiavano di finire sotto le barre di sistema su iPhone con notch in modalità installata. Desktop invariato (safe-area=0). Navigazione già ottimale, non toccata. |
 
 ## Rischi noti / da valutare
 - **PIN `1909`** hardcoded client-side ([PinModal.tsx](../src/components/PinModal.tsx)): protezione "soft", visibile nel bundle. Da rafforzare se serve sicurezza reale.

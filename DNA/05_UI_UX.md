@@ -31,3 +31,6 @@ Mobile-first. Riferimenti che non si ricavano dal solo codice.
 - Button nested in card: `onClick={(e) => { e.stopPropagation(); handler(...) }}`.
 - Async handler in try/finally per cleanup stato; prefisso `handle*`.
 - Key di lista sempre stabili (`articolo.id` / `item.id`); niente oggetti/array inline nel render.
+
+## Safe-area (PWA installata)
+- `index.html` ha `viewport-fit=cover`. `.page-header-fixed` usa `env(safe-area-inset-top)` e `.bottom-nav` usa `env(safe-area-inset-bottom)` per non finire sotto notch/gesture-bar in modalità installata. Su desktop/browser questi valgono 0 (nessun effetto).
