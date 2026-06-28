@@ -16,7 +16,7 @@
   --radius-card: 16px;
   --radius-button: 12px;
   --radius-input: 12px;
-  --nav-height: 70px;
+  --nav-height: 58px;
 }
 
 * {
@@ -199,7 +199,8 @@ ul, ol {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-bottom: 80px;
+  /* spazio per non finire sotto la bottom-nav + home-bar iPhone */
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 24px);
 }
 
 .item-card {
@@ -253,7 +254,7 @@ ul, ol {
 
 .fab {
   position: fixed;
-  bottom: calc(var(--nav-height) + 20px);
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 20px);
   right: 20px;
   width: 56px;
   height: 56px;
@@ -283,12 +284,13 @@ ul, ol {
   bottom: 0;
   left: 0;
   right: 0;
+  /* Area icone compatta + solo la safe-area reale (home-bar iPhone) come margine sotto */
   height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
   background-color: var(--color-green-dark);
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   z-index: 100;
 }
 
