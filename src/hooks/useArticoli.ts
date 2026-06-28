@@ -1,12 +1,23 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
+import {
+  getArticoliCache,
+  setArticoliCache,
+  subscribeArticoli,
+} from '../lib/articoliStore'
 import type { Articolo } from '../types'
 
 export function useArticoli() {
-  const [articoli, setArticoli] = useState<Articolo[]>([])
-  const [loading, setLoading] = useState(true)
+  // Parte dalla cache condivisa se già popolata: niente refetch ad ogni cambio pagina.
+  const [articoli, setArticoli] = useState<Articolo[]>(() => getArticoliCache() ?? [])
+  const [loading, setLoading] = useState(() => getArticoliCache() === null)
   const [error, setError] = useState<string | null>(null)
+
+  // Tiene sincronizzate tutte le viste montate quando la cache cambia.
+  useEffect(() => {
+    return subscribeArticoli(() => setArticoli(getArticoliCache() ?? []))
+  }, [])
 
   const fetchArticoli = useCallback(async () => {
     if (!isSupabaseConfigured() || !supabase) {
@@ -24,7 +35,7 @@ export function useArticoli() {
         .order('nome', { ascending: true })
 
       if (fetchError) throw fetchError
-      setArticoli(data || [])
+      setArticoliCache(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nel caricamento degli articoli')
     } finally {
@@ -33,7 +44,10 @@ export function useArticoli() {
   }, [])
 
   useEffect(() => {
-    fetchArticoli()
+    // Fetch solo se la cache è vuota; altrimenti riusa i dati già caricati.
+    if (getArticoliCache() === null) {
+      fetchArticoli()
+    }
   }, [fetchArticoli])
 
   const createArticolo = async (nome: string): Promise<Articolo | null> => {
@@ -52,7 +66,7 @@ export function useArticoli() {
 
       if (insertError) throw insertError
       
-      setArticoli(prev => [...prev, data].sort((a, b) => a.nome.localeCompare(b.nome)))
+      setArticoliCache([...(getArticoliCache() ?? []), data].sort((a, b) => a.nome.localeCompare(b.nome)))
       createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return data
     } catch (err) {
@@ -76,8 +90,9 @@ export function useArticoli() {
 
       if (updateError) throw updateError
 
-      setArticoli(prev => 
-        prev.map(a => a.id === id ? { ...a, nome } : a)
+      setArticoliCache(
+        (getArticoliCache() ?? [])
+          .map(a => a.id === id ? { ...a, nome } : a)
           .sort((a, b) => a.nome.localeCompare(b.nome))
       )
       createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
@@ -110,7 +125,7 @@ export function useArticoli() {
 
       if (deleteError) throw deleteError
 
-      setArticoli(prev => prev.filter(a => a.id !== id))
+      setArticoliCache((getArticoliCache() ?? []).filter(a => a.id !== id))
       createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {

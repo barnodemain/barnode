@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
+import {
+  getMissingCache,
+  setMissingCache,
+  subscribeMissing,
+} from '../lib/missingItemsStore'
 import type { MissingItemWithRelation, Articolo } from '../types'
 
 interface MissingItemRow {
@@ -18,9 +23,14 @@ function getArticoloNome(articoli: MissingItemRow['articoli']): string {
 }
 
 export function useMissingItems() {
-  const [missingItems, setMissingItems] = useState<MissingItemWithRelation[]>([])
-  const [loading, setLoading] = useState(true)
+  const [missingItems, setMissingItems] = useState<MissingItemWithRelation[]>(() => getMissingCache() ?? [])
+  const [loading, setLoading] = useState(() => getMissingCache() === null)
   const [error, setError] = useState<string | null>(null)
+
+  // Sincronizza tutte le viste montate quando la cache condivisa cambia.
+  useEffect(() => {
+    return subscribeMissing(() => setMissingItems(getMissingCache() ?? []))
+  }, [])
 
   const fetchMissingItems = useCallback(async () => {
     if (!isSupabaseConfigured() || !supabase) {
@@ -52,7 +62,7 @@ export function useMissingItems() {
         articoloNome: getArticoloNome(item.articoli)
       })).sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
 
-      setMissingItems(mappedItems)
+      setMissingCache(mappedItems)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore nel caricamento degli articoli mancanti')
     } finally {
@@ -61,7 +71,10 @@ export function useMissingItems() {
   }, [])
 
   useEffect(() => {
-    fetchMissingItems()
+    // Fetch solo se la cache è vuota; altrimenti riusa i dati già caricati.
+    if (getMissingCache() === null) {
+      fetchMissingItems()
+    }
   }, [fetchMissingItems])
 
   const addMissingItem = async (articolo: Articolo): Promise<boolean> => {
@@ -100,8 +113,8 @@ export function useMissingItems() {
         articoloNome: getArticoloNome(row.articoli) || articolo.nome
       }
 
-      setMissingItems(prev => 
-        [...prev, newItem].sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
+      setMissingCache(
+        [...(getMissingCache() ?? []), newItem].sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
       )
       createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
@@ -126,7 +139,7 @@ export function useMissingItems() {
 
       if (deleteError) throw deleteError
 
-      setMissingItems(prev => prev.filter(m => m.id !== id))
+      setMissingCache((getMissingCache() ?? []).filter(m => m.id !== id))
       createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {

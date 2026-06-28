@@ -36,6 +36,9 @@
 - `components/AnalysisGroupCard.tsx`: UI di una card-gruppo.
 - `pages/Analysis.tsx`: orchestrazione (usa hook + componente).
 
+## Cache dati condivisa
+- `lib/articoliStore.ts` e `lib/missingItemsStore.ts`: cache in-memory condivisa tra le pagine. Gli hook `useArticoli`/`useMissingItems` fetchano solo se la cache è vuota, riusano i dati tra le navigazioni e si sincronizzano via subscribe. Non persiste (sessione). Restore backup fa reload (azzera cache).
+
 ## Client Supabase
 - `src/lib/supabase.ts`: client creato da `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`; espone `isSupabaseConfigured()`. È `null` se le env mancano.
 

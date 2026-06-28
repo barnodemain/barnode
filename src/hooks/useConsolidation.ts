@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
 import { normalizeArticleName } from '../lib/normalize'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import { clearMissingCache } from '../lib/missingItemsStore'
 import type { ArticleGroup } from '../lib/analysisGrouping'
 
 const IGNORED_KEY = 'analysis_ignored_group_ids'
@@ -110,7 +111,10 @@ export function useConsolidation(fetchArticoli: () => Promise<void>) {
       }
 
       await createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
+      // Il consolidamento ha modificato articoli e missing_items nel DB:
+      // ricarica gli articoli e invalida la cache missing (verrà rifetchata al bisogno).
       await fetchArticoli()
+      clearMissingCache()
 
       setConsolidationMessage('Articoli consolidati con successo')
 
