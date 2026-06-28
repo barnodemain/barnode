@@ -10,6 +10,7 @@ Contesto canonico del progetto. Un agent legge questi file in ordine per operare
 | `03_ARCHITETTURA_E_DATI.md` | Schema DB, RPC, backup singleton, routing, hook principali | Prima di lavorare su dati o pagine |
 | `04_FLUSSI_E_DOMINIO.md` | Flussi funzionali e regole business (quick-add, analysis, note, export) | Quando si tocca una feature |
 | `05_UI_UX.md` | Spacing, colori, icone, convenzioni layout mobile-first | Quando si tocca la UI |
+| `06_DECISION_LOG.md` | Decisioni tecniche prese e rischi noti | Per non rifare/contraddire scelte già fatte |
 
 **Regola base:** il **codice è la fonte di verità**. Se il DNA diverge dal codice, vale il codice e il DNA va riallineato.
 
