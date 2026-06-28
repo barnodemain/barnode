@@ -23,7 +23,7 @@
 ## Note (lista prodotti auto)
 - Textarea full-screen in **sola lettura**: mostra SEMPRE l'elenco aggiornato di tutti gli articoli dal DB (via `useArticoli`, ordinati per nome), uno per riga. Pronta da copiare/esportare.
 - Si aggiorna da sola quando il catalogo cambia. Pulsante copia (label "testo copiato" 2s). Sottotitolo header: "Archivio completo prodotti." (classe `.page-subtitle`).
-- NB: non usa più la tabella `notes` (vecchia logica di note libere sincronizzate rimossa). La tabella `notes` resta nel DB ma è inutilizzata (droppabile in futuro).
+- NB: non usa più la tabella `notes` (vecchia logica di note libere sincronizzate rimossa). La tabella `notes` nel DB è stata SVUOTATA (0 righe) il 2026-06-28 perché inutilizzata; la struttura resta.
 
 ## Export articoli
 - Da Settings: scarica un .txt con tutti gli articoli ordinati alfabeticamente, uno per riga. Riusa i dati di `useArticoli`, nessuna query extra.
