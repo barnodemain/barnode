@@ -3,7 +3,7 @@
 Informazioni operative reali per sapere "dov'è" ogni cosa. Verificate il 2026-06-28.
 
 ## Cos'è
-BARnode — web app mobile-first per gestire l'inventario di un bar: catalogo articoli e lista dei "mancanti", con analisi duplicati, note sincronizzate, backup/restore ed export.
+BARnode — web app mobile-first per gestire l'inventario di un bar: catalogo articoli e lista dei "mancanti", con analisi duplicati, pagina note (elenco prodotti), backup/restore ed export.
 
 ## Stack reale (da `package.json`)
 - React **19** + TypeScript + Vite **7**
@@ -14,8 +14,8 @@ BARnode — web app mobile-first per gestire l'inventario di un bar: catalogo ar
 
 ## Repository
 - Remote `origin`: `git@github.com:barnodemain/barnode.git` (owner **barnodemain**)
-- Branch operativa: **main**
-- Esiste anche un remote locale `gitsafe-backup` e un branch `replit-agent` (residui dell'origine Replit del progetto).
+- Branch operativa: **main** (unica branch; remote: solo `origin`).
+- **Push:** SSH non autorizzato per l'owner → si pusha via HTTPS col `GITHUB_TOKEN` del `.env` (`git push https://barnodemain:<TOKEN>@github.com/barnodemain/barnode.git main`). Mai stampare il token.
 
 ## Deploy — Render
 - Servizio **barnode**, tipo `static_site`, id `srv-d4jplf2li9vc73da4c6g`
@@ -26,8 +26,9 @@ BARnode — web app mobile-first per gestire l'inventario di un bar: catalogo ar
 
 ## Database — Supabase
 - Progetto Supabase ref: **hizstywtuuevurgtqvqm** (`https://hizstywtuuevurgtqvqm.supabase.co`)
-- Free tier: può andare in **pausa** per inattività → l'app mostra errore caricamento finché non si riattiva dal pannello Supabase. I dati NON si perdono.
-- Accesso storicamente via login GitHub; l'account esatto legato al pannello è incerto (vedi memoria di sessione).
+- Free tier: andrebbe in **pausa** dopo ~7gg di inattività, ma il **keepalive** (vedi sotto) lo previene. Se mai succedesse: i dati NON si perdono, si riattiva dal pannello Supabase.
+- Tabelle: `articoli`, `missing_items`, `backups_barnode` (snapshot singleton), `notes` (svuotata/inutilizzata). Dettagli in `03_ARCHITETTURA_E_DATI.md`.
+- Se l'app online dà `ERR_CONNECTION_REFUSED` su Supabase **solo da un browser** (non da altri device/incognito): è cache di rete del browser, non il DB — flush in `chrome://net-internals` (#sockets / #dns).
 
 ## Allineamento servizi
 Render ↔ GitHub ↔ Supabase sono coerenti: stesso repo `barnodemain/barnode`, branch `main`, stesso progetto Supabase. ✅

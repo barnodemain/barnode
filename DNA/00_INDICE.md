@@ -12,6 +12,8 @@ Contesto canonico del progetto. Un agent legge questi file in ordine per operare
 | `05_UI_UX.md` | Spacing, colori, icone, convenzioni layout mobile-first | Quando si tocca la UI |
 | `06_DECISION_LOG.md` | Decisioni tecniche prese e rischi noti | Per non rifare/contraddire scelte già fatte |
 
+**Test:** suite E2E Playwright in `tests/` → `npm run test:e2e` (mock Supabase, nessuna scrittura reale).
+
 **Regola base:** il **codice è la fonte di verità**. Se il DNA diverge dal codice, vale il codice e il DNA va riallineato.
 
 **Riferimento operativo principale:** `CLAUDE.md` nella root (standard enterprise, scaricato da App Control).

@@ -3,7 +3,7 @@
 ## Sicurezza
 - Mai segreti/token/password in chiaro nel codice o nei commit.
 - `.env`, `.agent/`, `.mcp.json` sempre in `.gitignore`. Verificare `git status` prima di ogni push.
-- RLS attive su tutte le tabelle Supabase con dati. La tabella `notes` consente accesso al ruolo `anon` via RLS (sincronizzazione cross-device).
+- RLS attive su tutte le tabelle Supabase con dati. L'app usa la `anon key` (nessun login utente); le scritture passano per le tabelle consentite dalla RLS.
 
 ## Deploy
 - Un push su `main` = deploy in produzione (autoDeploy Render). Azione ad alto rischio: chiedere conferma.

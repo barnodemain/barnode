@@ -7,7 +7,7 @@
 - `/settings/import/text` → Import bulk da testo
 - `/settings/backup` → Backup / Restore
 - `/settings/analysis` → Rilevamento duplicati e consolidamento
-- `/settings/notes` → Pagina NOTE sincronizzata
+- `/settings/notes` → Pagina NOTE (elenco prodotti aggiornato dal DB, sola lettura)
 - Splash screen una volta per sessione (`sessionStorage: hasSeenSplash`). Pagine in lazy-load.
 
 ## Schema Supabase

@@ -19,5 +19,6 @@ Decisioni tecniche rilevanti su BARnode. Solo scelte che un agent futuro deve co
 
 ## Rischi noti / da valutare
 - **PIN `1909`** hardcoded client-side ([PinModal.tsx](../src/components/PinModal.tsx)): protezione "soft", visibile nel bundle. Da rafforzare se serve sicurezza reale.
-- **Bundle** `index` ~430KB: `Analysis.tsx` (526 righe) è il file più grande, candidato a split se cresce.
+- **Bundle** `index` ~430KB (gzip ~127KB): normale per la SPA; code-splitting possibile se cresce.
 - **GitHub Actions cron**: si disabilita dopo 60gg di inattività del repo (mitigato dai commit/deploy regolari).
+- **App Control — limite scrittura agent:** dal canale agent (anon key + header) si può scrivere SOLO `project_env_variables` (es. `LINK_DEPLOY`). La tabella `projects` è in **sola lettura** via RLS: il campo `deploy_url` (link sotto il titolo nell'UI) NON è scrivibile dall'agent (la PATCH torna `*/0`), va messo a mano dall'interfaccia. Non perderci tempo via API.
