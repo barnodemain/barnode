@@ -6,6 +6,7 @@ import {
   setArticoliCache,
   subscribeArticoli,
 } from '../lib/articoliStore'
+import { getMissingCache, setMissingCache } from '../lib/missingItemsStore'
 import type { Articolo } from '../types'
 
 export function useArticoli() {
@@ -90,11 +91,31 @@ export function useArticoli() {
 
       if (updateError) throw updateError
 
+      // Propaga il rename alla lista Home (missing_items): la colonna copia
+      // `articolo_nome` sul DB e la cache in-memory, così Home si aggiorna subito
+      // senza ricaricare l'app.
+      const { error: updateMissingError } = await supabase
+        .from('missing_items')
+        .update({ articolo_nome: nome })
+        .eq('articolo_id', id)
+
+      if (updateMissingError) throw updateMissingError
+
       setArticoliCache(
         (getArticoliCache() ?? [])
           .map(a => a.id === id ? { ...a, nome } : a)
           .sort((a, b) => a.nome.localeCompare(b.nome))
       )
+
+      const missingCache = getMissingCache()
+      if (missingCache) {
+        setMissingCache(
+          missingCache
+            .map(m => m.articoloId === id ? { ...m, articoloNome: nome } : m)
+            .sort((a, b) => a.articoloNome.localeCompare(b.articoloNome))
+        )
+      }
+
       createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {
