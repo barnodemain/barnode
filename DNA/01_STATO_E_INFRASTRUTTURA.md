@@ -39,5 +39,10 @@ Gestiti centralmente da **App Control** (bootstrap in `.agent/app-control.json`)
 ## Avvio locale
 Test E2E: `npm run test:e2e` (Playwright, mock Supabase). `npm run dev` → porta **5001** (standard di progetto). Build: `npm run build`. Lint: `npm run lint`.
 
-## Keepalive Supabase
-Workflow GitHub Actions `.github/workflows/keepalive.yml`: ping di lettura minima ogni 2 giorni (cron `0 6 */2 * *`) per evitare la pausa del piano Free (scatta dopo ~7gg). Usa i secret repo `SUPABASE_URL` + `SUPABASE_ANON_KEY` (già configurati). Avvio manuale dalla tab Actions. Rischio residuo: GitHub disabilita i cron dopo 60gg di inattività del repo (mitigato dai commit/deploy regolari). Disattivazione: disabilita il workflow dalla tab Actions.
+## Keepalive Supabase (doppio guardiano)
+Il piano Free mette il progetto in **pausa dopo ~7gg di inattività**. Due guardiani indipendenti lo prevengono, entrambi con lettura minima (`articoli?select=id&limit=1`, chiave anon, nessuna scrittura):
+
+1. **Principale — cron-job.org** (esterno all'account cron-job.org dell'utente): ping **giornaliero** (00:00 Europe/Rome), header `apikey` = anon key. **Notifiche email attive** su fallimento e su ripristino → se si rompe, l'utente lo sa subito. Nessun file nel repo. Disattivazione: dalla dashboard cron-job.org.
+2. **Riserva — GitHub Actions** `.github/workflows/keepalive.yml`: ping **giornaliero** (cron `0 6 * * *`) con **3 tentativi** (attesa crescente). Secret repo `SUPABASE_URL` + `SUPABASE_ANON_KEY`. Avvio manuale dalla tab Actions. Rischio residuo: GitHub disabilita i cron dopo 60gg di inattività del repo (mitigato dai commit/deploy regolari).
+
+**Perché doppio:** il 17/07/2026 il ping GitHub ha iniziato a fallire in silenzio (nessun avviso) → DB in pausa il 21/07. Due sistemi + allarme email evitano il ripetersi. Dettaglio in `06_DECISION_LOG.md` (2026-07-21). Per i **nuovi progetti**: solo cron-job.org.
