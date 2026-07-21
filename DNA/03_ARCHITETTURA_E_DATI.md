@@ -15,6 +15,7 @@
 - `missing_items` — mancanti: `id`, `articolo_id`, `articolo_nome`, `created_at`
 - `backups_barnode` — **snapshot singleton** (vedi sotto)
 - `notes` — una sola riga attiva: `id`, `content`, `updated_at`; accesso `anon` via RLS
+- `ignored_pairs` — coppie "diverse" marcate con Ignora in Analysis: `pair_key` (PK, nomi normalizzati ordinati + `||`), `name_a`, `name_b`, `created_at`. RLS anon select/insert/delete. Migrazione `20260721_ignored_pairs.sql`. Cresce di 1 riga per coppia ignorata.
 
 ## Backup singleton
 - Un unico record attivo, ID fisso `00000000-0000-0000-0000-000000000001`.
@@ -29,7 +30,7 @@
 ## Hook principali (`src/hooks/`)
 - `useArticoli`: `articoli[]`, `createArticolo`, `updateArticolo` (cascade su missing_items), `deleteArticolo`, `searchArticoli`.
 - `useMissingItems`: `missingItems[]`, `addMissingItem` (con duplicate check), `removeMissingItem`, `isArticoloMissing(id)` per render condizionali.
-- `useConsolidation(fetchArticoli)`: stato + handler della pagina Analysis (selezione, nome finale, consolidamento, ignore via localStorage).
+- `useConsolidation(fetchArticoli)`: stato + handler della pagina Analysis (selezione, nome finale, consolidamento, ignore **persistente su DB** tabella `ignored_pairs`; carica gli ignorati all'avvio, upsert su Ignora).
 
 ## Pagina Analysis (modulare)
 - `lib/analysisGrouping.ts`: logica pura di raggruppamento (`groupArticlesBySharedKeywords`, `getCategory`, tipo `ArticleGroup`).

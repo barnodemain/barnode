@@ -101,7 +101,7 @@ function Analysis() {
                 onSetNameSource={(articleId) => setNameSource(group.id, articleId)}
                 onSetNameInput={(value) => setNameInput(group.id, value)}
                 onConsolidate={() => handleConsolidate(group)}
-                onIgnore={() => handleIgnore(group.id)}
+                onIgnore={() => handleIgnore(group)}
               />
             ))}
           </div>

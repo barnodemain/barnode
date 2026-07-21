@@ -65,7 +65,7 @@ function AnalysisGroupCard({
               fontStyle: 'italic'
             }}
           >
-            Parole chiave: {group.sharedKeywords.join(', ')}
+            Motivo: {group.sharedKeywords.join(', ')}
           </div>
         )}
       </div>

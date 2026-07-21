@@ -13,12 +13,16 @@
 ## Archivio (catalogo)
 - Click card → edit modal. Trash → elimina articolo (e da `missing_items` se presente). "+" → quick-add.
 
-## Analysis (rilevamento duplicati) — interamente client-side
+## Analysis (nomi doppi o simili) — logica in `lib/analysisGrouping.ts`
 - Fonte dati: **solo `articoli`**, mai `missing_items`.
-- Normalizza nomi (lowercase, rimuove accenti NFD, split, filtra token ≤2 char, numeri puri e ~50 stopwords hardcoded tipo vodka/rum/gin/di/al/ml…).
-- Raggruppa per **prima parola normalizzata**; match esatto + fuzzy (edit distance ≤1 per token ≥3 char). Gruppo valido con ≥2 articoli e ≥2 keyword condivise. Ordina per numero articoli desc. `useMemo` per la computazione.
-- **Consolidamento multi-merge**: primo selezionato = master (mantiene `id`); nome finale via `normalizeArticleName` ("Usa esistente" o "Inserisci nuovo"); i `missing_items` degli altri puntano al master; gli altri articoli vengono eliminati; snapshot; ricarica e ricalcolo gruppi.
-- **Ignora gruppo**: archiviato lato client (`localStorage`), non ricompare; nessuna modifica a Supabase.
+- **NON raggruppa per categoria/prima parola** (la vecchia logica ammassava tutti i "Vino"/"Gin": scartata 2026-07-21). Confronta i nomi **a coppie** e collega i simili in cluster (union-find). `similarityReason(a,b,categoryWords)` → livello "B":
+  - **identici** a meno di maiuscole/accenti/punteggiatura;
+  - **parole invertite** (stessi token in ordine diverso);
+  - **quasi identici** (edit distance ≤2 e ratio ≥0.8 → refusi);
+  - **contenimento**: un nome è prefisso dell'altro a confine di parola, coda ≤12 char (es. "Barolo"/"Barolo Riserva"), **escluso** se il nome corto è una sola parola-categoria (prima parola presente in ≥3 articoli, es. "vino"/"gin") → evita che una categoria colleghi l'intero catalogo.
+- Etichetta card: "Motivo: …" (i criteri attivati). Ordina per numero articoli desc. `useMemo`.
+- **Consolidamento multi-merge**: invariato. Primo selezionato = master (mantiene `id`); nome finale via `normalizeArticleName`; i `missing_items` degli altri puntano al master; gli altri articoli eliminati; snapshot; ricarica e ricalcolo.
+- **Ignora coppia**: **persistente su DB** (`ignored_pairs`), non solo client. `id` del gruppo = `pair_key` stabile (nomi normalizzati ordinati) → una coppia ignorata **non ricompare mai più**, anche dopo reload o da altri device, e resta stabile se si spostano altri articoli. Caricato all'avvio, upsert su Ignora (ottimistico con rollback se il salvataggio fallisce).
 
 ## Note (lista prodotti auto)
 - Textarea full-screen in **sola lettura**: mostra SEMPRE l'elenco aggiornato di tutti gli articoli dal DB (via `useArticoli`, ordinati per nome), uno per riga. Pronta da copiare/esportare.

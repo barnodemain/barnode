@@ -1,24 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createAndSaveCurrentSnapshot } from '../lib/backupService'
 import { normalizeArticleName } from '../lib/normalize'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { clearMissingCache } from '../lib/missingItemsStore'
 import type { ArticleGroup } from '../lib/analysisGrouping'
-
-const IGNORED_KEY = 'analysis_ignored_group_ids'
-
-function loadIgnoredGroupIds(): Set<string> {
-  if (typeof window === 'undefined') return new Set()
-  try {
-    const raw = window.localStorage.getItem(IGNORED_KEY)
-    if (!raw) return new Set()
-    const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return new Set()
-    return new Set(parsed.map(String))
-  } catch {
-    return new Set()
-  }
-}
 
 export function useConsolidation(fetchArticoli: () => Promise<void>) {
   const [selectedByGroup, setSelectedByGroup] = useState<Record<string, string[]>>({})
@@ -27,7 +12,20 @@ export function useConsolidation(fetchArticoli: () => Promise<void>) {
   const [finalNameInputByGroup, setFinalNameInputByGroup] = useState<Record<string, string>>({})
   const [consolidating, setConsolidating] = useState(false)
   const [consolidationMessage, setConsolidationMessage] = useState<string | null>(null)
-  const [ignoredGroupIds, setIgnoredGroupIds] = useState<Set<string>>(loadIgnoredGroupIds)
+  // Coppie ignorate: caricate dal DB (tabella ignored_pairs), persistenti e cross-device.
+  const [ignoredGroupIds, setIgnoredGroupIds] = useState<Set<string>>(new Set())
+
+  // Carica all'avvio le coppie già ignorate dal DB.
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      if (!isSupabaseConfigured() || !supabase) return
+      const { data, error } = await supabase.from('ignored_pairs').select('pair_key')
+      if (!active || error || !data) return
+      setIgnoredGroupIds(new Set(data.map(r => r.pair_key as string)))
+    })()
+    return () => { active = false }
+  }, [])
 
   const toggleSelected = (groupId: string, articleId: string) => {
     setSelectedByGroup(prev => {
@@ -138,19 +136,31 @@ export function useConsolidation(fetchArticoli: () => Promise<void>) {
     }
   }
 
-  const handleIgnore = (groupId: string) => {
-    setIgnoredGroupIds(prev => {
-      const updated = new Set(prev)
-      updated.add(groupId)
-      if (typeof window !== 'undefined') {
-        try {
-          window.localStorage.setItem(IGNORED_KEY, JSON.stringify(Array.from(updated)))
-        } catch {
-          // Ignora eventuali errori di storage senza bloccare la UI
-        }
-      }
-      return updated
-    })
+  const handleIgnore = async (group: ArticleGroup) => {
+    // Aggiorna subito la UI (ottimistico): il gruppo sparisce.
+    setIgnoredGroupIds(prev => new Set(prev).add(group.id))
+
+    if (!isSupabaseConfigured() || !supabase) return
+
+    // Persiste la coppia nel DB così non verrà mai più riproposta (cross-device).
+    // I due nomi memorizzati sono i primi due del cluster (per riferimento umano);
+    // la chiave `pair_key` = group.id è l'identità stabile.
+    const nameA = group.articles[0]?.nome ?? ''
+    const nameB = group.articles[1]?.nome ?? group.articles[0]?.nome ?? ''
+    const { error } = await supabase
+      .from('ignored_pairs')
+      .upsert({ pair_key: group.id, name_a: nameA, name_b: nameB }, { onConflict: 'pair_key' })
+
+    if (error) {
+      // Se fallisce il salvataggio, annulla l'ottimismo e avvisa.
+      setIgnoredGroupIds(prev => {
+        const updated = new Set(prev)
+        updated.delete(group.id)
+        return updated
+      })
+      setConsolidationMessage(`Errore nel salvare "Ignora": ${error.message}`)
+      setTimeout(() => setConsolidationMessage(null), 3000)
+    }
   }
 
   return {

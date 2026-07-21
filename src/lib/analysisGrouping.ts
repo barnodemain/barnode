@@ -1,59 +1,167 @@
+import { editDistance } from './normalize'
 import type { Articolo } from '../types'
 
 export interface ArticleGroup {
-  id: string
+  id: string          // pairKey stabile: nomi normalizzati ordinati, join "||"
   articles: Articolo[]
-  sharedKeywords: string[]
+  sharedKeywords: string[]  // motivo/i della somiglianza (mostrati come "Parole chiave")
 }
 
-export function getCategory(name: string): string | null {
-  const normalized = name
+/**
+ * Normalizza un nome per il confronto di somiglianza:
+ * minuscole, senza accenti, senza punteggiatura, spazi compattati.
+ */
+export function normalizeForCompare(name: string): string {
+  return name
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-  const firstWord = normalized.split(/\s+/).find(Boolean)
-  return firstWord || null
+    .replace(/[̀-ͯ]/g, '') // via accenti
+    .replace(/[^a-z0-9]+/g, ' ')     // via punteggiatura
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
+function tokensSorted(normalized: string): string {
+  return normalized.split(' ').filter(Boolean).sort().join(' ')
+}
+
+/** Chiave canonica stabile per una coppia/cluster: nomi normalizzati ordinati. */
+export function pairKeyFor(names: string[]): string {
+  return names.map(normalizeForCompare).sort().join('||')
+}
+
+/**
+ * Decide se due nomi sono "simili" secondo il livello B:
+ *  - identici a parte case/accenti/punteggiatura
+ *  - stesse parole in ordine diverso
+ *  - refuso: distanza di edit piccola in rapporto alla lunghezza
+ *  - contenimento: un nome è prefisso dell'altro con poca coda aggiunta
+ *    (es. "Barolo" / "Barolo Riserva"), MA senza collegare una categoria
+ *    generica all'intero catalogo.
+ *
+ * `categoryWords`: prime parole molto frequenti (es. "vino", "gin", "rum").
+ * Se il nome più corto è UNA SOLA di queste parole, il contenimento è
+ * disattivato: "Vino"/"Vino Barolo" NON viene collegato, mentre
+ * "Barolo"/"Barolo Riserva" sì (perché "barolo" non è una categoria frequente).
+ *
+ * Ritorna il motivo (stringa) se simili, altrimenti null.
+ */
+export function similarityReason(
+  a: string,
+  b: string,
+  categoryWords?: Set<string>
+): string | null {
+  const na = normalizeForCompare(a)
+  const nb = normalizeForCompare(b)
+  if (!na || !nb) return null
+  if (na === nb) return 'identici'
+
+  // parole invertite
+  if (tokensSorted(na) === tokensSorted(nb)) return 'parole invertite'
+
+  // refuso: distanza piccola in rapporto alla lunghezza
+  const dist = editDistance(na, nb)
+  const maxLen = Math.max(na.length, nb.length)
+  const ratio = maxLen > 0 ? 1 - dist / maxLen : 0
+  if (dist <= 2 && ratio >= 0.8) return 'quasi identici'
+
+  // contenimento (livello B): uno "dentro" l'altro.
+  // Requisiti anti-rumore: il più corto deve essere sostanziale (>= 4 char),
+  // la coda aggiunta breve (<= 12 char) e a confine di parola.
+  const shorter = na.length <= nb.length ? na : nb
+  const longer = na.length <= nb.length ? nb : na
+  const shorterIsBareCategory =
+    !shorter.includes(' ') && !!categoryWords && categoryWords.has(shorter)
+  if (
+    !shorterIsBareCategory &&
+    shorter.length >= 4 &&
+    longer.startsWith(shorter) &&
+    longer.length - shorter.length <= 12 &&
+    longer.charAt(shorter.length) === ' ' // confine di parola: coda = parola/e intere
+  ) {
+    return 'uno contenuto nell\'altro'
+  }
+
+  return null
+}
+
+/** Prime parole che compaiono in >= 3 articoli: categorie di fatto. */
+function computeCategoryWords(articoli: Articolo[]): Set<string> {
+  const counts = new Map<string, number>()
+  for (const a of articoli) {
+    const first = normalizeForCompare(a.nome).split(' ').filter(Boolean)[0]
+    if (first) counts.set(first, (counts.get(first) || 0) + 1)
+  }
+  const set = new Set<string>()
+  counts.forEach((c, w) => { if (c >= 3) set.add(w) })
+  return set
+}
+
+/**
+ * Trova gruppi di articoli con nomi SIMILI (non per categoria).
+ * Usa union-find: articoli collegati da somiglianza a coppie finiscono
+ * nello stesso cluster (transitività). Ogni cluster con >= 2 articoli
+ * diventa un gruppo con id = pairKey stabile.
+ */
 export function groupArticlesBySharedKeywords(articoli: Articolo[]): ArticleGroup[] {
-  if (articoli.length === 0) return []
+  const n = articoli.length
+  if (n < 2) return []
 
-  // Raggruppa per parola chiave principale (prima parola normalizzata)
-  const categoryMap = new Map<string, Articolo[]>()
-  articoli.forEach(article => {
-    const category = getCategory(article.nome)
-    if (!category) return
-    if (!categoryMap.has(category)) {
-      categoryMap.set(category, [])
+  const categoryWords = computeCategoryWords(articoli)
+
+  const parent = Array.from({ length: n }, (_, i) => i)
+  const find = (x: number): number => {
+    while (parent[x] !== x) {
+      parent[x] = parent[parent[x]]
+      x = parent[x]
     }
-    categoryMap.get(category)!.push(article)
-  })
+    return x
+  }
+  const union = (x: number, y: number) => {
+    const rx = find(x)
+    const ry = find(y)
+    if (rx !== ry) parent[rx] = ry
+  }
 
-  const allGroups: ArticleGroup[] = []
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (similarityReason(articoli[i].nome, articoli[j].nome, categoryWords)) {
+        union(i, j)
+      }
+    }
+  }
 
-  categoryMap.forEach(categoryArticles => {
-    if (categoryArticles.length < 2) return
-    // Tutti gli articoli con la stessa categoria (prima parola) formano un unico gruppo
-    const sortedArticles = [...categoryArticles].sort((a, b) => a.nome.localeCompare(b.nome))
-    const groupIds = sortedArticles.map(a => a.id)
-    // ID di gruppo stabile: insieme di ID ordinati alfabeticamente, indipendente dall'ordine o da rinomini
-    const stableGroupKey = [...groupIds].sort().join('|')
+  // raccogli i cluster
+  const clusters = new Map<number, number[]>()
+  for (let i = 0; i < n; i++) {
+    const r = find(i)
+    if (!clusters.has(r)) clusters.set(r, [])
+    clusters.get(r)!.push(i)
+  }
 
-    allGroups.push({
-      id: stableGroupKey,
-      articles: sortedArticles,
-      sharedKeywords: [getCategory(sortedArticles[0].nome) || '']
+  // ricalcola i motivi per ciascun cluster (solo tra i suoi membri)
+  const groups: ArticleGroup[] = []
+  clusters.forEach(indices => {
+    if (indices.length < 2) return
+    const clusterArticles = indices
+      .map(i => articoli[i])
+      .sort((a, b) => a.nome.localeCompare(b.nome))
+
+    const clusterReasons = new Set<string>()
+    for (let i = 0; i < clusterArticles.length; i++) {
+      for (let j = i + 1; j < clusterArticles.length; j++) {
+        const reason = similarityReason(clusterArticles[i].nome, clusterArticles[j].nome, categoryWords)
+        if (reason) clusterReasons.add(reason)
+      }
+    }
+
+    groups.push({
+      id: pairKeyFor(clusterArticles.map(a => a.nome)),
+      articles: clusterArticles,
+      sharedKeywords: Array.from(clusterReasons),
     })
   })
 
-  // Deduplica globalmente per insieme di articoli
-  const uniqueGroups = new Map<string, ArticleGroup>()
-  allGroups.forEach(group => {
-    const key = group.articles.map(a => a.id).sort().join('|')
-    if (!uniqueGroups.has(key)) {
-      uniqueGroups.set(key, group)
-    }
-  })
-
-  return Array.from(uniqueGroups.values()).sort((a, b) => b.articles.length - a.articles.length)
+  // più articoli prima
+  return groups.sort((a, b) => b.articles.length - a.articles.length)
 }
