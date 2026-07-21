@@ -17,6 +17,9 @@
   --radius-button: 12px;
   --radius-input: 12px;
   --nav-height: 70px;
+  /* altezza totale occupata dalla bottom-nav = barra + safe-area home-bar (0 fuori da PWA-iPhone).
+     Usare questa per FAB e padding-bottom dei contenuti, così nulla resta coperto in PWA. */
+  --nav-total-height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
 }
 
 * {
@@ -133,7 +136,8 @@ ul, ol {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 16px 16px 16px;
+  /* safe-area in fondo per le sotto-pagine in PWA (home-bar iPhone) */
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom, 0px)) 16px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -231,7 +235,8 @@ ul, ol {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-bottom: 80px;
+  /* spazio per la nav + safe-area (in PWA la nav è più alta) */
+  padding-bottom: calc(var(--nav-total-height) + 10px);
 }
 
 .item-card {
@@ -285,7 +290,7 @@ ul, ol {
 
 .fab {
   position: fixed;
-  bottom: calc(var(--nav-height) + 20px);
+  bottom: calc(var(--nav-total-height) + 20px);
   right: 20px;
   width: 56px;
   height: 56px;
@@ -315,11 +320,15 @@ ul, ol {
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--nav-height);
+  /* min-height (non height) + padding-bottom = safe-area: in PWA su iPhone il
+     verde si estende sotto la home-bar; le icone restano nei --nav-height in alto.
+     In browser/Android la safe-area è 0 → nav identica a prima (nessun cambiamento). */
+  min-height: var(--nav-height);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background-color: var(--color-green-dark);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 100;
 }
 
@@ -329,7 +338,7 @@ ul, ol {
   align-items: center;
   width: 100%;
   max-width: 430px;
-  height: 100%;
+  height: var(--nav-height);
   padding: 0 16px;
 }
 
@@ -931,7 +940,7 @@ ul, ol {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
-  padding: 8px 12px calc(var(--nav-height) + 8px) 12px;
+  padding: 8px 12px calc(var(--nav-total-height) + 8px) 12px;
 }
 
 .cocktail-card {
@@ -1088,7 +1097,8 @@ ul, ol {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-yellow-amber);
+  /* ambra scuro: giallo/arancio ben leggibile su fondo bianco */
+  color: #c8860d;
   font-weight: 700;
 }
 .cocktail-garnish-value {
@@ -1103,7 +1113,7 @@ ul, ol {
   overflow-y: auto;
   overflow-x: hidden;
   /* spazio extra in fondo perché il FAB non copra l'ultima card */
-  padding: 8px 16px calc(var(--nav-height) + 88px) 16px;
+  padding: 8px 16px calc(var(--nav-total-height) + 88px) 16px;
 }
 .prep-group { margin-bottom: 18px; }
 .prep-group-title {
