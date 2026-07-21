@@ -1,0 +1,437 @@
+{
+  "cocktails": [
+    {
+      "nome": "Amandoti",
+      "bicchiere": "Coppa martini vintage",
+      "ghiaccio": "",
+      "metodo": "Shake and fine strain, top up gently stir",
+      "garnish": "Amarena Fabbri, polvere dorata",
+      "ingredienti": [
+        { "nome": "Gin Fabbri", "misura": "1", "unita": "oz" },
+        { "nome": "Noily prat dry vermouth", "misura": "1", "unita": "oz" },
+        { "nome": "Shrub alla pesca bianca home made", "misura": "1 1/2", "unita": "oz" },
+        { "nome": "Franciacorta", "misura": "top", "unita": "oz" }
+      ]
+    },
+    {
+      "nome": "Rihad",
+      "bicchiere": "Highball Bormioli",
+      "ghiaccio": "Chunck",
+      "metodo": "Build, stir, top",
+      "garnish": "Tondino pompelmo",
+      "ingredienti": [
+        { "nome": "Grey Goose allo zafferano", "misura": "1 1/4", "unita": "oz" },
+        { "nome": "Italicus", "misura": "1/2", "unita": "oz" },
+        { "nome": "Liquore quaglia zafferano", "misura": "1/2", "unita": "oz" },
+        { "nome": "Soda home made pompelmo e timo", "misura": "top", "unita": "up" },
+        { "nome": "Essenza di timo", "misura": "2", "unita": "sprz" }
+      ]
+    },
+    {
+      "nome": "Piper",
+      "bicchiere": "Highball \"Jazz\"",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Build, top up, stir spray",
+      "garnish": "Aria sapida di st Germain, pepe rosa",
+      "ingredienti": [
+        { "nome": "Bombay dry gin", "misura": "1 1/2", "unita": "oz" },
+        { "nome": "St Germain", "misura": "1/4", "unita": "oz" },
+        { "nome": "Cordiale alla salvia", "misura": "1", "unita": "oz" },
+        { "nome": "Assenzio", "misura": "4", "unita": "dash" },
+        { "nome": "Essenza di salvia", "misura": "2", "unita": "sprz" },
+        { "nome": "Soda home made", "misura": "top", "unita": "up" }
+      ]
+    },
+    {
+      "nome": "Club Margarita",
+      "bicchiere": "Rocks",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Shake and fine strain",
+      "garnish": "Fili peperoncino essiccato",
+      "ingredienti": [
+        { "nome": "Tequila", "misura": "1 3/4", "unita": "oz" },
+        { "nome": "Mezcal", "misura": "1/2", "unita": "oz" },
+        { "nome": "Sciroppo di jalapeno", "misura": "1/2", "unita": "oz" },
+        { "nome": "Succo di limone", "misura": "1", "unita": "oz" },
+        { "nome": "Albume", "misura": "1/4", "unita": "oz" }
+      ]
+    },
+    {
+      "nome": "G-zest",
+      "bicchiere": "Rocks",
+      "ghiaccio": "Ghiaccio trito",
+      "metodo": "Muddle, build",
+      "garnish": "Rondella di lime essiccato, fiori edibili",
+      "ingredienti": [
+        { "nome": "Gin", "misura": "2", "unita": "oz" },
+        { "nome": "Succo di limone", "misura": "1", "unita": "oz" },
+        { "nome": "Zucchero", "misura": "1", "unita": "spoon" },
+        { "nome": "Zenzero fresco", "misura": "3", "unita": "pz" }
+      ]
+    },
+    {
+      "nome": "Negroni Hotel",
+      "bicchiere": "Rocks nude",
+      "ghiaccio": "Cubo grande",
+      "metodo": "3 oz di pre-batch, stir",
+      "garnish": "Aria di mezcal su rondella di lime essiccato",
+      "ingredienti": [
+        { "nome": "Bombay dry gin", "misura": "30", "unita": "ml" },
+        { "nome": "Martini rubino riserva", "misura": "30", "unita": "ml" },
+        { "nome": "Martini Bitter riserva", "misura": "23", "unita": "ml" },
+        { "nome": "Alipus mezcal", "misura": "7", "unita": "ml" },
+        { "nome": "Don Zolio 15 Years", "misura": "10", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "La grande bellezza",
+      "bicchiere": "Coppetta",
+      "ghiaccio": "",
+      "metodo": "Build, top up",
+      "garnish": "Amarena fabbri con stecchino perla",
+      "ingredienti": [
+        { "nome": "Creme de mure", "misura": "3/4", "unita": "oz" },
+        { "nome": "Cognac VSOP", "misura": "1/4", "unita": "oz" },
+        { "nome": "Champagne", "misura": "top", "unita": "up" }
+      ]
+    },
+    {
+      "nome": "1920",
+      "bicchiere": "Rocks \"jazz\"",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Shake and strain, float",
+      "garnish": "Peel di arancio",
+      "ingredienti": [
+        { "nome": "Vodka Grey goose", "misura": "1 3/4", "unita": "oz" },
+        { "nome": "Succo limone", "misura": "1", "unita": "oz" },
+        { "nome": "Zucchero", "misura": "3/4", "unita": "oz" },
+        { "nome": "Porto Ruby Fonseca", "misura": "top", "unita": "up" }
+      ]
+    },
+    {
+      "nome": "Pacha",
+      "bicchiere": "Highball \"jazz\"",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Shake and fine strain",
+      "garnish": "Ciuffo di menta",
+      "ingredienti": [
+        { "nome": "Bacardi Blanco", "misura": "1 1/2", "unita": "oz" },
+        { "nome": "Martini bitter", "misura": "1/2", "unita": "oz" },
+        { "nome": "Wray &Nephew overproof rum", "misura": "1/2", "unita": "oz" },
+        { "nome": "Vetiver Gris", "misura": "3/4", "unita": "oz" },
+        { "nome": "Succo limone", "misura": "1", "unita": "oz" },
+        { "nome": "Succo ananas", "misura": "3/4", "unita": "oz" },
+        { "nome": "Passion fruit", "misura": "3/4", "unita": "oz" },
+        { "nome": "Orzata", "misura": "1/2", "unita": "oz" },
+        { "nome": "Angostura bitter", "misura": "2", "unita": "dash" }
+      ]
+    },
+    {
+      "nome": "Manis",
+      "bicchiere": "Rocks nude",
+      "ghiaccio": "Cubo grande",
+      "metodo": "Shake and fine strain",
+      "garnish": "3 ribes, polvere dorata",
+      "ingredienti": [
+        { "nome": "Bourbon", "misura": "1 1/2", "unita": "oz" },
+        { "nome": "Purea al mango", "misura": "2", "unita": "oz" },
+        { "nome": "Creme de menthe blanche", "misura": "1/4", "unita": "oz" },
+        { "nome": "Adriatico latte di mandorla", "misura": "1/4", "unita": "oz" },
+        { "nome": "Limone", "misura": "1/2", "unita": "oz" },
+        { "nome": "Zucchero", "misura": "1/4", "unita": "oz" }
+      ]
+    },
+    {
+      "nome": "Fujian",
+      "bicchiere": "Highball Bormioli",
+      "ghiaccio": "Chunk",
+      "metodo": "Pre-batch lasciare in infusione per 20 min. Versare 3 1/2 di pre-batch nello shaker. Shake and fine strain, top up",
+      "garnish": "Rim con Zucchero aromatizzato agli agrumi",
+      "ingredienti": [
+        { "nome": "Sangiovese", "misura": "1", "unita": "oz" },
+        { "nome": "Vermouth rosso", "misura": "1", "unita": "oz" },
+        { "nome": "Ratafià fabbri", "misura": "3/4", "unita": "oz" },
+        { "nome": "Cointreau", "misura": "1/2", "unita": "oz" },
+        { "nome": "Gin", "misura": "1/2", "unita": "oz" },
+        { "nome": "Amaro Nardini", "misura": "10", "unita": "ml" },
+        { "nome": "Peychaud bitter", "misura": "2", "unita": "dash" },
+        { "nome": "Tè nero lapsang", "misura": "23/25", "unita": "g" },
+        { "nome": "Limonata san pellegrino", "misura": "top", "unita": "up" }
+      ]
+    },
+    {
+      "nome": "Espresso nut-ini",
+      "bicchiere": "Coppetta martini",
+      "ghiaccio": "",
+      "metodo": "Shake and fine strain",
+      "garnish": "Grattugiata di nocciola e polvere di caffè",
+      "ingredienti": [
+        { "nome": "Grappa barricata Nardini", "misura": "3/4", "unita": "oz" },
+        { "nome": "Frangelico", "misura": "1", "unita": "oz" },
+        { "nome": "Caffè espresso", "misura": "1", "unita": "Norm" },
+        { "nome": "Albume", "misura": "1/4", "unita": "oz" }
+      ]
+    },
+    {
+      "nome": "Vintage spritz",
+      "bicchiere": "Highball Bormioli",
+      "ghiaccio": "",
+      "metodo": "Base spritz + 80 ml prebatch",
+      "garnish": "Arancia essiccata",
+      "ingredienti": [
+        { "nome": "Soda", "misura": "", "unita": "" },
+        { "nome": "Prosecco", "misura": "", "unita": "" },
+        { "nome": "Vintage", "misura": "80", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "ZERO",
+      "bicchiere": "",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Versare 800ml nel Twist & Soda e caricare con una bombola di CO2",
+      "garnish": "Grattugiata di fava tonka, mela essiccata",
+      "ingredienti": [
+        { "nome": "Acqua", "misura": "5", "unita": "L" },
+        { "nome": "Foglie Moringa", "misura": "100", "unita": "g" },
+        { "nome": "Estratto di mela", "misura": "1", "unita": "L" },
+        { "nome": "Succo di limone", "misura": "200", "unita": "ml" },
+        { "nome": "Estratto di vaniglia", "misura": "2", "unita": "boccette" },
+        { "nome": "Acido citrico", "misura": "8", "unita": "g" },
+        { "nome": "Stevia misura", "misura": "25", "unita": "g" },
+        { "nome": "Fava tonka", "misura": "", "unita": "" }
+      ]
+    },
+    {
+      "nome": "Mate",
+      "bicchiere": "",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Shake and fine strain, top",
+      "garnish": "Rim di mate",
+      "ingredienti": [
+        { "nome": "Yerba mate", "misura": "2 1/2", "unita": "oz" },
+        { "nome": "Succo limone", "misura": "1", "unita": "oz" },
+        { "nome": "Agave", "misura": "1/2", "unita": "oz" },
+        { "nome": "Foglie menta", "misura": "6", "unita": "" },
+        { "nome": "Scorza lime", "misura": "2", "unita": "" },
+        { "nome": "Pizzico sale o soluzione", "misura": "1", "unita": "" },
+        { "nome": "Soda al melograno", "misura": "Top", "unita": "up" }
+      ]
+    },
+    {
+      "nome": "Skin-care",
+      "bicchiere": "",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Shake and fine strain, top up",
+      "garnish": "Foglia di Basilico",
+      "ingredienti": [
+        { "nome": "Acqua di cocco", "misura": "100", "unita": "ml" },
+        { "nome": "Estratto di cetriolo", "misura": "20", "unita": "ml" },
+        { "nome": "Estratto di basilico", "misura": "6", "unita": "dash" },
+        { "nome": "Estratto di zenzero", "misura": "12", "unita": "dash" },
+        { "nome": "Succo di limone", "misura": "1/2", "unita": "oz" },
+        { "nome": "Agave", "misura": "1/4", "unita": "oz" },
+        { "nome": "Ginger beer", "misura": "top", "unita": "Up" },
+        { "nome": "Collagene", "misura": "1", "unita": "teasp" }
+      ]
+    },
+    {
+      "nome": "Unforgettable",
+      "bicchiere": "",
+      "ghiaccio": "Ghiaccio a cubi",
+      "metodo": "Build",
+      "garnish": "Pennellata di miele verde",
+      "ingredienti": [
+        { "nome": "Cordiale anguria", "misura": "1 3/4", "unita": "oz" },
+        { "nome": "Succo lime", "misura": "3/4", "unita": "oz" },
+        { "nome": "Orzata", "misura": "1/2", "unita": "oz" },
+        { "nome": "Soluzione salina", "misura": "3", "unita": "drop" },
+        { "nome": "Soda pepe Sichuan verde", "misura": "up", "unita": "up" }
+      ]
+    }
+  ],
+  "preparations": [
+    {
+      "nome": "Succo limone",
+      "categoria": "sciroppo",
+      "procedimento": "Rapporto 3:1",
+      "ingredienti": [
+        { "nome": "Limone", "misura": "1500", "unita": "ml" },
+        { "nome": "Lime", "misura": "500", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Zucchero liquido",
+      "categoria": "sciroppo",
+      "procedimento": "Far sciogliere lo zucchero senza portarlo a ebollizione",
+      "ingredienti": [
+        { "nome": "Acqua", "misura": "2", "unita": "L" },
+        { "nome": "Zucchero semolato", "misura": "4", "unita": "kg" }
+      ]
+    },
+    {
+      "nome": "Aria di st germain",
+      "categoria": "aria",
+      "procedimento": "Versare tutti gli ingredienti nel bicchiere St Germain, omogeneizzarli con il montino elettrico, \"montare\" il composto con l'ossigenatore, lasciare riposare ca. 2 min, montare nuovamente",
+      "ingredienti": [
+        { "nome": "St Germain", "misura": "1 3/4", "unita": "oz" },
+        { "nome": "Succo limone", "misura": "3/4", "unita": "oz" },
+        { "nome": "Zucchero", "misura": "1/4", "unita": "oz scarso" },
+        { "nome": "Sale", "misura": "1", "unita": "teasp" },
+        { "nome": "Sucrestere", "misura": "1", "unita": "g" }
+      ]
+    },
+    {
+      "nome": "Aria di mezcal",
+      "categoria": "aria",
+      "procedimento": "Versare tutti gli ingredienti in un highball, omogeneizzarli con il montino elettrico, \"montare\" il composto con l'ossigenatore, lasciare riposare ca. 2 min, montare nuovamente",
+      "ingredienti": [
+        { "nome": "Mezcal", "misura": "2", "unita": "oz" },
+        { "nome": "Succo limone", "misura": "1", "unita": "oz" },
+        { "nome": "Zucchero", "misura": "1/4", "unita": "oz" },
+        { "nome": "Sucrestere", "misura": "0,5", "unita": "g" }
+      ]
+    },
+    {
+      "nome": "Soda al pepe rosa homemade",
+      "categoria": "soda",
+      "procedimento": "Frullare acqua + pepe bene e poi filtrare bene bene con 100 micron fino a che non scende facilmente",
+      "ingredienti": [
+        { "nome": "Acqua", "misura": "1", "unita": "L" },
+        { "nome": "Pepe rosa", "misura": "100", "unita": "ml" },
+        { "nome": "Zucchero liquido", "misura": "30", "unita": "ml" },
+        { "nome": "Limone", "misura": "40", "unita": "ml" },
+        { "nome": "Colorante rosa", "misura": "q.b.", "unita": "" }
+      ]
+    },
+    {
+      "nome": "Soda al pompelmo rosa e timo homade",
+      "categoria": "soda",
+      "procedimento": "Spremere succo di pompelmo. Filtrare bene succo con 100 micron. Unire gli ingredienti al succo di pompelmo.",
+      "ingredienti": [
+        { "nome": "Succo di pompelmo fresco", "misura": "700", "unita": "ml" },
+        { "nome": "Acqua", "misura": "230", "unita": "ml" },
+        { "nome": "Zucchero liquido", "misura": "70", "unita": "ml" },
+        { "nome": "Essenza di timo", "misura": "15", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Soda al melograno",
+      "categoria": "soda",
+      "procedimento": "Togliere tutti i grani del melograno e frullarli insieme ad acqua, filtrare tutto con 100 micron e aggiungere il resto degli ingredienti",
+      "ingredienti": [
+        { "nome": "Melograni", "misura": "3", "unita": "pz" },
+        { "nome": "Succo melograni", "misura": "700", "unita": "ml" },
+        { "nome": "Acqua", "misura": "300", "unita": "ml" },
+        { "nome": "Limone", "misura": "50", "unita": "ml" },
+        { "nome": "Zucchero liquido", "misura": "100", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Soda al pepe di Sichuan",
+      "categoria": "soda",
+      "procedimento": "Tostare il pepe per 2 min in padella. Frullare insieme all'acqua. Filtrare bene bene con 100 micron fino a che non scende facilmente",
+      "ingredienti": [
+        { "nome": "Pepe Sichuan", "misura": "15", "unita": "g" },
+        { "nome": "Acqua", "misura": "1", "unita": "L" },
+        { "nome": "Limone", "misura": "40", "unita": "ml" },
+        { "nome": "Zucchero", "misura": "30", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Shrub alla pesca bianca",
+      "categoria": "shrub",
+      "procedimento": "Metti tutto nel pentolino e lo porti circa a 75 gradi, una volta che è a 75 lo lasci così per circa 10min controllando che la temperatura non vada assolutamente sopra I 78 e che non scenda sotto I 70. Poi lo spegni e lo filtri subito e lo lasci raffreddare da solo. Una volta \"tiepido\" lo passi nel colino grande a conico con il pestello",
+      "ingredienti": [
+        { "nome": "Purea pesca ponthier", "misura": "700", "unita": "g" },
+        { "nome": "Aceto di mele", "misura": "300", "unita": "g" },
+        { "nome": "Zucchero semolato", "misura": "260", "unita": "g" },
+        { "nome": "Acido citrico", "misura": "1", "unita": "g" }
+      ]
+    },
+    {
+      "nome": "Yerba mate",
+      "categoria": "infusione",
+      "procedimento": "Scaldare un po' l'Acqua e lasciare in infusione per min",
+      "ingredienti": [
+        { "nome": "Yerba", "misura": "75", "unita": "g" },
+        { "nome": "Acqua", "misura": "1", "unita": "L" }
+      ]
+    },
+    {
+      "nome": "Estratto cetriolo",
+      "categoria": "estratto",
+      "procedimento": "Lavare i cetrioli e tagliarli a pezzettini e usare estrattore (dovrebbero venire fuori 550 ml di estratto), aggiungere la vodka (per aumentare il periodo di conservazione) il volume di alcool deve stare sotto il 5% vol. Succo limone sempre per la conservazione",
+      "ingredienti": [
+        { "nome": "Cetrioli", "misura": "5", "unita": "" },
+        { "nome": "Vodka", "misura": "65", "unita": "ml" },
+        { "nome": "Succo limone", "misura": "10", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Estratto zenzero",
+      "categoria": "estratto",
+      "procedimento": "Estrarre zenzero e filtrare bene, aggiungere la vodka",
+      "ingredienti": [
+        { "nome": "Estratto di zenzero", "misura": "150", "unita": "ml" },
+        { "nome": "Vodka", "misura": "20", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Estratto basilico",
+      "categoria": "estratto",
+      "procedimento": "Fare il calcolo e aggiungere la vodka in base a quanto estratto si ottiene",
+      "ingredienti": [
+        { "nome": "Basilico", "misura": "/", "unita": "ml" },
+        { "nome": "Vodka", "misura": "/", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Prebatch Vintage",
+      "categoria": "prebatch",
+      "procedimento": "Soluzione citrica: 1 L + 60 gr acido citrico",
+      "ingredienti": [
+        { "nome": "Aperitivo audere", "misura": "550", "unita": "ml" },
+        { "nome": "Bitter furium", "misura": "250", "unita": "ml" },
+        { "nome": "Succo di limone", "misura": "120", "unita": "ml" },
+        { "nome": "Sciroppo di zucchero", "misura": "100", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Pre-batch zero",
+      "categoria": "prebatch",
+      "procedimento": "- Scaldare i 5 L d'acqua e portarlo a bollore\n- Spegnere il fuoco e mettere le foglie di moringa\n- Lasciare in infusione mentre raffredda\n- Filtrare bene con 100 micron 2 o tre volte\n- Aggiungere estratto di mela, stevia, vaniglia, acido citrico, limone",
+      "ingredienti": []
+    },
+    {
+      "nome": "Vodka zafferano",
+      "categoria": "infusione",
+      "procedimento": "Mettere i fili nella bottiglia e lasciare per qualche ora, filtrare prima dell'uso",
+      "ingredienti": [
+        { "nome": "Grey goose", "misura": "1", "unita": "Bottiglia" },
+        { "nome": "Zafferano", "misura": "5/6", "unita": "filini" }
+      ]
+    },
+    {
+      "nome": "Cordiale salvia",
+      "categoria": "cordiale",
+      "procedimento": "Omogeneizzare gli ingredienti",
+      "ingredienti": [
+        { "nome": "Zucchero liquido", "misura": "250", "unita": "ml" },
+        { "nome": "Succo di limone", "misura": "250", "unita": "ml" },
+        { "nome": "Essenza di salvia", "misura": "7", "unita": "ml" }
+      ]
+    },
+    {
+      "nome": "Cordiale anguria e lime",
+      "categoria": "cordiale",
+      "procedimento": "Frullare tutto e filtrare con colino cinese",
+      "ingredienti": [
+        { "nome": "Anguria", "misura": "300", "unita": "g" },
+        { "nome": "Zucchero", "misura": "200", "unita": "g" },
+        { "nome": "Zest di lime", "misura": "20", "unita": "g" },
+        { "nome": "Acqua", "misura": "100", "unita": "ml" },
+        { "nome": "Sciroppo anguria", "misura": "30", "unita": "ml" }
+      ]
+    }
+  ]
+}
