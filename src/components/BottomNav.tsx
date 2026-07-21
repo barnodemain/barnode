@@ -59,7 +59,7 @@ function BottomNav() {
             onClick={handleSettingsClick}
           >
             <IoSettingsOutline className="nav-icon" />
-            <span className="nav-label">Impostazioni</span>
+            <span className="nav-label">Admin</span>
           </button>
         </div>
       </nav>

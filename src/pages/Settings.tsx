@@ -31,7 +31,7 @@ function Settings() {
       <div className="page-header-fixed">
         <div className="page-header">
           <img src="/logo.png" alt="BARnode" className="logo" />
-          <h1 className="page-title">Impostazioni</h1>
+          <h1 className="page-title">Admin</h1>
         </div>
       </div>
 

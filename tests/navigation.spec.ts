@@ -35,7 +35,7 @@ test('Bottom nav: naviga tra Home e Archivio', async ({ page }) => {
 
 test('Settings è protetto da PIN (tastierino richiesto)', async ({ page }) => {
   await page.goto('/')
-  await page.getByText('Impostazioni', { exact: true }).click()
+  await page.getByText('Admin', { exact: true }).click()
   // senza PIN sbloccato deve apparire il tastierino, non la pagina settings
   // (verifica che NON siamo entrati direttamente nelle impostazioni complete)
   await expect(page.locator('body')).toBeVisible()
