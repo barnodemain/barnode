@@ -89,6 +89,12 @@ ul, ol {
   position: relative;
 }
 
+/* Archivio: sfondo più scuro rispetto alle altre pagine */
+.page-wrapper-archivio,
+.page-wrapper-archivio .page-header-fixed {
+  background-color: #e6e3c3;
+}
+
 .page-header-fixed {
   position: relative;
   flex-shrink: 0;
@@ -482,7 +488,7 @@ ul, ol {
 }
 
 .settings-big-button {
-  width: 100%;
+  width: 84%;
   min-height: 56px;
   padding: 16px 20px;
   border-radius: 12px;

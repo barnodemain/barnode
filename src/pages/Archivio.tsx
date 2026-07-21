@@ -87,7 +87,7 @@ function Archivio() {
   }
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper page-wrapper-archivio">
       <div className="page-header-fixed">
         <ShareWhatsAppButton />
         <div className="page-header">

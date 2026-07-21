@@ -36,7 +36,7 @@ function Settings() {
       </div>
 
       <div className="page-content-scrollable">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '80px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', paddingBottom: '80px' }}>
           <button
             className="settings-big-button settings-big-button-primary"
             onClick={() => navigate('/settings/import/text')}
