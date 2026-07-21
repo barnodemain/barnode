@@ -36,14 +36,14 @@ function Settings() {
       </div>
 
       <div className="page-content-scrollable">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '80px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '80px' }}>
           <button
             className="settings-big-button settings-big-button-primary"
             onClick={() => navigate('/settings/import/text')}
           >
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <IoDocumentTextOutline size={32} />
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>IMPORTA</span>
+              <IoDocumentTextOutline size={22} />
+              <span style={{ fontSize: '16px', fontWeight: '600' }}>IMPORTA</span>
             </span>
           </button>
           <button
@@ -51,8 +51,8 @@ function Settings() {
             onClick={() => navigate('/settings/backup')}
           >
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <IoCopyOutline size={32} />
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>BACKUP</span>
+              <IoCopyOutline size={22} />
+              <span style={{ fontSize: '16px', fontWeight: '600' }}>BACKUP</span>
             </span>
           </button>
 
@@ -61,8 +61,8 @@ function Settings() {
             onClick={() => navigate('/settings/analysis')}
           >
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <IoAnalyticsOutline size={32} />
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>ANALYSIS</span>
+              <IoAnalyticsOutline size={22} />
+              <span style={{ fontSize: '16px', fontWeight: '600' }}>ANALYSIS</span>
             </span>
           </button>
 
@@ -73,8 +73,8 @@ function Settings() {
             disabled={loading}
           >
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <IoShareOutline size={32} />
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>ESPORTA ARTICOLI</span>
+              <IoShareOutline size={22} />
+              <span style={{ fontSize: '16px', fontWeight: '600' }}>ESPORTA ARTICOLI</span>
             </span>
           </button>
 
@@ -84,8 +84,8 @@ function Settings() {
             onClick={() => navigate('/settings/notes')}
           >
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <IoDocumentTextOutline size={32} />
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>NOTE</span>
+              <IoDocumentTextOutline size={22} />
+              <span style={{ fontSize: '16px', fontWeight: '600' }}>NOTE</span>
             </span>
           </button>
         </div>
