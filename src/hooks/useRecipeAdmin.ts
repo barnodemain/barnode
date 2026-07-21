@@ -37,7 +37,8 @@ export function useRecipeAdmin() {
   }
 
   // --- COCKTAIL ---
-  async function saveCocktail(input: CocktailInput, existing?: Cocktail): Promise<boolean> {
+  // Ritorna l'id del cocktail salvato (per portarlo in vista dopo il salvataggio), null se errore.
+  async function saveCocktail(input: CocktailInput, existing?: Cocktail): Promise<string | null> {
     setSaving(true); setError(null)
     try {
       const sb = ensure()
@@ -77,10 +78,10 @@ export function useRecipeAdmin() {
         if (ie) throw ie
       }
       clearRecipesCache()
-      return true
+      return cocktailId
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore salvataggio cocktail')
-      return false
+      return null
     } finally {
       setSaving(false)
     }

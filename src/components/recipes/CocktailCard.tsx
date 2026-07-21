@@ -13,7 +13,7 @@ interface Props {
 function CocktailCard({ cocktail, prepById, onOpenPreparation, onEdit }: Props) {
   const c = cocktail
   return (
-    <div className="cocktail-card">
+    <div className="cocktail-card" data-cocktail-id={c.id}>
       <div className="cocktail-card-inner">
         {onEdit && (
           <button className="cocktail-edit-btn" onClick={() => onEdit(c)} aria-label="Modifica cocktail" type="button">

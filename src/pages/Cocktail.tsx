@@ -15,6 +15,19 @@ function Cocktail() {
   const [tab, setTab] = useState<Tab>('cocktail')
   const [query, setQuery] = useState('')
   const forms = useRef<RecipeFormsHandle>(null)
+  // id del cocktail su cui portare la vista dopo un salvataggio
+  const [scrollToId, setScrollToId] = useState<string | null>(null)
+
+  // dopo il salvataggio di un cocktail: ricarica, mostra il tab cocktail,
+  // pulisce la ricerca (così la scheda è nella lista) e la porta in vista
+  const handleSaved = async (savedCocktailId?: string) => {
+    await fetchRecipes()
+    if (savedCocktailId) {
+      setTab('cocktail')
+      setQuery('')
+      setScrollToId(savedCocktailId)
+    }
+  }
 
   const q = normalizeForCompare(query)
 
@@ -83,6 +96,8 @@ function Cocktail() {
           prepById={prepById}
           onEditCocktail={c => forms.current?.openCocktail(c)}
           onEditPreparation={p => forms.current?.openPrep(p)}
+          scrollToId={scrollToId}
+          onScrolled={() => setScrollToId(null)}
         />
       ) : (
         <PreparationsList
@@ -99,7 +114,7 @@ function Cocktail() {
         <IoAddOutline size={28} />
       </button>
 
-      <RecipeForms ref={forms} onSaved={fetchRecipes} />
+      <RecipeForms ref={forms} onSaved={handleSaved} preparations={preparations} />
     </div>
   )
 }

@@ -925,16 +925,19 @@ ul, ol {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  /* proximity (non mandatory): scroll libero e fluido, aggancia in modo morbido
+     alla scheda solo quando ci si ferma vicino → sensazione mobile standard */
+  scroll-snap-type: y proximity;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
   padding: 8px 12px calc(var(--nav-height) + 8px) 12px;
 }
 
 .cocktail-card {
   scroll-snap-align: start;
-  scroll-snap-stop: always;
   /* La scheda si adatta al contenuto (niente vuoto sotto per drink corti),
-     ma ha un minimo per drink brevissimi. Lo snap resta comodo. */
+     ma ha un minimo per drink brevissimi. */
   min-height: min(100%, 320px);
   display: flex;
   margin-bottom: 12px;
@@ -1230,7 +1233,7 @@ ul, ol {
    sfruttare lo schermo su telefoni medi/grandi, restando comodo. Su telefoni
    stretti prende quasi tutta la larghezza (margini ridotti via overlay :has). */
 .recipe-form {
-  max-height: 90vh;
+  max-height: 82vh;
   overflow-y: auto;
   text-align: left;
   width: 100%;
@@ -1330,12 +1333,18 @@ ul, ol {
   border-radius: 8px;
 }
 .ing-editor-del:active { background: rgba(192, 74, 74, 0.1); }
+/* i due bottoni "+ Ingrediente" e "+ Preparazione" affiancati, larghi uguali */
+.ing-editor-add-row {
+  display: flex;
+  gap: 8px;
+}
 .ing-editor-add {
+  flex: 1 1 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  padding: 8px 12px;
+  justify-content: center;
+  gap: 4px;
+  padding: 9px 8px;
   border: 1px dashed var(--color-green-light);
   background: transparent;
   color: var(--color-green-dark);
@@ -1343,4 +1352,56 @@ ul, ol {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+.ing-editor-add:active { background: var(--color-cream); }
+/* "Preparazione": riempito leggero per distinguerlo dall'ingrediente */
+.ing-editor-add-prep {
+  background: var(--color-green-light);
+  border-color: var(--color-green-light);
+  color: var(--color-white);
+}
+.ing-editor-add-prep:active { background: var(--color-green-dark); }
+
+/* Selettore preparazioni (bottom-sheet dentro il form cocktail).
+   Eredita .sheet-overlay (z-index 1000) → appare sopra il modale del form. */
+.prep-picker-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-green-dark);
+  margin-bottom: 12px;
+  padding-right: 40px;
+}
+.prep-picker-search { margin-bottom: 12px; }
+.prep-picker-search .search-input { padding-left: 14px; }
+.prep-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.prep-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-light);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+.prep-picker-item:active { background: var(--color-cream); }
+.prep-picker-item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.prep-picker-empty {
+  text-align: center;
+  color: var(--color-text-light);
+  font-size: 14px;
+  padding: 20px;
 }

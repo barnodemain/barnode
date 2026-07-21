@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { LuPencilLine } from 'react-icons/lu'
 import CocktailCard from './CocktailCard'
@@ -10,10 +10,22 @@ interface Props {
   prepById: Map<string, Preparation>
   onEditCocktail?: (cocktail: Cocktail) => void
   onEditPreparation?: (prep: Preparation) => void
+  // id del cocktail da portare in vista (es. dopo un salvataggio); onScrolled resetta
+  scrollToId?: string | null
+  onScrolled?: () => void
 }
 
-function CocktailDeck({ cocktails, prepById, onEditCocktail, onEditPreparation }: Props) {
+function CocktailDeck({ cocktails, prepById, onEditCocktail, onEditPreparation, scrollToId, onScrolled }: Props) {
   const [openPrep, setOpenPrep] = useState<Preparation | null>(null)
+  const deckRef = useRef<HTMLDivElement>(null)
+
+  // porta in vista la scheda del cocktail appena salvato
+  useEffect(() => {
+    if (!scrollToId || !deckRef.current) return
+    const card = deckRef.current.querySelector<HTMLElement>(`[data-cocktail-id="${scrollToId}"]`)
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    onScrolled?.()
+  }, [scrollToId, cocktails, onScrolled])
 
   if (cocktails.length === 0) {
     return (
@@ -26,7 +38,7 @@ function CocktailDeck({ cocktails, prepById, onEditCocktail, onEditPreparation }
 
   return (
     <>
-      <div className="cocktail-deck">
+      <div className="cocktail-deck" ref={deckRef}>
         {cocktails.map(c => (
           <CocktailCard
             key={c.id}

@@ -76,7 +76,7 @@ function RecipeAdmin() {
         <IoAddOutline size={28} />
       </button>
 
-      <RecipeForms ref={forms} onSaved={fetchRecipes} />
+      <RecipeForms ref={forms} onSaved={fetchRecipes} preparations={preparations} />
 
       <ConfirmationDialog
         isOpen={toDelete !== null}

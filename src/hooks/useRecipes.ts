@@ -65,7 +65,8 @@ export function useRecipes() {
         supabase
           .from('cocktails')
           .select('id,nome,bicchiere,ghiaccio,metodo,garnish,note,sort_order,cocktail_ingredients(id,nome,misura,unita,preparation_id,sort_order)')
-          .order('sort_order', { ascending: true }),
+          // cocktail sempre in ordine alfabetico per nome
+          .order('nome', { ascending: true }),
         supabase
           .from('preparations')
           .select('id,nome,categoria,procedimento,note,sort_order,preparation_ingredients(id,nome,misura,unita,sort_order)')
@@ -86,6 +87,8 @@ export function useRecipes() {
         sortOrder: (c.sort_order as number) ?? 0,
         ingredienti: mapIng(c.cocktail_ingredients as IngRow[]),
       }))
+        // ordine alfabetico "umano" (ignora maiuscole/accenti)
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'it', { sensitivity: 'base' }))
 
       preparationsCache = (pData || []).map((p: Record<string, unknown>) => ({
         id: p.id as string,

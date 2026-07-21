@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState, useRef } from 'react'
 import { IoTrashOutline } from 'react-icons/io5'
 import { useRecipeAdmin } from '../../hooks/useRecipeAdmin'
 import type { EditableIngredient } from '../../hooks/useRecipeAdmin'
@@ -15,12 +15,15 @@ export interface RecipeFormsHandle {
 }
 
 interface Props {
-  onSaved: () => void | Promise<void>
+  // savedCocktailId: id del cocktail appena salvato, per portarlo in vista nel deck (undefined per le preparazioni)
+  onSaved: (savedCocktailId?: string) => void | Promise<void>
+  // preparazioni disponibili: abilitano il collegamento ingrediente→preparazione nel form cocktail
+  preparations?: Preparation[]
 }
 
 // Form condivisi (cocktail + preparazione) con CRUD completo.
 // Usato sia dalla pagina Cocktail (barman) sia da Admin → Ricettario.
-const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved }, ref) => {
+const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparations }, ref) => {
   const admin = useRecipeAdmin()
 
   const [editCocktail, setEditCocktail] = useState<Cocktail | null | 'new'>(null)
@@ -33,35 +36,71 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved }, ref) => {
 
   // conferma eliminazione (coerente con l'app, non confirm nativo)
   const [confirmDelete, setConfirmDelete] = useState<null | 'cocktail' | 'prep'>(null)
+  // conferma "uscire senza salvare" quando ci sono modifiche non salvate
+  const [confirmDiscard, setConfirmDiscard] = useState<null | 'cocktail' | 'prep'>(null)
+
+  // snapshot dei valori all'apertura del form: serve a capire se l'utente ha modificato qualcosa
+  const cSnapshot = useRef('')
+  const pSnapshot = useRef('')
+  const snapCocktail = (form: typeof cForm, ings: EditableIngredient[]) => JSON.stringify({ form, ings })
+  const snapPrep = (form: typeof pForm, ings: EditableIngredient[]) => JSON.stringify({ form, ings })
 
   const openCocktail = (c: Cocktail | 'new') => {
+    let form, ings: EditableIngredient[]
     if (c === 'new') {
-      setCForm({ nome: '', bicchiere: '', ghiaccio: '', metodo: '', garnish: '' })
-      setCIngs([{ nome: '', misura: '', unita: '' }])
+      form = { nome: '', bicchiere: '', ghiaccio: '', metodo: '', garnish: '' }
+      ings = [{ nome: '', misura: '', unita: '' }]
     } else {
-      setCForm({ nome: c.nome, bicchiere: c.bicchiere || '', ghiaccio: c.ghiaccio || '', metodo: c.metodo || '', garnish: c.garnish || '' })
-      setCIngs(admin.toEditable(c.ingredienti))
+      form = { nome: c.nome, bicchiere: c.bicchiere || '', ghiaccio: c.ghiaccio || '', metodo: c.metodo || '', garnish: c.garnish || '' }
+      ings = admin.toEditable(c.ingredienti)
     }
+    setCForm(form)
+    setCIngs(ings)
+    cSnapshot.current = snapCocktail(form, ings)
     setEditCocktail(c)
   }
 
   const openPrep = (p: Preparation | 'new') => {
+    let form, ings: EditableIngredient[]
     if (p === 'new') {
-      setPForm({ nome: '', categoria: 'altro', procedimento: '' })
-      setPIngs([{ nome: '', misura: '', unita: '' }])
+      form = { nome: '', categoria: 'altro', procedimento: '' }
+      ings = [{ nome: '', misura: '', unita: '' }]
     } else {
-      setPForm({ nome: p.nome, categoria: p.categoria || 'altro', procedimento: p.procedimento || '' })
-      setPIngs(admin.toEditable(p.ingredienti))
+      form = { nome: p.nome, categoria: p.categoria || 'altro', procedimento: p.procedimento || '' }
+      ings = admin.toEditable(p.ingredienti)
     }
+    setPForm(form)
+    setPIngs(ings)
+    pSnapshot.current = snapPrep(form, ings)
     setEditPrep(p)
   }
 
   useImperativeHandle(ref, () => ({ openCocktail, openPrep }))
 
+  // ci sono modifiche non salvate?
+  const isCocktailDirty = () => snapCocktail(cForm, cIngs) !== cSnapshot.current
+  const isPrepDirty = () => snapPrep(pForm, pIngs) !== pSnapshot.current
+
+  // chiusura dall'esterno (tap fuori dal modale): se ci sono modifiche, chiedi conferma
+  const tryCloseCocktail = () => {
+    if (isCocktailDirty()) setConfirmDiscard('cocktail')
+    else setEditCocktail(null)
+  }
+  const tryClosePrep = () => {
+    if (isPrepDirty()) setConfirmDiscard('prep')
+    else setEditPrep(null)
+  }
+  // conferma "esci senza salvare": chiude davvero
+  const doDiscard = () => {
+    if (confirmDiscard === 'cocktail') setEditCocktail(null)
+    else if (confirmDiscard === 'prep') setEditPrep(null)
+    setConfirmDiscard(null)
+  }
+
   const saveCocktail = async () => {
     const existing = editCocktail === 'new' ? undefined : editCocktail || undefined
-    const ok = await admin.saveCocktail({ ...cForm, ingredienti: cIngs }, existing)
-    if (ok) { setEditCocktail(null); await onSaved() }
+    const savedId = await admin.saveCocktail({ ...cForm, ingredienti: cIngs }, existing)
+    if (savedId) { setEditCocktail(null); await onSaved(savedId) }
   }
   const savePrep = async () => {
     const existing = editPrep === 'new' ? undefined : editPrep || undefined
@@ -99,7 +138,7 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved }, ref) => {
 
       {/* Form Cocktail */}
       {editCocktail !== null && (
-        <div className="modal-overlay" onClick={() => setEditCocktail(null)}>
+        <div className="modal-overlay" onClick={tryCloseCocktail}>
           <div className="modal-content recipe-form" onClick={e => e.stopPropagation()}>
             <h2 className="recipe-form-title">{editCocktail === 'new' ? 'Nuovo cocktail' : 'Modifica cocktail'}</h2>
             <label className="modal-input-label">Nome *</label>
@@ -109,7 +148,7 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved }, ref) => {
             <label className="modal-input-label">Ghiaccio</label>
             <input className="modal-input" value={cForm.ghiaccio} onChange={e => setCForm({ ...cForm, ghiaccio: e.target.value })} />
             <label className="modal-input-label">Ingredienti</label>
-            <IngredientEditor ingredienti={cIngs} onChange={setCIngs} />
+            <IngredientEditor ingredienti={cIngs} onChange={setCIngs} preparations={preparations} />
             <label className="modal-input-label">Metodo</label>
             <textarea className="modal-input" rows={3} value={cForm.metodo} onChange={e => setCForm({ ...cForm, metodo: e.target.value })} />
             <label className="modal-input-label">Garnish</label>
@@ -131,7 +170,7 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved }, ref) => {
 
       {/* Form Preparazione */}
       {editPrep !== null && (
-        <div className="modal-overlay" onClick={() => setEditPrep(null)}>
+        <div className="modal-overlay" onClick={tryClosePrep}>
           <div className="modal-content recipe-form" onClick={e => e.stopPropagation()}>
             <h2 className="recipe-form-title">{editPrep === 'new' ? 'Nuova preparazione' : 'Modifica preparazione'}</h2>
             <label className="modal-input-label">Nome *</label>
@@ -168,6 +207,17 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved }, ref) => {
         isDangerous
         onCancel={() => setConfirmDelete(null)}
         onConfirm={confirmDelete === 'prep' ? doDeletePrep : doDeleteCocktail}
+      />
+
+      <ConfirmationDialog
+        isOpen={confirmDiscard !== null}
+        title="Modifiche non salvate"
+        message="Hai delle modifiche non salvate. Vuoi uscire senza salvare?"
+        cancelText="Continua a modificare"
+        confirmText="Esci senza salvare"
+        isDangerous
+        onCancel={() => setConfirmDiscard(null)}
+        onConfirm={doDiscard}
       />
     </>
   )
