@@ -4,6 +4,7 @@ import { useRecipeAdmin } from '../../hooks/useRecipeAdmin'
 import type { EditableIngredient } from '../../hooks/useRecipeAdmin'
 import IngredientEditor from './IngredientEditor'
 import ConfirmationDialog from '../ConfirmationDialog'
+import { RECIPE_ICE } from '../../lib/recipeFormat'
 import type { Cocktail, Preparation } from '../../types'
 
 const PREP_CATEGORIES = ['sciroppo', 'cordiale', 'shrub', 'soda', 'estratto', 'infusione', 'aria', 'prebatch', 'altro']
@@ -146,7 +147,14 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
             <label className="modal-input-label">Bicchiere</label>
             <input className="modal-input" value={cForm.bicchiere} onChange={e => setCForm({ ...cForm, bicchiere: e.target.value })} />
             <label className="modal-input-label">Ghiaccio</label>
-            <input className="modal-input" value={cForm.ghiaccio} onChange={e => setCForm({ ...cForm, ghiaccio: e.target.value })} />
+            <select className="modal-input modal-select" value={cForm.ghiaccio} onChange={e => setCForm({ ...cForm, ghiaccio: e.target.value })}>
+              <option value="">-</option>
+              {RECIPE_ICE.map(g => <option key={g} value={g}>{g}</option>)}
+              {/* valore legacy non in lista: lo mostro per non perderlo */}
+              {cForm.ghiaccio && !RECIPE_ICE.includes(cForm.ghiaccio as typeof RECIPE_ICE[number]) && (
+                <option value={cForm.ghiaccio}>{cForm.ghiaccio}</option>
+              )}
+            </select>
             <label className="modal-input-label">Ingredienti</label>
             <IngredientEditor ingredienti={cIngs} onChange={setCIngs} preparations={preparations} />
             <label className="modal-input-label">Metodo</label>

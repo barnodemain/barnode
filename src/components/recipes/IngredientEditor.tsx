@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { IoAddOutline, IoTrashOutline, IoClose } from 'react-icons/io5'
 import { normalizeForCompare } from '../../lib/analysisGrouping'
+import { RECIPE_UNITS } from '../../lib/recipeFormat'
 import type { EditableIngredient } from '../../hooks/useRecipeAdmin'
 import type { Preparation } from '../../types'
 
@@ -66,12 +67,19 @@ function IngredientEditor({ ingredienti, onChange, preparations }: Props) {
               value={ing.misura}
               onChange={e => update(idx, 'misura', e.target.value)}
             />
-            <input
+            <select
               className="ing-editor-unita"
-              placeholder="Unità (oz, ml…)"
               value={ing.unita}
               onChange={e => update(idx, 'unita', e.target.value)}
-            />
+              aria-label="Unità di misura"
+            >
+              <option value="">— unità</option>
+              {RECIPE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+              {/* valore legacy non in lista: lo mostro per non perderlo */}
+              {ing.unita && !RECIPE_UNITS.includes(ing.unita as typeof RECIPE_UNITS[number]) && (
+                <option value={ing.unita}>{ing.unita}</option>
+              )}
+            </select>
             <button className="ing-editor-del" onClick={() => remove(idx)} aria-label="Rimuovi ingrediente" type="button">
               <IoTrashOutline size={18} />
             </button>
