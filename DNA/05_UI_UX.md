@@ -16,10 +16,11 @@ Mobile-first. Riferimenti che non si ricavano dal solo codice.
 - `--color-text` #333 · `--color-cream` (sfondo pagina) · `--color-white` (card)
 - `--color-green-light` #4a9c3d · `--color-green-dark` #2d5a27
 - `--color-red` #c04a4a · `--color-yellow-amber` #f4c430 (Analysis, testo scuro)
+- **Archivio** ha sfondo dedicato più scuro `#e6e3c3` (classe `.page-wrapper-archivio`, wrapper+header); le altre pagine restano `--color-cream`.
 
 ## Settings — big buttons
 - IMPORTA: verde scuro · BACKUP: verde chiaro · ANALYSIS: giallo-ambrato (testo scuro).
-- Font 18px weight 600, gap icona-testo 12px, hover opacity 0.9.
+- Standard touch-friendly: `min-height 56px`, padding 16px, radius 12px, **width 84% centrati** (`align-items:center` sul contenitore), gap tra pulsanti 8px. Font 16px weight 600, icona 22px, gap icona-testo 12px.
 
 ## Analysis — card gruppo
 - Header: titolo "Possibile gruppo duplicato (X articoli)" verde scuro + sottotitolo corsivo con keyword condivise + "Ignora" in alto a destra.
