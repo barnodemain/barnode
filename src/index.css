@@ -933,8 +933,9 @@ ul, ol {
 .cocktail-card {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  /* altezza = viewport meno header e nav, così una scheda "riempie" lo schermo */
-  min-height: calc(100dvh - 190px);
+  /* La scheda si adatta al contenuto (niente vuoto sotto per drink corti),
+     ma ha un minimo per drink brevissimi. Lo snap resta comodo. */
+  min-height: min(100%, 320px);
   display: flex;
   margin-bottom: 12px;
 }
@@ -949,6 +950,7 @@ ul, ol {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  height: fit-content;
 }
 
 .cocktail-title-row {
@@ -1065,8 +1067,6 @@ ul, ol {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: auto;
-  padding-top: 4px;
 }
 .cocktail-garnish-label {
   font-size: 11px;
