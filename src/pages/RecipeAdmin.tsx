@@ -1,72 +1,32 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IoArrowBack, IoAddOutline, IoPencilOutline, IoTrashOutline } from 'react-icons/io5'
 import { useRecipes } from '../hooks/useRecipes'
 import { useRecipeAdmin } from '../hooks/useRecipeAdmin'
-import type { EditableIngredient } from '../hooks/useRecipeAdmin'
-import IngredientEditor from '../components/recipes/IngredientEditor'
+import RecipeForms from '../components/recipes/RecipeForms'
+import type { RecipeFormsHandle } from '../components/recipes/RecipeForms'
+import ConfirmationDialog from '../components/ConfirmationDialog'
 import type { Cocktail, Preparation } from '../types'
 
 type Tab = 'cocktail' | 'preparazioni'
-
-const PREP_CATEGORIES = ['sciroppo', 'cordiale', 'shrub', 'soda', 'estratto', 'infusione', 'aria', 'prebatch', 'altro']
 
 function RecipeAdmin() {
   const navigate = useNavigate()
   const { cocktails, preparations, loading, fetchRecipes } = useRecipes()
   const admin = useRecipeAdmin()
+  const forms = useRef<RecipeFormsHandle>(null)
   const [tab, setTab] = useState<Tab>('cocktail')
 
-  // stato form cocktail
-  const [editCocktail, setEditCocktail] = useState<Cocktail | null | 'new'>(null)
-  const [cForm, setCForm] = useState({ nome: '', bicchiere: '', ghiaccio: '', metodo: '', garnish: '' })
-  const [cIngs, setCIngs] = useState<EditableIngredient[]>([])
+  // conferma eliminazione dalla lista (coerente con l'app)
+  const [toDelete, setToDelete] = useState<{ kind: 'cocktail' | 'prep'; id: string; nome: string } | null>(null)
 
-  // stato form preparazione
-  const [editPrep, setEditPrep] = useState<Preparation | null | 'new'>(null)
-  const [pForm, setPForm] = useState({ nome: '', categoria: '', procedimento: '' })
-  const [pIngs, setPIngs] = useState<EditableIngredient[]>([])
-
-  const openCocktail = (c: Cocktail | 'new') => {
-    if (c === 'new') {
-      setCForm({ nome: '', bicchiere: '', ghiaccio: '', metodo: '', garnish: '' })
-      setCIngs([{ nome: '', misura: '', unita: '' }])
-    } else {
-      setCForm({ nome: c.nome, bicchiere: c.bicchiere || '', ghiaccio: c.ghiaccio || '', metodo: c.metodo || '', garnish: c.garnish || '' })
-      setCIngs(admin.toEditable(c.ingredienti))
-    }
-    setEditCocktail(c)
-  }
-
-  const openPrep = (p: Preparation | 'new') => {
-    if (p === 'new') {
-      setPForm({ nome: '', categoria: 'altro', procedimento: '' })
-      setPIngs([{ nome: '', misura: '', unita: '' }])
-    } else {
-      setPForm({ nome: p.nome, categoria: p.categoria || 'altro', procedimento: p.procedimento || '' })
-      setPIngs(admin.toEditable(p.ingredienti))
-    }
-    setEditPrep(p)
-  }
-
-  const saveCocktail = async () => {
-    const existing = editCocktail === 'new' ? undefined : editCocktail || undefined
-    const ok = await admin.saveCocktail({ ...cForm, ingredienti: cIngs }, existing)
-    if (ok) { setEditCocktail(null); await fetchRecipes() }
-  }
-  const savePrep = async () => {
-    const existing = editPrep === 'new' ? undefined : editPrep || undefined
-    const ok = await admin.savePreparation({ ...pForm, ingredienti: pIngs }, existing)
-    if (ok) { setEditPrep(null); await fetchRecipes() }
-  }
-
-  const delCocktail = async (c: Cocktail) => {
-    if (!confirm(`Eliminare il cocktail "${c.nome}"?`)) return
-    if (await admin.deleteCocktail(c.id)) await fetchRecipes()
-  }
-  const delPrep = async (p: Preparation) => {
-    if (!confirm(`Eliminare la preparazione "${p.nome}"?`)) return
-    if (await admin.deletePreparation(p.id)) await fetchRecipes()
+  const confirmDelete = async () => {
+    if (!toDelete) return
+    const ok = toDelete.kind === 'cocktail'
+      ? await admin.deleteCocktail(toDelete.id)
+      : await admin.deletePreparation(toDelete.id)
+    setToDelete(null)
+    if (ok) await fetchRecipes()
   }
 
   return (
@@ -98,11 +58,11 @@ function RecipeAdmin() {
                 <span className="item-name">{item.nome}</span>
                 <div className="item-actions">
                   <button className="icon-button edit" aria-label="Modifica"
-                    onClick={() => tab === 'cocktail' ? openCocktail(item as Cocktail) : openPrep(item as Preparation)}>
+                    onClick={() => tab === 'cocktail' ? forms.current?.openCocktail(item as Cocktail) : forms.current?.openPrep(item as Preparation)}>
                     <IoPencilOutline size={20} />
                   </button>
                   <button className="icon-button delete" aria-label="Elimina"
-                    onClick={() => tab === 'cocktail' ? delCocktail(item as Cocktail) : delPrep(item as Preparation)}>
+                    onClick={() => setToDelete({ kind: tab === 'cocktail' ? 'cocktail' : 'prep', id: item.id, nome: item.nome })}>
                     <IoTrashOutline size={20} />
                   </button>
                 </div>
@@ -112,67 +72,22 @@ function RecipeAdmin() {
         )}
       </div>
 
-      <button className="fab" onClick={() => tab === 'cocktail' ? openCocktail('new') : openPrep('new')} aria-label="Aggiungi">
+      <button className="fab" onClick={() => tab === 'cocktail' ? forms.current?.openCocktail('new') : forms.current?.openPrep('new')} aria-label="Aggiungi">
         <IoAddOutline size={28} />
       </button>
 
-      {/* Form Cocktail */}
-      {editCocktail !== null && (
-        <div className="modal-overlay" onClick={() => setEditCocktail(null)}>
-          <div className="modal-content recipe-form" onClick={e => e.stopPropagation()}>
-            <h2 className="recipe-form-title">{editCocktail === 'new' ? 'Nuovo cocktail' : 'Modifica cocktail'}</h2>
-            <label className="modal-input-label">Nome *</label>
-            <input className="modal-input" value={cForm.nome} onChange={e => setCForm({ ...cForm, nome: e.target.value })} autoFocus />
-            <div className="recipe-form-grid">
-              <div>
-                <label className="modal-input-label">Bicchiere</label>
-                <input className="modal-input" value={cForm.bicchiere} onChange={e => setCForm({ ...cForm, bicchiere: e.target.value })} />
-              </div>
-              <div>
-                <label className="modal-input-label">Ghiaccio</label>
-                <input className="modal-input" value={cForm.ghiaccio} onChange={e => setCForm({ ...cForm, ghiaccio: e.target.value })} />
-              </div>
-            </div>
-            <label className="modal-input-label">Ingredienti</label>
-            <IngredientEditor ingredienti={cIngs} onChange={setCIngs} />
-            <label className="modal-input-label">Metodo</label>
-            <textarea className="modal-input" rows={2} value={cForm.metodo} onChange={e => setCForm({ ...cForm, metodo: e.target.value })} />
-            <label className="modal-input-label">Garnish</label>
-            <input className="modal-input" value={cForm.garnish} onChange={e => setCForm({ ...cForm, garnish: e.target.value })} />
-            <div className="modal-buttons">
-              <button className="btn btn-secondary" onClick={() => setEditCocktail(null)}>Annulla</button>
-              <button className="btn btn-primary" onClick={saveCocktail} disabled={admin.saving || !cForm.nome.trim()}>
-                {admin.saving ? '...' : 'Salva'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RecipeForms ref={forms} onSaved={fetchRecipes} />
 
-      {/* Form Preparazione */}
-      {editPrep !== null && (
-        <div className="modal-overlay" onClick={() => setEditPrep(null)}>
-          <div className="modal-content recipe-form" onClick={e => e.stopPropagation()}>
-            <h2 className="recipe-form-title">{editPrep === 'new' ? 'Nuova preparazione' : 'Modifica preparazione'}</h2>
-            <label className="modal-input-label">Nome *</label>
-            <input className="modal-input" value={pForm.nome} onChange={e => setPForm({ ...pForm, nome: e.target.value })} autoFocus />
-            <label className="modal-input-label">Categoria</label>
-            <select className="modal-input" value={pForm.categoria} onChange={e => setPForm({ ...pForm, categoria: e.target.value })}>
-              {PREP_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <label className="modal-input-label">Ingredienti</label>
-            <IngredientEditor ingredienti={pIngs} onChange={setPIngs} />
-            <label className="modal-input-label">Procedimento</label>
-            <textarea className="modal-input" rows={4} value={pForm.procedimento} onChange={e => setPForm({ ...pForm, procedimento: e.target.value })} />
-            <div className="modal-buttons">
-              <button className="btn btn-secondary" onClick={() => setEditPrep(null)}>Annulla</button>
-              <button className="btn btn-primary" onClick={savePrep} disabled={admin.saving || !pForm.nome.trim()}>
-                {admin.saving ? '...' : 'Salva'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationDialog
+        isOpen={toDelete !== null}
+        title={toDelete?.kind === 'prep' ? 'Elimina preparazione' : 'Elimina cocktail'}
+        message={`Vuoi eliminare "${toDelete?.nome ?? ''}"? L'operazione non è reversibile.`}
+        cancelText="Annulla"
+        confirmText="Elimina"
+        isDangerous
+        onCancel={() => setToDelete(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

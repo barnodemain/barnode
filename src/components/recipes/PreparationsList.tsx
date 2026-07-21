@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react'
 import { IoClose } from 'react-icons/io5'
+import { LuPencilLine } from 'react-icons/lu'
 import PreparationDetail from './PreparationDetail'
 import type { Preparation } from '../../types'
 
 interface Props {
   preparations: Preparation[]
+  onEdit?: (prep: Preparation) => void
 }
 
 // etichette leggibili per le categorie
@@ -23,7 +25,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 // ordine di visualizzazione dei gruppi
 const CATEGORY_ORDER = ['sciroppo', 'cordiale', 'shrub', 'soda', 'estratto', 'infusione', 'aria', 'prebatch', 'altro']
 
-function PreparationsList({ preparations }: Props) {
+function PreparationsList({ preparations, onEdit }: Props) {
   const [open, setOpen] = useState<Preparation | null>(null)
 
   const grouped = useMemo(() => {
@@ -73,6 +75,11 @@ function PreparationsList({ preparations }: Props) {
         <div className="sheet-overlay" onClick={() => setOpen(null)}>
           <div className="sheet-panel" onClick={e => e.stopPropagation()}>
             <div className="sheet-handle" />
+            {onEdit && (
+              <button className="sheet-edit" onClick={() => { const p = open; setOpen(null); onEdit(p) }} aria-label="Modifica preparazione">
+                <LuPencilLine size={20} />
+              </button>
+            )}
             <button className="sheet-close" onClick={() => setOpen(null)} aria-label="Chiudi">
               <IoClose size={24} />
             </button>

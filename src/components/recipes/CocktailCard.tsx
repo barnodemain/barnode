@@ -1,4 +1,5 @@
-import { LuMartini } from 'react-icons/lu'
+import { LuPencilLine } from 'react-icons/lu'
+import { IoDocumentTextOutline } from 'react-icons/io5'
 import { formatDose } from '../../lib/recipeFormat'
 import type { Cocktail, Preparation } from '../../types'
 
@@ -6,15 +7,20 @@ interface Props {
   cocktail: Cocktail
   prepById: Map<string, Preparation>
   onOpenPreparation: (prep: Preparation) => void
+  onEdit?: (cocktail: Cocktail) => void
 }
 
-function CocktailCard({ cocktail, prepById, onOpenPreparation }: Props) {
+function CocktailCard({ cocktail, prepById, onOpenPreparation, onEdit }: Props) {
   const c = cocktail
   return (
     <div className="cocktail-card">
       <div className="cocktail-card-inner">
+        {onEdit && (
+          <button className="cocktail-edit-btn" onClick={() => onEdit(c)} aria-label="Modifica cocktail" type="button">
+            <LuPencilLine size={18} />
+          </button>
+        )}
         <div className="cocktail-title-row">
-          <LuMartini className="cocktail-title-icon" />
           <h2 className="cocktail-title">{c.nome}</h2>
         </div>
 
@@ -49,7 +55,9 @@ function CocktailCard({ cocktail, prepById, onOpenPreparation }: Props) {
                 >
                   <span className="ingredient-name">
                     {ing.nome}
-                    {prep && <span className="ingredient-link-hint">ricetta ›</span>}
+                    {prep && (
+                      <IoDocumentTextOutline className="ingredient-link-icon" aria-label="Vedi ricetta" />
+                    )}
                   </span>
                   {dose && <span className="ingredient-dose">{dose}</span>}
                 </li>

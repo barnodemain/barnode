@@ -942,6 +942,7 @@ ul, ol {
 .cocktail-card:last-child { margin-bottom: 0; }
 
 .cocktail-card-inner {
+  position: relative;
   background: var(--color-white);
   border-radius: 20px;
   box-shadow: var(--shadow-card);
@@ -953,15 +954,30 @@ ul, ol {
   height: fit-content;
 }
 
+/* matita modifica in alto a destra sulla scheda */
+.cocktail-edit-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--color-cream);
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-green-dark);
+  cursor: pointer;
+  z-index: 2;
+}
+.cocktail-edit-btn:active { background: var(--color-gray-light); }
+
 .cocktail-title-row {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-.cocktail-title-icon {
-  color: var(--color-green-light);
-  font-size: 26px;
-  flex-shrink: 0;
+  padding-right: 44px;
 }
 .cocktail-title {
   font-size: 24px;
@@ -1040,14 +1056,11 @@ ul, ol {
 /* ingrediente collegato a una preparazione: toccabile */
 .ingredient-row.linked { cursor: pointer; }
 .ingredient-row.linked .ingredient-name { color: var(--color-green-dark); font-weight: 600; }
-.ingredient-link-hint {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-white);
-  background: var(--color-green-light);
-  border-radius: 20px;
-  padding: 2px 8px;
-  white-space: nowrap;
+/* icona "vedi ricetta": verde, senza sfondo, accanto al nome */
+.ingredient-link-icon {
+  color: var(--color-green-light);
+  font-size: 17px;
+  flex-shrink: 0;
 }
 
 /* metodo: blocco evidenziato (azione chiave) */
@@ -1086,7 +1099,8 @@ ul, ol {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 16px calc(var(--nav-height) + 16px) 16px;
+  /* spazio extra in fondo perché il FAB non copra l'ultima card */
+  padding: 8px 16px calc(var(--nav-height) + 88px) 16px;
 }
 .prep-group { margin-bottom: 18px; }
 .prep-group-title {
@@ -1173,8 +1187,24 @@ ul, ol {
   color: var(--color-text);
   cursor: pointer;
 }
+.sheet-edit {
+  position: absolute;
+  top: 10px;
+  right: 56px;
+  background: var(--color-cream);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-green-dark);
+  cursor: pointer;
+}
+.sheet-edit:active { background: var(--color-gray-light); }
 
-.prep-detail-head { margin-bottom: 14px; padding-right: 40px; }
+.prep-detail-head { margin-bottom: 14px; padding-right: 88px; }
 .prep-category-chip {
   display: inline-block;
   font-size: 11px;
@@ -1196,11 +1226,25 @@ ul, ol {
 .prep-procedure { white-space: pre-line; }
 
 /* ---- Gestione ricettario (Admin) ---- */
+/* Il form ricetta ha molti campi: più largo dei modali generici (340px) per
+   sfruttare lo schermo su telefoni medi/grandi, restando comodo. Su telefoni
+   stretti prende quasi tutta la larghezza (margini ridotti via overlay :has). */
 .recipe-form {
-  max-height: 88vh;
+  max-height: 90vh;
   overflow-y: auto;
   text-align: left;
   width: 100%;
+  max-width: 480px;
+  padding: 20px 18px;
+}
+/* Margini laterali ridotti quando l'overlay contiene il form ricetta, così il
+   modale è più largo e leggibile su telefoni medi/grandi.
+   `:has()` per i browser recenti; il margine negativo di fallback compensa il
+   padding di .modal-overlay (20px) sui telefoni più vecchi senza `:has()`. */
+.recipe-form { margin: 0 -8px; }
+@supports selector(:has(*)) {
+  .recipe-form { margin: 0; }
+  .modal-overlay:has(.recipe-form) { padding: 16px 12px; }
 }
 .recipe-form-title {
   font-size: 18px;
@@ -1213,23 +1257,60 @@ ul, ol {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.recipe-form-error { margin-bottom: 12px; }
+/* riga azioni: [cestino] a sx, Annulla + Salva a dx, tutto su una riga */
+.recipe-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.recipe-form-actions .btn-secondary { margin-left: auto; }
+/* elimina = solo icona cestino, sfondo bianco + icona rossa (coerente con i cestini ingrediente) */
+.recipe-form-delete {
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  padding: 0;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-light);
+  color: var(--color-red);
+  cursor: pointer;
+}
+.recipe-form-delete:active { background: rgba(192, 74, 74, 0.08); }
+.recipe-form-delete:disabled { opacity: 0.5; }
 
 .ing-editor {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   margin-bottom: 6px;
 }
+/* ogni ingrediente = una card a due righe: nome largo sopra, dose/unità sotto.
+   Così il testo lungo (es. "Noilly Prat Dry Vermouth") è sempre leggibile.
+   Sfondo beige più scuro per staccare bene le card dal form. */
 .ing-editor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #e6e3c3;
+  border-radius: 10px;
+  padding: 8px;
+}
+.ing-editor-line2 {
   display: flex;
   gap: 6px;
   align-items: center;
 }
-.ing-editor-name { flex: 1 1 auto; min-width: 0; }
-.ing-editor-misura { width: 60px; flex-shrink: 0; }
-.ing-editor-unita { width: 60px; flex-shrink: 0; }
+.ing-editor-name { width: 100%; }
+/* dose e unità larghi uguali */
+.ing-editor-misura { flex: 1 1 0; min-width: 0; }
+.ing-editor-unita { flex: 1 1 0; min-width: 0; }
 .ing-editor-row input {
-  padding: 8px 10px;
+  padding: 9px 10px;
   border: 1px solid var(--color-gray-light);
   border-radius: 8px;
   font-size: 14px;
@@ -1237,17 +1318,18 @@ ul, ol {
 }
 .ing-editor-del {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  background: transparent;
+  background: var(--color-white);
   color: var(--color-red);
   cursor: pointer;
   border-radius: 8px;
 }
+.ing-editor-del:active { background: rgba(192, 74, 74, 0.1); }
 .ing-editor-add {
   display: inline-flex;
   align-items: center;

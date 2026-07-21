@@ -1,17 +1,20 @@
-import { useState, useMemo } from 'react'
-import { IoSearch } from 'react-icons/io5'
+import { useState, useMemo, useRef } from 'react'
+import { IoSearch, IoAddOutline } from 'react-icons/io5'
 import { useRecipes } from '../hooks/useRecipes'
 import { normalizeForCompare } from '../lib/analysisGrouping'
 import CocktailDeck from '../components/recipes/CocktailDeck'
 import PreparationsList from '../components/recipes/PreparationsList'
+import RecipeForms from '../components/recipes/RecipeForms'
+import type { RecipeFormsHandle } from '../components/recipes/RecipeForms'
 import type { Preparation } from '../types'
 
 type Tab = 'cocktail' | 'preparazioni'
 
 function Cocktail() {
-  const { cocktails, preparations, loading, error } = useRecipes()
+  const { cocktails, preparations, loading, error, fetchRecipes } = useRecipes()
   const [tab, setTab] = useState<Tab>('cocktail')
   const [query, setQuery] = useState('')
+  const forms = useRef<RecipeFormsHandle>(null)
 
   const q = normalizeForCompare(query)
 
@@ -75,10 +78,28 @@ function Cocktail() {
       {loading ? (
         <div className="loading-spinner"><div className="spinner" /></div>
       ) : tab === 'cocktail' ? (
-        <CocktailDeck cocktails={filteredCocktails} prepById={prepById} />
+        <CocktailDeck
+          cocktails={filteredCocktails}
+          prepById={prepById}
+          onEditCocktail={c => forms.current?.openCocktail(c)}
+          onEditPreparation={p => forms.current?.openPrep(p)}
+        />
       ) : (
-        <PreparationsList preparations={filteredPreparations} />
+        <PreparationsList
+          preparations={filteredPreparations}
+          onEdit={p => forms.current?.openPrep(p)}
+        />
       )}
+
+      <button
+        className="fab"
+        onClick={() => tab === 'cocktail' ? forms.current?.openCocktail('new') : forms.current?.openPrep('new')}
+        aria-label={tab === 'cocktail' ? 'Nuovo cocktail' : 'Nuova preparazione'}
+      >
+        <IoAddOutline size={28} />
+      </button>
+
+      <RecipeForms ref={forms} onSaved={fetchRecipes} />
     </div>
   )
 }

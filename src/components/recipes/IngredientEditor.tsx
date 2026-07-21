@@ -6,7 +6,9 @@ interface Props {
   onChange: (next: EditableIngredient[]) => void
 }
 
-// Editor righe ingrediente: nome + misura + unità, aggiungibili/rimovibili.
+// Editor righe ingrediente. Ogni riga: nome a tutta larghezza (leggibile),
+// sotto dose + unità affiancate + cestino. Il cestino rimuove subito la riga
+// (azione reversibile: nulla è salvato finché non premi "Salva").
 function IngredientEditor({ ingredienti, onChange }: Props) {
   const update = (idx: number, field: keyof EditableIngredient, value: string) => {
     const next = ingredienti.map((ing, i) => i === idx ? { ...ing, [field]: value } : ing)
@@ -25,21 +27,23 @@ function IngredientEditor({ ingredienti, onChange }: Props) {
             value={ing.nome}
             onChange={e => update(idx, 'nome', e.target.value)}
           />
-          <input
-            className="ing-editor-misura"
-            placeholder="Dose"
-            value={ing.misura}
-            onChange={e => update(idx, 'misura', e.target.value)}
-          />
-          <input
-            className="ing-editor-unita"
-            placeholder="Unità"
-            value={ing.unita}
-            onChange={e => update(idx, 'unita', e.target.value)}
-          />
-          <button className="ing-editor-del" onClick={() => remove(idx)} aria-label="Rimuovi ingrediente" type="button">
-            <IoTrashOutline size={18} />
-          </button>
+          <div className="ing-editor-line2">
+            <input
+              className="ing-editor-misura"
+              placeholder="Dose"
+              value={ing.misura}
+              onChange={e => update(idx, 'misura', e.target.value)}
+            />
+            <input
+              className="ing-editor-unita"
+              placeholder="Unità (oz, ml…)"
+              value={ing.unita}
+              onChange={e => update(idx, 'unita', e.target.value)}
+            />
+            <button className="ing-editor-del" onClick={() => remove(idx)} aria-label="Rimuovi ingrediente" type="button">
+              <IoTrashOutline size={18} />
+            </button>
+          </div>
         </div>
       ))}
       <button className="ing-editor-add" onClick={add} type="button">
