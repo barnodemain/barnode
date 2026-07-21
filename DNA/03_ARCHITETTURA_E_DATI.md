@@ -16,6 +16,12 @@
 - `backups_barnode` — **snapshot singleton** (vedi sotto)
 - `notes` — una sola riga attiva: `id`, `content`, `updated_at`; accesso `anon` via RLS
 - `ignored_pairs` — coppie "diverse" marcate con Ignora in Analysis: `pair_key` (PK, nomi normalizzati ordinati + `||`), `name_a`, `name_b`, `created_at`. RLS anon select/insert/delete. Migrazione `20260721_ignored_pairs.sql`. Cresce di 1 riga per coppia ignorata.
+- **Ricettario** (migrazione `20260721_recipebook.sql`, RLS anon CRUD su tutte):
+  - `cocktails` — `nome`, `bicchiere`, `ghiaccio`, `metodo`, `garnish`, `note`, `sort_order`
+  - `cocktail_ingredients` — `cocktail_id` (FK cascade), `nome`, `misura` (testo: frazioni), `unita`, `preparation_id` (FK→preparations, set null: link home-made), `sort_order`
+  - `preparations` — `nome`, `categoria` (soda/cordiale/shrub/estratto/prebatch/infusione/sciroppo/aria/altro), `procedimento`, `note`, `sort_order`
+  - `preparation_ingredients` — `preparation_id` (FK cascade), `nome`, `misura`, `unita`, `sort_order`
+  - Seed iniziale dal PDF in `supabase/seed/recipebook_seed.json` (17 cocktail, 18 preparazioni).
 
 ## Backup singleton
 - Un unico record attivo, ID fisso `00000000-0000-0000-0000-000000000001`.
@@ -31,6 +37,7 @@
 - `useArticoli`: `articoli[]`, `createArticolo`, `updateArticolo` (cascade su missing_items), `deleteArticolo`, `searchArticoli`.
 - `useMissingItems`: `missingItems[]`, `addMissingItem` (con duplicate check), `removeMissingItem`, `isArticoloMissing(id)` per render condizionali.
 - `useConsolidation(fetchArticoli)`: stato + handler della pagina Analysis (selezione, nome finale, consolidamento, ignore **persistente su DB** tabella `ignored_pairs`; carica gli ignorati all'avvio, upsert su Ignora).
+- `useRecipes`: legge cocktail + preparazioni (con ingredienti via join), cache in-memory condivisa (`clearRecipesCache` per invalidare). `useRecipeAdmin`: CRUD ricette (save/delete cocktail e preparazioni; gli ingredienti si rimpiazzano delete+insert). `lib/recipeFormat.ts`: `formatDose` (gestisce misure-parola come "top"/"up").
 
 ## Pagina Analysis (modulare)
 - `lib/analysisGrouping.ts`: logica pura di raggruppamento (`groupArticlesBySharedKeywords`, `getCategory`, tipo `ArticleGroup`).

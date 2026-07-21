@@ -1194,3 +1194,71 @@ ul, ol {
   line-height: 1.15;
 }
 .prep-procedure { white-space: pre-line; }
+
+/* ---- Gestione ricettario (Admin) ---- */
+.recipe-form {
+  max-height: 88vh;
+  overflow-y: auto;
+  text-align: left;
+  width: 100%;
+}
+.recipe-form-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-green-dark);
+  margin-bottom: 12px;
+}
+.recipe-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ing-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.ing-editor-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ing-editor-name { flex: 1 1 auto; min-width: 0; }
+.ing-editor-misura { width: 60px; flex-shrink: 0; }
+.ing-editor-unita { width: 60px; flex-shrink: 0; }
+.ing-editor-row input {
+  padding: 8px 10px;
+  border: 1px solid var(--color-gray-light);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--color-white);
+}
+.ing-editor-del {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-red);
+  cursor: pointer;
+  border-radius: 8px;
+}
+.ing-editor-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 8px 12px;
+  border: 1px dashed var(--color-green-light);
+  background: transparent;
+  color: var(--color-green-dark);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}

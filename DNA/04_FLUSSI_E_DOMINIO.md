@@ -1,5 +1,12 @@
 # Flussi funzionali e regole di dominio
 
+## Ricettario (sezione Cocktail) — rotta `/cocktail`, pubblica
+- Navbar 3a voce "Cocktail" (icona `LuMartini`). Due tab: **Cocktail** | **Preparazioni** + ricerca istantanea (filtra anche per ingrediente).
+- **Cocktail**: schede full-screen con scroll-snap verticale (una scheda per schermo, scroll per cambiare drink; scheda adattiva al contenuto). Layout stile app-ricette (NON il PDF): nome + badge bicchiere/ghiaccio, ingredienti con dose a destra, metodo evidenziato, garnish. Un ingrediente collegato a una preparazione (`preparation_id`) mostra badge "ricetta ›" e apre un bottom-sheet con la preparazione.
+- **Preparazioni**: raggruppate per `categoria`, card → bottom-sheet con ingredienti + procedimento.
+- **Gestione** (Admin → RICETTARIO, `/settings/recipes`, dietro PIN): lista con modifica/elimina + FAB per nuovo; form con ingredienti dinamici (`IngredientEditor`). Salvataggio rimpiazza gli ingredienti (delete+insert) e invalida la cache.
+- Collegamenti ingrediente→preparazione: solo home-made reali (shrub/cordiale/soda/estratto/succo/yerba), non distillati/zucchero. Impostati nel seed + aggiungibili via `preparation_id`.
+
 ## Quick-add (Archivio)
 - "+" su ogni articolo lo aggiunge ai mancanti, **senza modal**.
 - Duplicate protection: "+" nascosto se l'articolo è già in `missing_items` (`isArticoloMissing`).

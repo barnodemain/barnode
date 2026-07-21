@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { IoDocumentTextOutline, IoCopyOutline, IoAnalyticsOutline, IoShareOutline } from 'react-icons/io5'
+import { LuMartini } from 'react-icons/lu'
 import { useArticoli } from '../hooks/useArticoli'
 
 function Settings() {
@@ -63,6 +64,16 @@ function Settings() {
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
               <IoAnalyticsOutline size={22} />
               <span style={{ fontSize: '16px', fontWeight: '600' }}>ANALYSIS</span>
+            </span>
+          </button>
+
+          <button
+            className="settings-big-button settings-big-button-primary"
+            onClick={() => navigate('/settings/recipes')}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+              <LuMartini size={22} />
+              <span style={{ fontSize: '16px', fontWeight: '600' }}>RICETTARIO</span>
             </span>
           </button>
 
