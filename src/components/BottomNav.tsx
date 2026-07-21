@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { IoHomeOutline, IoArchiveOutline, IoSettingsOutline } from 'react-icons/io5'
+import { LuMartini } from 'react-icons/lu'
 import PinModal from './PinModal'
 
 function BottomNav() {
@@ -45,14 +46,22 @@ function BottomNav() {
             <span className="nav-label">Home</span>
           </NavLink>
           
-          <NavLink 
-            to="/archivio" 
+          <NavLink
+            to="/archivio"
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <IoArchiveOutline className="nav-icon" />
             <span className="nav-label">Archivio</span>
           </NavLink>
-          
+
+          <NavLink
+            to="/cocktail"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          >
+            <LuMartini className="nav-icon" />
+            <span className="nav-label">Cocktail</span>
+          </NavLink>
+
           <button
             type="button"
             className={`nav-item ${isSettingsActive ? 'active' : ''}`}

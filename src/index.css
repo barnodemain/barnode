@@ -877,3 +877,320 @@ ul, ol {
     border-right: 1px solid var(--color-gray-light);
   }
 }
+
+/* ============================================================
+   RICETTARIO (Cocktail + Preparazioni)
+   Mobile-first, touch-friendly, coerente col brand.
+   ============================================================ */
+
+.page-wrapper-recipes {
+  background-color: var(--color-cream);
+}
+
+/* Header: tabs + ricerca (niente logo per dare spazio alle schede) */
+.recipes-header {
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding-bottom: 10px;
+}
+
+.recipes-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-button);
+  padding: 4px;
+  margin-bottom: 10px;
+}
+.recipes-tab {
+  flex: 1;
+  min-height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.recipes-tab.active {
+  background: var(--color-white);
+  color: var(--color-green-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+.recipes-search { margin: 0; }
+
+/* ---- Deck cocktail: scroll-snap verticale, una scheda per schermo ---- */
+.cocktail-deck {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 12px calc(var(--nav-height) + 8px) 12px;
+}
+
+.cocktail-card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  /* altezza = viewport meno header e nav, così una scheda "riempie" lo schermo */
+  min-height: calc(100dvh - 190px);
+  display: flex;
+  margin-bottom: 12px;
+}
+.cocktail-card:last-child { margin-bottom: 0; }
+
+.cocktail-card-inner {
+  background: var(--color-white);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cocktail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cocktail-title-icon {
+  color: var(--color-green-light);
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.cocktail-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-green-dark);
+  line-height: 1.1;
+}
+
+/* badge bicchiere / ghiaccio */
+.cocktail-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cocktail-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-cream);
+  border-radius: 10px;
+  padding: 8px 12px;
+  flex: 1;
+  min-width: 0;
+}
+.cocktail-badge-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-light);
+  font-weight: 600;
+}
+.cocktail-badge-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cocktail-section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-green-light);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* lista ingredienti stile ricetta: nome a sx, dose a dx */
+.ingredient-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.ingredient-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--color-gray-light);
+}
+.ingredient-row:last-child { border-bottom: none; }
+.ingredient-name {
+  font-size: 15px;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ingredient-dose {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-green-dark);
+  white-space: nowrap;
+}
+/* ingrediente collegato a una preparazione: toccabile */
+.ingredient-row.linked { cursor: pointer; }
+.ingredient-row.linked .ingredient-name { color: var(--color-green-dark); font-weight: 600; }
+.ingredient-link-hint {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-white);
+  background: var(--color-green-light);
+  border-radius: 20px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+/* metodo: blocco evidenziato (azione chiave) */
+.cocktail-method {
+  background: var(--color-cream);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--color-green-light);
+}
+.cocktail-method-text {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.cocktail-garnish {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.cocktail-garnish-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-yellow-amber);
+  font-weight: 700;
+}
+.cocktail-garnish-value {
+  font-size: 15px;
+  color: var(--color-text);
+  font-style: italic;
+}
+
+/* ---- Preparazioni: gruppi per categoria ---- */
+.prep-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 16px calc(var(--nav-height) + 16px) 16px;
+}
+.prep-group { margin-bottom: 18px; }
+.prep-group-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-green-light);
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding-left: 2px;
+}
+.prep-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.prep-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  background: var(--color-white);
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  text-align: left;
+}
+.prep-item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.prep-item-count {
+  font-size: 12px;
+  color: var(--color-text-light);
+  white-space: nowrap;
+}
+
+/* ---- Bottom-sheet (dettaglio preparazione) ---- */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  animation: sheetFade 0.15s ease;
+}
+@keyframes sheetFade { from { opacity: 0 } to { opacity: 1 } }
+.sheet-panel {
+  position: relative;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--color-cream-light);
+  border-radius: 20px 20px 0 0;
+  padding: 8px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
+  animation: sheetUp 0.2s ease;
+}
+@keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-gray-light);
+  margin: 4px auto 12px auto;
+}
+.sheet-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.prep-detail-head { margin-bottom: 14px; padding-right: 40px; }
+.prep-category-chip {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--color-white);
+  background: var(--color-green-light);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-bottom: 8px;
+}
+.prep-detail-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-green-dark);
+  line-height: 1.15;
+}
+.prep-procedure { white-space: pre-line; }
