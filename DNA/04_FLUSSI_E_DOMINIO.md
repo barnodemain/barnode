@@ -19,7 +19,9 @@
   - **identici** a meno di maiuscole/accenti/punteggiatura;
   - **parole invertite** (stessi token in ordine diverso);
   - **quasi identici** (edit distance ≤2 e ratio ≥0.8 → refusi);
-  - **contenimento**: un nome è prefisso dell'altro a confine di parola, coda ≤12 char (es. "Barolo"/"Barolo Riserva"), **escluso** se il nome corto è una sola parola-categoria (prima parola presente in ≥3 articoli, es. "vino"/"gin") → evita che una categoria colleghi l'intero catalogo.
+  - **contenimento (prefisso)**: un nome è prefisso dell'altro a confine di parola, coda ≤12 char (es. "Barolo"/"Barolo Riserva");
+  - **contenimento (per parole)**: il nome corto compare come blocco di parole nel lungo con 1-2 parole in più — cattura la categoria messa davanti/dietro (es. "Jagermeister"/"Amaro Jagermeister", "Noilly Prat"/"Vermouth Dry Noilly Prat"). Richiede una parola distintiva ≥5 char non-categoria → esclude i gusti/varianti ("Succo Di Lime"/"Succo Di Mango");
+  - entrambi i contenimenti sono **esclusi** se il nome corto è una sola parola-categoria (prima parola presente in ≥3 articoli, es. "vino"/"gin") → evita che una categoria colleghi l'intero catalogo.
 - Etichetta card: "Motivo: …" (i criteri attivati). Ordina per numero articoli desc. `useMemo`.
 - **Consolidamento multi-merge**: invariato. Primo selezionato = master (mantiene `id`); nome finale via `normalizeArticleName`; i `missing_items` degli altri puntano al master; gli altri articoli eliminati; snapshot; ricarica e ricalcolo.
 - **Ignora coppia**: **persistente su DB** (`ignored_pairs`), non solo client. `id` del gruppo = `pair_key` stabile (nomi normalizzati ordinati) → una coppia ignorata **non ricompare mai più**, anche dopo reload o da altri device, e resta stabile se si spostano altri articoli. Caricato all'avvio, upsert su Ignora (ottimistico con rollback se il salvataggio fallisce).

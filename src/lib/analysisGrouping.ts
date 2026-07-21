@@ -82,7 +82,45 @@ export function similarityReason(
     return 'uno contenuto nell\'altro'
   }
 
+  // contenimento per parole (categoria davanti/dietro): il nome corto compare
+  // INTERAMENTE come blocco di parole nel lungo, con 1-2 parole in più
+  // (tipicamente la categoria: "Jagermeister" -> "Amaro Jagermeister";
+  //  "Noilly Prat" -> "Vermouth Dry Noilly Prat").
+  // Anti-rumore: il corto deve avere una parte distintiva (una parola >= 5 char
+  // che non sia una categoria), così "Succo Di Lime"/"Succo Di Mango" NON matcha
+  // (differiscono nella parte distintiva, non solo per categorie aggiunte).
+  const wShort = shorter.split(' ').filter(Boolean)
+  const wLong = longer.split(' ').filter(Boolean)
+  const wordDiff = wLong.length - wShort.length
+  if (
+    !shorterIsBareCategory &&
+    (wordDiff === 1 || wordDiff === 2) &&
+    wShort.length >= 1 &&
+    isWordSubsequenceBlock(wShort, wLong) &&
+    hasDistinctiveWord(wShort, categoryWords)
+  ) {
+    return 'uno contenuto nell\'altro'
+  }
+
   return null
+}
+
+/** true se `sub` compare come blocco contiguo di parole dentro `full`. */
+function isWordSubsequenceBlock(sub: string[], full: string[]): boolean {
+  if (sub.length === 0 || sub.length > full.length) return false
+  for (let start = 0; start + sub.length <= full.length; start++) {
+    let ok = true
+    for (let k = 0; k < sub.length; k++) {
+      if (full[start + k] !== sub[k]) { ok = false; break }
+    }
+    if (ok) return true
+  }
+  return false
+}
+
+/** true se tra le parole c'è almeno un termine distintivo (>= 5 char, non categoria). */
+function hasDistinctiveWord(words: string[], categoryWords?: Set<string>): boolean {
+  return words.some(w => w.length >= 5 && !(categoryWords && categoryWords.has(w)))
 }
 
 /** Prime parole che compaiono in >= 3 articoli: categorie di fatto. */
