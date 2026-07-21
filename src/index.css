@@ -90,11 +90,37 @@ ul, ol {
 }
 
 .page-header-fixed {
+  position: relative;
   flex-shrink: 0;
   background-color: var(--color-cream);
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top, 0px));
   z-index: 10;
+}
+
+.share-whatsapp-button {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-green-light);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 11;
+}
+
+.share-whatsapp-button:active {
+  background-color: rgba(74, 156, 61, 0.12);
+  transform: scale(0.92);
 }
 
 .page-content-scrollable {

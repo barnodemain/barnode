@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { IoSearch, IoTrashOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
+import ShareWhatsAppButton from '../components/ShareWhatsAppButton'
 import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
 import { normalizeArticleName } from '../lib/normalize'
@@ -82,6 +83,7 @@ function Home() {
   return (
     <div className="page-wrapper">
       <div className="page-header-fixed">
+        <ShareWhatsAppButton />
         <div className="page-header">
           <img src="/logo.png" alt="BARnode" className="logo" />
           <h1 className="page-title">Lista articoli mancanti</h1>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { IoSearch, IoAddOutline } from 'react-icons/io5'
 import Modal from '../components/Modal'
 import FloatingActionButton from '../components/FloatingActionButton'
+import ShareWhatsAppButton from '../components/ShareWhatsAppButton'
 import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
 import { normalizeArticleName } from '../lib/normalize'
@@ -88,6 +89,7 @@ function Archivio() {
   return (
     <div className="page-wrapper">
       <div className="page-header-fixed">
+        <ShareWhatsAppButton />
         <div className="page-header">
           <img src="/logo.png" alt="BARnode" className="logo" />
           <h1 className="page-title">Archivio articoli</h1>
