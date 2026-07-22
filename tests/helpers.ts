@@ -33,7 +33,6 @@ export async function mockSupabase(page: Page) {
     let body: unknown = []
     if (url.includes('/articoli')) body = ARTICOLI
     else if (url.includes('/missing_items')) body = MISSING
-    else if (url.includes('/notes')) body = []
     else if (url.includes('/backups_barnode')) body = []
 
     await route.fulfill({

@@ -486,26 +486,6 @@ ul, ol {
   letter-spacing: 0.5px;
 }
 
-.settings-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 16px 18px;
-  background: var(--color-white);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-text);
-  margin-bottom: 12px;
-  transition: background-color 0.15s;
-}
-
-.settings-button:hover {
-  background-color: var(--color-cream-light);
-}
-
 .settings-big-button {
   width: 84%;
   min-height: 56px;
@@ -773,12 +753,6 @@ ul, ol {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.pin-modal-subtitle {
-  font-size: 14px;
-  color: var(--color-text-light);
-  text-align: center;
 }
 
 .pin-dots-row {
@@ -1272,11 +1246,6 @@ ul, ol {
   font-weight: 700;
   color: var(--color-green-dark);
   margin-bottom: 12px;
-}
-.recipe-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
 }
 .recipe-form-error { margin-bottom: 12px; }
 /* riga azioni: [cestino] a sx, Annulla + Salva a dx, tutto su una riga */

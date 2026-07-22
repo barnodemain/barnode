@@ -155,10 +155,6 @@ export function useArticoli() {
     }
   }
 
-  const findByName = (nome: string): Articolo | undefined => {
-    return articoli.find(a => a.nome.toLowerCase() === nome.toLowerCase())
-  }
-
   const searchArticoli = (query: string): Articolo[] => {
     if (!query.trim()) return []
     const lowerQuery = query.toLowerCase()
@@ -173,7 +169,6 @@ export function useArticoli() {
     createArticolo,
     updateArticolo,
     deleteArticolo,
-    findByName,
     searchArticoli,
     clearError: () => setError(null)
   }

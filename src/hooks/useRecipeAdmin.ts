@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { clearRecipesCache } from './useRecipes'
+import { createAndSaveCurrentSnapshot } from '../lib/backupService'
 import type { Cocktail, Preparation, RecipeIngredient } from '../types'
 
 // Payload editabili (senza id lato ingredienti: gli id vengono ricreati al save)
@@ -78,6 +79,7 @@ export function useRecipeAdmin() {
         if (ie) throw ie
       }
       clearRecipesCache()
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return cocktailId
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore salvataggio cocktail')
@@ -94,6 +96,7 @@ export function useRecipeAdmin() {
       const { error: e } = await sb.from('cocktails').delete().eq('id', id) // cascade sugli ingredienti
       if (e) throw e
       clearRecipesCache()
+      createAndSaveCurrentSnapshot().catch(err2 => console.error('Backup failed:', err2))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore eliminazione cocktail')
@@ -140,6 +143,7 @@ export function useRecipeAdmin() {
         if (ie) throw ie
       }
       clearRecipesCache()
+      createAndSaveCurrentSnapshot().catch(e => console.error('Backup failed:', e))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore salvataggio preparazione')
@@ -156,6 +160,7 @@ export function useRecipeAdmin() {
       const { error: e } = await sb.from('preparations').delete().eq('id', id)
       if (e) throw e
       clearRecipesCache()
+      createAndSaveCurrentSnapshot().catch(err2 => console.error('Backup failed:', err2))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore eliminazione preparazione')

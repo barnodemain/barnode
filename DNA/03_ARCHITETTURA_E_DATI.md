@@ -25,13 +25,13 @@
 
 ## Backup singleton
 - Un unico record attivo, ID fisso `00000000-0000-0000-0000-000000000001`.
-- Colonna `payload` JSONB: `{ articoli: [...], missing_items: [...] }`; `created_at` aggiornato a ogni snapshot.
+- Colonna `payload` JSONB (dal 2026-07-22 copre anche il ricettario): `{ articoli, missing_items, cocktails, cocktail_ingredients, preparations, preparation_ingredients }`; `created_at` aggiornato a ogni snapshot. Guard: se il DB risulta completamente vuoto (probabile errore di rete) lo snapshot NON viene sovrascritto.
 - Ogni operazione CRUD critica fa `upsert` su questo ID, sovrascrivendo lo snapshot. Altri record sono **legacy**.
-- Snapshot via `createAndSaveCurrentSnapshot()` (`src/lib/backupService.ts`), chiamato non-bloccante post-CRUD.
+- Snapshot via `createAndSaveCurrentSnapshot()` (`src/lib/backupService.ts`), chiamato non-bloccante post-CRUD da `useArticoli`, `useMissingItems`, `useConsolidation` **e `useRecipeAdmin`** (save/delete cocktail e preparazioni).
 
 ## RPC `restore_last_backup`
-- PL/pgSQL `security definer`. Prende l'ultimo backup con `articoli` non vuoto, svuota `missing_items` e `articoli`, reinserisce da `payload`. Ritorna conteggi.
-- Invocata dalla pagina Backup previa conferma utente. (SQL completo: nel codice/migrazioni Supabase, non duplicato qui.)
+- PL/pgSQL `security definer` (migrazione `20260722_backup_ricettario.sql`). Prende l'ultimo backup con `articoli` non vuoto; svuota e reinserisce `articoli`+`missing_items` e, **solo se il payload contiene le chiavi del ricettario**, anche le 4 tabelle ricette (ordine FK: preparations→cocktails→ingredienti). Snapshot vecchi senza ricette → le tabelle ricette restano intatte. Ritorna conteggi jsonb (ignorati dal client).
+- Invocata dalla pagina Backup previa conferma utente.
 
 ## Hook principali (`src/hooks/`)
 - `useArticoli`: `articoli[]`, `createArticolo`, `updateArticolo` (cascade su missing_items), `deleteArticolo`, `searchArticoli`.

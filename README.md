@@ -1,121 +1,74 @@
 # BARnode
 
-BARnode is an internal tool for cocktail bars to manage missing items (things to buy) and maintain a catalog of all drink products.
+App interna per bar/cocktail bar: lista della spesa (prodotti mancanti), catalogo prodotti e **ricettario digitale** (cocktail + preparazioni home-made), pensata per l'uso su smartphone durante il servizio. PWA installabile.
 
-## Features
+## Funzionalità
 
-- **Missing Items List**: Track items that need to be purchased
-- **Article Catalog**: Maintain a complete list of all drink products
-- **Text Import**: Bulk import articles from a plain text list
-- **Mobile-First Design**: Optimized for phones and tablets
+- **Home — Mancanti**: lista dei prodotti da comprare; si aggiunge via ricerca con suggerimenti.
+- **Archivio**: catalogo completo dei prodotti (crea/modifica/elimina, quick-add ai mancanti).
+- **Cocktail — Ricettario**: schede cocktail full-screen (ingredienti, dosi, metodo, garnish) + preparazioni home-made collegate (icona "ricetta" → bottom-sheet). Gestione completa dalla pagina stessa (matita/FAB, selector unità di misura e ghiaccio, editor procedimento a tutta pagina).
+- **Admin** (protetto da PIN): Analysis (nomi doppi/simili con consolidamento), Import da testo, Export .txt, Note (elenco prodotti copiabile), Backup con ripristino, gestione Ricettario.
+- **Backup automatico interno**: snapshot su DB di catalogo, mancanti e ricettario ad ogni modifica; ripristino dall'app (RPC `restore_last_backup`).
+- **Condivisione WhatsApp** del link dell'app.
+- **Mobile-first**: bottom-nav con safe-area, scroll-snap, ottimizzata per telefoni.
 
-## Tech Stack
+## Stack
 
-- React 18 + TypeScript
-- Vite (build tool)
-- React Router 6 (navigation)
-- Supabase (PostgreSQL database)
+- React 19 + TypeScript + Vite 7
+- React Router 7
+- Supabase (PostgreSQL + REST, RLS attive — vedi `supabase/migrations/`)
+- Playwright (test E2E) · ESLint
+- Deploy: Render (static site, autodeploy da `main`)
 
-## Getting Started
-
-### 1. Install Dependencies
+## Avvio locale
 
 ```bash
 npm install
+npm run dev        # http://localhost:5001
 ```
 
-### 2. Configure Supabase
+Serve un file `.env` nella root (vedi `.env.example`). Le variabili sono gestite centralmente via App Control; il client usa solo `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
 
-Create a `.env` file in the project root with your Supabase credentials:
-
-```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-You can find these values in your Supabase project settings under "API".
-
-### 3. Create Database Tables
-
-Run the following SQL in your Supabase SQL editor:
-
-```sql
--- Create articoli table (catalog of articles)
-CREATE TABLE articoli (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  nome TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create missing_items table (list of items to buy)
-CREATE TABLE missing_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  articolo_id UUID NOT NULL REFERENCES articoli(id) ON DELETE CASCADE,
-  articolo_nome TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create indexes for better performance
-CREATE INDEX idx_articoli_nome ON articoli(nome);
-CREATE INDEX idx_missing_items_articolo_id ON missing_items(articolo_id);
-
--- Enable Row Level Security (optional but recommended)
-ALTER TABLE articoli ENABLE ROW LEVEL SECURITY;
-ALTER TABLE missing_items ENABLE ROW LEVEL SECURITY;
-
--- Create policies for public access (since there's no auth)
-CREATE POLICY "Allow all operations on articoli" ON articoli FOR ALL USING (true);
-CREATE POLICY "Allow all operations on missing_items" ON missing_items FOR ALL USING (true);
-```
-
-### 4. Run the Development Server
+## Comandi
 
 ```bash
-npm run dev
+npm run dev       # sviluppo (porta 5001)
+npm run build     # typecheck + build di produzione in dist/
+npm run lint      # ESLint
+npm run test:e2e  # test Playwright (mobile + desktop)
+npm run preview   # anteprima della build (porta 5001)
 ```
 
-The app will be available at `http://localhost:5001`.
+## Database
 
-### 5. Build for Production
+Schema e policy RLS sono versionati in `supabase/migrations/` (migrazioni additive, da applicare in ordine nel SQL Editor di Supabase). Il seed del ricettario è in `supabase/seed/recipebook_seed.json`.
 
-```bash
-npm run build
-```
+Tabelle principali: `articoli`, `missing_items`, `cocktails`, `cocktail_ingredients`, `preparations`, `preparation_ingredients`, `ignored_pairs`, `backups_barnode` (snapshot singleton).
 
-The built files will be in the `dist` folder, ready to deploy as a static site.
-
-## Project Structure
+## Struttura
 
 ```
 src/
-├── components/       # Reusable UI components
-│   ├── BottomNav.tsx
-│   ├── FloatingActionButton.tsx
-│   └── Modal.tsx
-├── hooks/            # Custom React hooks
-│   ├── useArticoli.ts
-│   └── useMissingItems.ts
-├── lib/              # External service clients
-│   └── supabase.ts
-├── pages/            # Route pages
-│   ├── Home.tsx
-│   ├── Archivio.tsx
-│   ├── Settings.tsx
-│   └── ImportText.tsx
-├── types/            # TypeScript type definitions
-│   └── index.ts
-├── App.tsx           # Main app component with routing
-├── main.tsx          # Application entry point
-└── index.css         # Global styles
+├── components/        # UI riusabile (BottomNav, Modal, ConfirmationDialog, …)
+│   └── recipes/       # componenti del ricettario (schede, form, picker, editor)
+├── hooks/             # useArticoli, useMissingItems, useRecipes, useRecipeAdmin, …
+├── lib/               # supabase client, backupService, normalize, analysisGrouping, recipeFormat
+├── pages/             # route (Home, Archivio, Cocktail, Settings, Analysis, …)
+└── types/             # tipi condivisi
+DNA/                   # documentazione operativa canonica (indice: DNA/00)
+supabase/              # migrazioni SQL + seed
+tests/                 # E2E Playwright
 ```
 
-## Routes
+## Route
 
-- `/` - Home: Missing items list
-- `/archivio` - Archive: Full catalog of articles
-- `/settings` - Settings page
-- `/settings/import/text` - Import articles from text
+- `/` Home (mancanti) · `/archivio` Catalogo · `/cocktail` Ricettario
+- `/settings` Admin con PIN → `/settings/{analysis,import/text,backup,notes,recipes}`
 
-## License
+## Documentazione
 
-Private - Internal use only
+Il contesto operativo per lo sviluppo (regole, architettura, flussi, decision log) è in `DNA/` — partire da `DNA/00_INDICE.md`. Il codice è l'unica fonte di verità; il DNA si aggiorna insieme al codice.
+
+## Licenza
+
+Privata — uso interno.
