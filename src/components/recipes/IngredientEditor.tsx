@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { IoAddOutline, IoTrashOutline, IoClose } from 'react-icons/io5'
-import { normalizeForCompare } from '../../lib/analysisGrouping'
+import { IoAddOutline, IoTrashOutline } from 'react-icons/io5'
 import { RECIPE_UNITS } from '../../lib/recipeFormat'
+import PreparationPicker from './PreparationPicker'
 import type { EditableIngredient } from '../../hooks/useRecipeAdmin'
 import type { Preparation } from '../../types'
 
@@ -20,7 +20,6 @@ interface Props {
 // Da lì in poi è un ingrediente come gli altri.
 function IngredientEditor({ ingredienti, onChange, preparations }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [pickerQuery, setPickerQuery] = useState('')
 
   const update = (idx: number, field: keyof EditableIngredient, value: string) => {
     const next = ingredienti.map((ing, i) => i === idx ? { ...ing, [field]: value } : ing)
@@ -33,22 +32,9 @@ function IngredientEditor({ ingredienti, onChange, preparations }: Props) {
   const addPreparation = (prep: Preparation) => {
     onChange([...ingredienti, { nome: prep.nome, misura: '', unita: '', preparationId: prep.id }])
     setPickerOpen(false)
-    setPickerQuery('')
   }
 
   const canAddPrep = !!preparations && preparations.length > 0
-
-  const q = normalizeForCompare(pickerQuery)
-  const filteredPreps = (!preparations ? [] : (
-    !q ? preparations
-      : preparations.filter(p =>
-          normalizeForCompare(p.nome).includes(q) ||
-          (p.categoria && normalizeForCompare(p.categoria).includes(q))
-        )
-  ))
-    // sempre in ordine alfabetico
-    .slice()
-    .sort((a, b) => a.nome.localeCompare(b.nome, 'it', { sensitivity: 'base' }))
 
   return (
     <div className="ing-editor">
@@ -92,50 +78,18 @@ function IngredientEditor({ ingredienti, onChange, preparations }: Props) {
           <IoAddOutline size={18} /> Ingrediente
         </button>
         {canAddPrep && (
-          <button className="ing-editor-add ing-editor-add-prep" onClick={() => { setPickerOpen(true); setPickerQuery('') }} type="button">
+          <button className="ing-editor-add ing-editor-add-prep" onClick={() => setPickerOpen(true)} type="button">
             <IoAddOutline size={18} /> Preparazione
           </button>
         )}
       </div>
 
-      {/* Elenco preparazioni (bottom-sheet) */}
-      {pickerOpen && (
-        <div className="sheet-overlay" onClick={() => setPickerOpen(false)}>
-          <div className="sheet-panel prep-picker" onClick={e => e.stopPropagation()}>
-            <div className="sheet-handle" />
-            <button className="sheet-close" onClick={() => setPickerOpen(false)} aria-label="Chiudi">
-              <IoClose size={24} />
-            </button>
-            <h3 className="prep-picker-title">Aggiungi preparazione</h3>
-            <div className="search-container prep-picker-search">
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Cerca preparazione…"
-                value={pickerQuery}
-                onChange={e => setPickerQuery(e.target.value)}
-              />
-            </div>
-            <div className="prep-picker-list">
-              {filteredPreps.length === 0 ? (
-                <p className="prep-picker-empty">Nessuna preparazione trovata</p>
-              ) : (
-                filteredPreps.map(p => (
-                  <button
-                    key={p.id}
-                    className="prep-picker-item"
-                    type="button"
-                    // onPointerDown (non onClick): scatta al primo contatto, prima che il
-                    // blur della tastiera/ricerca "consumi" il tap → niente doppio tocco su mobile
-                    onPointerDown={e => { e.preventDefault(); addPreparation(p) }}
-                  >
-                    <span className="prep-picker-item-name">{p.nome}</span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
+      {pickerOpen && preparations && (
+        <PreparationPicker
+          preparations={preparations}
+          onPick={addPreparation}
+          onClose={() => setPickerOpen(false)}
+        />
       )}
     </div>
   )

@@ -1116,6 +1116,16 @@ ul, ol {
   color: var(--color-text);
   font-style: italic;
 }
+/* garnish che cita una preparazione: tappabile, icona ricetta a fine testo */
+.cocktail-garnish-value.linked {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-green-dark);
+  font-weight: 600;
+}
+.cocktail-garnish-value.linked .ingredient-link-icon { font-style: normal; }
 
 /* ---- Preparazioni: gruppi per categoria ---- */
 .prep-list-scroll {
@@ -1228,18 +1238,6 @@ ul, ol {
 .sheet-edit:active { background: var(--color-gray-light); }
 
 .prep-detail-head { margin-bottom: 14px; padding-right: 88px; }
-.prep-category-chip {
-  display: inline-block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 700;
-  color: var(--color-white);
-  background: var(--color-green-light);
-  border-radius: 20px;
-  padding: 3px 10px;
-  margin-bottom: 8px;
-}
 .prep-detail-title {
   font-size: 22px;
   font-weight: 700;
@@ -1282,6 +1280,66 @@ ul, ol {
 }
 .recipe-form-error { margin-bottom: 12px; }
 /* riga azioni: [cestino] a sx, Annulla + Salva a dx, tutto su una riga */
+/* Box "apri editor" al posto della textarea: mostra un'anteprima del testo e,
+   al tap, apre l'editor a tutta pagina (.text-editor-overlay). */
+.textarea-open {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 88px;
+  max-height: 140px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.textarea-open-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-line;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+.textarea-open-placeholder { color: var(--color-gray); }
+
+/* Editor testo a tutta pagina */
+.text-editor-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* sopra il form (modal-overlay ~1000) e i bottom-sheet */
+  background: var(--color-cream-light);
+  display: flex;
+  flex-direction: column;
+}
+.text-editor-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: max(12px, env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+}
+.text-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 12px;
+}
+.text-editor-title { font-weight: 700; color: var(--color-text); }
+.text-editor-cancel { color: var(--color-text-light); font-size: 15px; padding: 6px 4px; }
+.text-editor-done { color: var(--color-green-dark); font-weight: 700; font-size: 15px; padding: 6px 4px; }
+.text-editor-area {
+  flex: 1;
+  width: 100%;
+  resize: none;
+  border: 1px solid var(--color-gray-light);
+  border-radius: var(--radius-input);
+  background: var(--color-white);
+  padding: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
 .recipe-form-actions {
   display: flex;
   align-items: center;
@@ -1393,6 +1451,67 @@ ul, ol {
   color: var(--color-white);
 }
 .ing-editor-add-prep:active { background: var(--color-green-dark); }
+
+/* Bottone "+ Preparazione" sotto il campo garnish: compatto, attaccato al campo. */
+.garnish-add-prep {
+  display: inline-flex;
+  width: fit-content; /* si adatta al contenuto (sovrascrive flex:1 ereditato da .ing-editor-add) */
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  margin-bottom: 20px;
+}
+
+/* Campo garnish: contenitore che sembra .modal-input (bordo bianco) e ospita
+   inline la preparazione (pillola verde non modificabile) + il testo libero. */
+.garnish-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-light);
+  border-radius: var(--radius-input);
+  margin-bottom: 20px;
+}
+.garnish-field:focus-within { border-color: var(--color-green-light); }
+/* preparazione inline: testo verde, senza contorno, con solo la × alla fine */
+.garnish-prep-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-green-dark);
+  font-weight: 700;
+  font-size: 16px;
+  max-width: 100%;
+}
+.garnish-prep-inline-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.garnish-prep-inline-remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--color-green-dark);
+}
+.garnish-prep-inline-remove:active { background: rgba(45, 90, 39, 0.12); }
+/* input testo libero: nessun bordo/sfondo, scorre accanto alla pillola */
+.garnish-input-inline {
+  flex: 1 1 80px;
+  min-width: 80px;
+  border: none;
+  background: transparent;
+  padding: 4px 0;
+  font-size: 16px;
+  color: var(--color-text);
+}
 
 /* Selettore preparazioni (bottom-sheet dentro il form cocktail).
    Eredita .sheet-overlay (z-index 1000) → appare sopra il modale del form. */

@@ -1,27 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { IoSearch, IoTrashOutline } from 'react-icons/io5'
-import Modal from '../components/Modal'
-import FloatingActionButton from '../components/FloatingActionButton'
 import ShareWhatsAppButton from '../components/ShareWhatsAppButton'
 import { useArticoli } from '../hooks/useArticoli'
 import { useMissingItems } from '../hooks/useMissingItems'
-import { normalizeArticleName } from '../lib/normalize'
 import type { Articolo } from '../types'
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [newItemName, setNewItemName] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const searchContainerRef = useRef<HTMLDivElement>(null)
-  
-  const { 
-    loading: articoliLoading, 
+
+  const {
+    loading: articoliLoading,
     error: articoliError,
-    createArticolo,
-    searchArticoli,
-    findByName
+    searchArticoli
   } = useArticoli()
   
   const { 
@@ -56,25 +48,6 @@ function Home() {
 
   const handleRemoveItem = async (id: string) => {
     await removeMissingItem(id)
-  }
-
-  const handleAddNewItem = async () => {
-    if (!newItemName.trim()) return
-    
-    setIsSubmitting(true)
-    try {
-      const normalizedName = normalizeArticleName(newItemName)
-      let articolo: Articolo | null | undefined = findByName(normalizedName)
-      
-      if (!articolo) {
-        articolo = await createArticolo(normalizedName)
-      }
-      
-      setNewItemName('')
-      setIsModalOpen(false)
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   const loading = articoliLoading || missingLoading
@@ -150,45 +123,6 @@ function Home() {
           </div>
         )}
       </div>
-
-      <FloatingActionButton onClick={() => setIsModalOpen(true)} />
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setNewItemName('')
-        }}
-        title="Aggiungi articolo"
-      >
-        <label className="modal-input-label">Nome articolo</label>
-        <input
-          type="text"
-          className="modal-input"
-          value={newItemName}
-          onChange={(e) => setNewItemName(e.target.value)}
-          placeholder="Es. Vodka Premium"
-          autoFocus
-        />
-        <div className="modal-buttons">
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              setIsModalOpen(false)
-              setNewItemName('')
-            }}
-          >
-            Annulla
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={handleAddNewItem}
-            disabled={isSubmitting || !newItemName.trim()}
-          >
-            {isSubmitting ? '...' : 'Conferma'}
-          </button>
-        </div>
-      </Modal>
     </div>
   )
 }

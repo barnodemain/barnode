@@ -1,10 +1,12 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from 'react'
-import { IoTrashOutline } from 'react-icons/io5'
+import { IoTrashOutline, IoAddOutline, IoClose } from 'react-icons/io5'
 import { useRecipeAdmin } from '../../hooks/useRecipeAdmin'
 import type { EditableIngredient } from '../../hooks/useRecipeAdmin'
 import IngredientEditor from './IngredientEditor'
+import PreparationPicker from './PreparationPicker'
+import FullscreenTextEditor from './FullscreenTextEditor'
 import ConfirmationDialog from '../ConfirmationDialog'
-import { RECIPE_ICE } from '../../lib/recipeFormat'
+import { RECIPE_ICE, splitGarnish, joinGarnish } from '../../lib/recipeFormat'
 import type { Cocktail, Preparation } from '../../types'
 
 const PREP_CATEGORIES = ['sciroppo', 'cordiale', 'shrub', 'soda', 'estratto', 'infusione', 'aria', 'prebatch', 'altro']
@@ -30,6 +32,13 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
   const [editCocktail, setEditCocktail] = useState<Cocktail | null | 'new'>(null)
   const [cForm, setCForm] = useState({ nome: '', bicchiere: '', ghiaccio: '', metodo: '', garnish: '' })
   const [cIngs, setCIngs] = useState<EditableIngredient[]>([])
+  // picker preparazione per il campo garnish
+  const [garnishPickerOpen, setGarnishPickerOpen] = useState(false)
+  // preparazione collegata al garnish: mostrata come chip NON modificabile (solo eliminabile).
+  // Il campo cForm.garnish contiene solo il testo libero; al salvataggio si ricompongono insieme.
+  const [garnishPrep, setGarnishPrep] = useState<Preparation | null>(null)
+  // editor testo a tutta pagina (per il Procedimento della preparazione)
+  const [textEditor, setTextEditor] = useState<null | 'procedimento'>(null)
 
   const [editPrep, setEditPrep] = useState<Preparation | null | 'new'>(null)
   const [pForm, setPForm] = useState({ nome: '', categoria: '', procedimento: '' })
@@ -43,21 +52,26 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
   // snapshot dei valori all'apertura del form: serve a capire se l'utente ha modificato qualcosa
   const cSnapshot = useRef('')
   const pSnapshot = useRef('')
-  const snapCocktail = (form: typeof cForm, ings: EditableIngredient[]) => JSON.stringify({ form, ings })
+  const snapCocktail = (form: typeof cForm, ings: EditableIngredient[], prep: Preparation | null) => JSON.stringify({ form, ings, prepId: prep?.id ?? null })
   const snapPrep = (form: typeof pForm, ings: EditableIngredient[]) => JSON.stringify({ form, ings })
 
   const openCocktail = (c: Cocktail | 'new') => {
     let form, ings: EditableIngredient[]
+    let prep: Preparation | null = null
     if (c === 'new') {
       form = { nome: '', bicchiere: '', ghiaccio: '', metodo: '', garnish: '' }
       ings = [{ nome: '', misura: '', unita: '' }]
     } else {
-      form = { nome: c.nome, bicchiere: c.bicchiere || '', ghiaccio: c.ghiaccio || '', metodo: c.metodo || '', garnish: c.garnish || '' }
+      // separo il garnish: la preparazione citata diventa chip, il resto è testo libero
+      const split = splitGarnish(c.garnish, preparations || [])
+      prep = split.prep
+      form = { nome: c.nome, bicchiere: c.bicchiere || '', ghiaccio: c.ghiaccio || '', metodo: c.metodo || '', garnish: split.rest }
       ings = admin.toEditable(c.ingredienti)
     }
     setCForm(form)
     setCIngs(ings)
-    cSnapshot.current = snapCocktail(form, ings)
+    setGarnishPrep(prep)
+    cSnapshot.current = snapCocktail(form, ings, prep)
     setEditCocktail(c)
   }
 
@@ -79,7 +93,7 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
   useImperativeHandle(ref, () => ({ openCocktail, openPrep }))
 
   // ci sono modifiche non salvate?
-  const isCocktailDirty = () => snapCocktail(cForm, cIngs) !== cSnapshot.current
+  const isCocktailDirty = () => snapCocktail(cForm, cIngs, garnishPrep) !== cSnapshot.current
   const isPrepDirty = () => snapPrep(pForm, pIngs) !== pSnapshot.current
 
   // chiusura dall'esterno (tap fuori dal modale): se ci sono modifiche, chiedi conferma
@@ -100,7 +114,9 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
 
   const saveCocktail = async () => {
     const existing = editCocktail === 'new' ? undefined : editCocktail || undefined
-    const savedId = await admin.saveCocktail({ ...cForm, ingredienti: cIngs }, existing)
+    // ricompongo il garnish: nome della preparazione collegata + testo libero
+    const garnish = joinGarnish(garnishPrep?.nome, cForm.garnish)
+    const savedId = await admin.saveCocktail({ ...cForm, garnish, ingredienti: cIngs }, existing)
     if (savedId) { setEditCocktail(null); await onSaved(savedId) }
   }
   const savePrep = async () => {
@@ -160,7 +176,32 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
             <label className="modal-input-label">Metodo</label>
             <textarea className="modal-input" rows={3} value={cForm.metodo} onChange={e => setCForm({ ...cForm, metodo: e.target.value })} />
             <label className="modal-input-label">Garnish</label>
-            <input className="modal-input" value={cForm.garnish} onChange={e => setCForm({ ...cForm, garnish: e.target.value })} />
+            {/* Il campo garnish è un contenitore che ospita, inline: la preparazione
+                collegata come pillola verde NON modificabile (testo verde + ×, senza
+                icona) e, accanto, l'input di testo libero. Così l'utente scrive prima
+                o dopo la preparazione, e il nome non è alterabile (solo rimuovibile). */}
+            <div className="garnish-field">
+              {garnishPrep && (
+                <span className="garnish-prep-inline">
+                  <span className="garnish-prep-inline-name">{garnishPrep.nome}</span>
+                  <button type="button" className="garnish-prep-inline-remove" onClick={() => setGarnishPrep(null)} aria-label="Rimuovi preparazione">
+                    <IoClose size={15} />
+                  </button>
+                </span>
+              )}
+              <input
+                className="garnish-input-inline"
+                value={cForm.garnish}
+                onChange={e => setCForm({ ...cForm, garnish: e.target.value })}
+                placeholder={garnishPrep ? '' : 'Garnish…'}
+              />
+            </div>
+            {/* il bottone appare solo se non c'è già una preparazione collegata (una per garnish) */}
+            {!garnishPrep && preparations && preparations.length > 0 && (
+              <button type="button" className="ing-editor-add ing-editor-add-prep garnish-add-prep" onClick={() => setGarnishPickerOpen(true)}>
+                <IoAddOutline size={18} /> Preparazione
+              </button>
+            )}
             <div className="recipe-form-actions">
               {editCocktail !== 'new' && (
                 <button className="btn recipe-form-delete" onClick={() => setConfirmDelete('cocktail')} disabled={admin.saving} type="button" aria-label="Elimina cocktail">
@@ -190,7 +231,12 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
             <label className="modal-input-label">Ingredienti</label>
             <IngredientEditor ingredienti={pIngs} onChange={setPIngs} />
             <label className="modal-input-label">Procedimento</label>
-            <textarea className="modal-input" rows={4} value={pForm.procedimento} onChange={e => setPForm({ ...pForm, procedimento: e.target.value })} />
+            {/* box cliccabile: apre l'editor a tutta pagina per gestire meglio il testo lungo */}
+            <button type="button" className="modal-input textarea-open" onClick={() => setTextEditor('procedimento')}>
+              {pForm.procedimento
+                ? <span className="textarea-open-text">{pForm.procedimento}</span>
+                : <span className="textarea-open-placeholder">Tocca per scrivere il procedimento…</span>}
+            </button>
             <div className="recipe-form-actions">
               {editPrep !== 'new' && (
                 <button className="btn recipe-form-delete" onClick={() => setConfirmDelete('prep')} disabled={admin.saving} type="button" aria-label="Elimina preparazione">
@@ -204,6 +250,28 @@ const RecipeForms = forwardRef<RecipeFormsHandle, Props>(({ onSaved, preparation
             </div>
           </div>
         </div>
+      )}
+
+      {garnishPickerOpen && preparations && (
+        <PreparationPicker
+          preparations={preparations}
+          onPick={prep => {
+            // la preparazione scelta diventa il chip non modificabile (non testo libero)
+            setGarnishPrep(prep)
+            setGarnishPickerOpen(false)
+          }}
+          onClose={() => setGarnishPickerOpen(false)}
+        />
+      )}
+
+      {textEditor === 'procedimento' && (
+        <FullscreenTextEditor
+          title="Procedimento"
+          value={pForm.procedimento}
+          placeholder="Scrivi il procedimento…"
+          onConfirm={val => { setPForm({ ...pForm, procedimento: val }); setTextEditor(null) }}
+          onCancel={() => setTextEditor(null)}
+        />
       )}
 
       <ConfirmationDialog

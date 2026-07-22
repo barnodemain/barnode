@@ -9,7 +9,6 @@ function PreparationDetail({ preparation: p }: Props) {
   return (
     <div className="prep-detail">
       <div className="prep-detail-head">
-        {p.categoria && <span className="prep-category-chip">{p.categoria}</span>}
         <h2 className="prep-detail-title">{p.nome}</h2>
       </div>
 

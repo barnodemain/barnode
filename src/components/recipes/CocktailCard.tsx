@@ -1,6 +1,6 @@
 import { LuPencilLine } from 'react-icons/lu'
 import { IoDocumentTextOutline } from 'react-icons/io5'
-import { formatDose } from '../../lib/recipeFormat'
+import { formatDose, findPreparationInText } from '../../lib/recipeFormat'
 import type { Cocktail, Preparation } from '../../types'
 
 interface Props {
@@ -73,12 +73,23 @@ function CocktailCard({ cocktail, prepById, onOpenPreparation, onEdit }: Props) 
           </div>
         )}
 
-        {c.garnish && (
-          <div className="cocktail-garnish">
-            <span className="cocktail-garnish-label">Garnish</span>
-            <span className="cocktail-garnish-value">{c.garnish}</span>
-          </div>
-        )}
+        {c.garnish && (() => {
+          const garnishPrep = findPreparationInText(c.garnish, Array.from(prepById.values()))
+          return (
+            <div className="cocktail-garnish">
+              <span className="cocktail-garnish-label">Garnish</span>
+              <span
+                className={`cocktail-garnish-value ${garnishPrep ? 'linked' : ''}`}
+                onClick={garnishPrep ? () => onOpenPreparation(garnishPrep) : undefined}
+              >
+                {c.garnish}
+                {garnishPrep && (
+                  <IoDocumentTextOutline className="ingredient-link-icon" aria-label="Vedi ricetta" />
+                )}
+              </span>
+            </div>
+          )
+        })()}
       </div>
     </div>
   )
